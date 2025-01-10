@@ -4,56 +4,88 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
-    <left>
-        <VBox fx:id="menuBox" alignment="TOP_CENTER" spacing="10">
-         <Label text="Jayuwoki ">
-            <font>
-               <Font size="25.0" />
-            </font>
-         </Label>
-            <Button maxWidth="1.7976931348623157E308" text="Home" />
-         <Separator />
-            <Button maxWidth="1.7976931348623157E308" text="About" />
-         <Separator />
-            <Button maxWidth="1.7976931348623157E308" text="Contact" />
-         <Label text="Copyright © | All rights reserved">
-            <VBox.margin>
-               <Insets top="100.0" />
-            </VBox.margin>
-         </Label>
-         <Button mnemonicParsing="false" onAction="#onChangeTheme">
-            <graphic>
-               <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
-            </graphic>
-         </Button>
-         <BorderPane.margin>
+
+<SplitPane fx:id="root" dividerPositions="0.3" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+   <items>
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+          <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" vgrow="NEVER" />
+        </rowConstraints>
+         <children>
+            <Label text="Jayuwoki ">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+            <Button mnemonicParsing="false" onAction="#onCollapseAction" GridPane.columnIndex="1">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <graphic>
+                  <FontIcon iconLiteral="mdi2a-arrow-collapse-left" iconSize="10" text="󰞓" />
+               </graphic>
+            </Button>
+               <Button maxWidth="1.7976931348623157E308" onAction="#onConnectAction" text="Connect" GridPane.rowIndex="1" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onSettingsAction" text="Settings" GridPane.rowIndex="3" />
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogsAction" text="Logs" GridPane.rowIndex="5" />
+               <Button maxWidth="1.7976931348623157E308" onAction="#onAboutAction" text="About" GridPane.rowIndex="7" />
+               <Button maxWidth="1.7976931348623157E308" onAction="#onContactAction" text="Contact" GridPane.rowIndex="9" />
+            <Label prefHeight="32.0" prefWidth="171.0" text="Copyright © | All rights reserved" GridPane.rowIndex="11" />
+            <Button mnemonicParsing="false" onAction="#onChangeTheme" GridPane.rowIndex="12">
+               <graphic>
+                  <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
+               </graphic>
+            </Button>
+            <Separator prefWidth="200.0" GridPane.rowIndex="2" />
+            <Separator prefWidth="200.0" GridPane.rowIndex="4" />
+            <Separator prefWidth="200.0" GridPane.rowIndex="6" />
+            <Separator prefWidth="200.0" GridPane.rowIndex="8" />
+            <Separator prefWidth="200.0" GridPane.rowIndex="10" />
+         </children>
+         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </BorderPane.margin>
-        </VBox>
-    </left>
-    <center>
+         </padding>
+      </GridPane>
         <StackPane fx:id="contentPane">
-         <BorderPane.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </BorderPane.margin>
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/placeholder.jpg" />
                </image>
             </ImageView>
-         </children></StackPane>
-    </center>
+         </children>
+         <padding>
+            <Insets left="5.0" />
+         </padding>
+      </StackPane>
+   </items>
    <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
-</BorderPane>
+</SplitPane>

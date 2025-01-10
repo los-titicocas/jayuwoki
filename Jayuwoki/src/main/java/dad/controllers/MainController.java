@@ -8,11 +8,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -22,10 +21,7 @@ public class MainController implements Initializable{
     private StackPane contentPane;
 
     @FXML
-    private VBox menuBox;
-
-    @FXML
-    private BorderPane root;
+    private SplitPane root;
 
     public MainController() {
         try {
@@ -42,6 +38,42 @@ public class MainController implements Initializable{
 
     }
 
+    // side menu actions
+
+    @FXML
+    void onCollapseAction(ActionEvent event) {
+        if (root.getDividerPositions() != null && root.getDividerPositions()[0] > 0.2) {
+            root.setDividerPositions(0);
+        } else if(root.getDividerPositions() != null && root.getDividerPositions()[0] < 0.2) {
+            root.setDividerPositions(0.3);
+        }
+    }
+
+    @FXML
+    void onAboutAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onConnectAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onContactAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onLogsAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void onSettingsAction(ActionEvent event) {
+
+    }
+
     @FXML
     void onChangeTheme(ActionEvent event) {
         if (Application.getUserAgentStylesheet().equals(new PrimerDark().getUserAgentStylesheet())) {
@@ -52,7 +84,7 @@ public class MainController implements Initializable{
 
     }
 
-    public BorderPane getRoot() {
+    public SplitPane getRoot() {
         return root;
     }
 
