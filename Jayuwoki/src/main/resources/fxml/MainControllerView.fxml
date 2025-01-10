@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+    <left>
+        <VBox fx:id="menuBox" alignment="TOP_CENTER" spacing="10">
+         <Label text="Jayuwoki ">
+            <font>
+               <Font size="25.0" />
+            </font>
+         </Label>
+            <Button maxWidth="1.7976931348623157E308" text="Home" />
+         <Separator />
+            <Button maxWidth="1.7976931348623157E308" text="About" />
+         <Separator />
+            <Button maxWidth="1.7976931348623157E308" text="Contact" />
+         <Label text="Copyright © | All rights reserved">
+            <VBox.margin>
+               <Insets top="100.0" />
+            </VBox.margin>
+         </Label>
+         <Button mnemonicParsing="false" onAction="#onChangeTheme">
+            <graphic>
+               <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
+            </graphic>
+         </Button>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+        </VBox>
+    </left>
+    <center>
+        <StackPane fx:id="contentPane">
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/placeholder.jpg" />
+               </image>
+            </ImageView>
+         </children></StackPane>
+    </center>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</BorderPane>

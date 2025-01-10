@@ -1,6 +1,7 @@
 package dad.app;
 
 import atlantafx.base.theme.Dracula;
+import atlantafx.base.theme.PrimerDark;
 import dad.controllers.LoginController;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -13,7 +14,7 @@ public class JayuwokiApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 
         Scene scene = new Scene(loginController.getRoot());
         Stage stage = new Stage();
