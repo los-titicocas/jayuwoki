@@ -19,10 +19,9 @@
 <?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
 <StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane prefHeight="200.0" prefWidth="200.0">
+      <BorderPane fx:id="borderPaneRoot" prefHeight="200.0" prefWidth="200.0">
          <bottom>
             <ButtonBar buttonMinWidth="30.0" maxHeight="-Infinity" maxWidth="-Infinity" BorderPane.alignment="BOTTOM_RIGHT">
                <buttons>
@@ -115,7 +114,10 @@
             <VBox fx:id="connectBox" alignment="CENTER" layoutX="188.0" layoutY="4.800000190734863" spacing="10.0" AnchorPane.leftAnchor="188.0" AnchorPane.topAnchor="5.0">
                <children>
                   <TextFlow fx:id="connectInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/bochudin.png" />
+                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -126,7 +128,10 @@
             <VBox fx:id="settingsBox" alignment="CENTER" layoutX="188.0" layoutY="46.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
                <children>
                   <TextFlow fx:id="settingsInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/bochudin.png" />
+                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -137,7 +142,10 @@
             <VBox fx:id="logsBox" alignment="CENTER" layoutX="188.0" layoutY="89.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
                <children>
                   <TextFlow fx:id="logsInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/bochudin.png" />
+                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -148,7 +156,10 @@
             <VBox fx:id="aboutBox" alignment="CENTER" layoutX="188.0" layoutY="128.0" spacing="10.0">
                <children>
                   <TextFlow fx:id="aboutInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/bochudin.png" />
+                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -159,7 +170,10 @@
             <VBox fx:id="contactBox" alignment="CENTER" layoutX="188.0" layoutY="170.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
                <children>
                   <TextFlow fx:id="contactInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/bochudin.png" />
+                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />

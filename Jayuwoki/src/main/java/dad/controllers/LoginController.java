@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class LoginController implements Initializable {
 
@@ -29,6 +30,7 @@ public class LoginController implements Initializable {
         MainController mainController = new MainController();
         Scene scene = new Scene(mainController.getRoot());
         Stage mainStage = new Stage();
+        mainStage.initStyle(StageStyle.UNDECORATED);
         mainStage.setTitle("JayuwokiBot");
         mainStage.setScene(scene);
         mainStage.show();
@@ -37,7 +39,7 @@ public class LoginController implements Initializable {
     @FXML
     void onLinkAction(ActionEvent event) {
         try {
-            Desktop.getDesktop().browse(new URL("http://www.github.com/dam-dad/jayuwoki").toURI());
+            Desktop.getDesktop().browse(new URL("https://www.github.com/dam-dad/jayuwoki").toURI());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,7 +57,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        root.setTop(new CustomTitleBar().getRoot());
     }
 
     public BorderPane getRoot() {
