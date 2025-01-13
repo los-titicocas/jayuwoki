@@ -11,9 +11,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 public class MainController implements Initializable{
 
@@ -21,7 +21,13 @@ public class MainController implements Initializable{
     private StackPane contentPane;
 
     @FXML
-    private SplitPane root;
+    private BorderPane root;
+
+    @FXML
+    private SplitPane splitPaneRoot;
+
+    @FXML
+    private Button tutorialButton;
 
     public MainController() {
         try {
@@ -35,17 +41,25 @@ public class MainController implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //loadContent("/fxml/DashboardView.fxml"); example to load a menu by default
 
+        onCollapsedMenu();
+    }
+
+    // adds a listener to the tutorial button to disable it while the menu is collapsed
+    private void onCollapsedMenu() {
+        splitPaneRoot.getDividers().getFirst().positionProperty().addListener((obs, oldVal, newVal) -> {
+            tutorialButton.setDisable(newVal.doubleValue() < 0.2);
+        });
     }
 
     // side menu actions
-
     @FXML
     void onCollapseAction(ActionEvent event) {
-        if (root.getDividerPositions() != null && root.getDividerPositions()[0] > 0.2) {
-            root.setDividerPositions(0);
-        } else if(root.getDividerPositions() != null && root.getDividerPositions()[0] < 0.2) {
-            root.setDividerPositions(0.3);
+        if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] > 0.2) {
+            splitPaneRoot.setDividerPositions(0);
+        } else if(splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] < 0.2) {
+            splitPaneRoot.setDividerPositions(0.3);
         }
     }
 
@@ -75,6 +89,11 @@ public class MainController implements Initializable{
     }
 
     @FXML
+    void onTutorialAction(ActionEvent event) {
+
+    }
+
+    @FXML
     void onChangeTheme(ActionEvent event) {
         if (Application.getUserAgentStylesheet().equals(new PrimerDark().getUserAgentStylesheet())) {
             Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
@@ -82,10 +101,6 @@ public class MainController implements Initializable{
             Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         }
 
-    }
-
-    public SplitPane getRoot() {
-        return root;
     }
 
     // allows to load the content of the main window
@@ -96,5 +111,29 @@ public class MainController implements Initializable{
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public StackPane getContentPane() {
+        return contentPane;
+    }
+
+    public void setContentPane(StackPane contentPane) {
+        this.contentPane = contentPane;
+    }
+
+    public BorderPane getRoot() {
+        return root;
+    }
+
+    public void setRoot(BorderPane root) {
+        this.root = root;
+    }
+
+    public SplitPane getSplitPaneRoot() {
+        return splitPaneRoot;
+    }
+
+    public void setSplitPaneRoot(SplitPane splitPaneRoot) {
+        this.splitPaneRoot = splitPaneRoot;
     }
 }
