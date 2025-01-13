@@ -8,106 +8,169 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <SplitPane fx:id="splitPaneRoot" dividerPositions="0.3" prefHeight="400.0" prefWidth="800.0">
-         <items>
-            <GridPane>
-              <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
-                  <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="1.7976931348623157E308" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
-                  <RowConstraints minHeight="10.0" vgrow="NEVER" />
-              </rowConstraints>
-               <children>
-                  <Label text="Jayuwoki ">
-                     <font>
-                        <Font size="20.0" />
-                     </font>
-                  </Label>
-                  <Button mnemonicParsing="false" onAction="#onCollapseAction" GridPane.columnIndex="1">
-                     <GridPane.margin>
-                        <Insets />
-                     </GridPane.margin>
+
+<StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <bottom>
+            <ButtonBar buttonMinWidth="30.0" maxHeight="-Infinity" maxWidth="-Infinity" BorderPane.alignment="BOTTOM_RIGHT">
+               <buttons>
+                  <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onChangeTheme" prefWidth="30.0">
                      <graphic>
-                        <FontIcon iconLiteral="mdi2a-arrow-collapse-left" iconSize="10" text="󰞓" />
+                        <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
                      </graphic>
                   </Button>
-                     <Button maxWidth="1.7976931348623157E308" onAction="#onConnectAction" text="Connect" GridPane.rowIndex="1" />
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onSettingsAction" text="Settings" GridPane.rowIndex="3" />
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogsAction" text="Logs" GridPane.rowIndex="5" />
-                     <Button maxWidth="1.7976931348623157E308" onAction="#onAboutAction" text="About" GridPane.rowIndex="7" />
-                     <Button maxWidth="1.7976931348623157E308" onAction="#onContactAction" text="Contact" GridPane.rowIndex="9" />
-                  <Separator prefWidth="200.0" GridPane.rowIndex="2" />
-                  <Separator prefWidth="200.0" GridPane.rowIndex="4" />
-                  <Separator prefWidth="200.0" GridPane.rowIndex="6" />
-                  <Separator prefWidth="200.0" GridPane.rowIndex="8" />
-                  <Separator prefWidth="200.0" GridPane.rowIndex="10" />
-               </children>
+                  <Button fx:id="tutorialButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onTutorialAction" prefWidth="30.0">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2a-account-question" iconSize="20" />
+                     </graphic>
+                  </Button>
+               </buttons>
+            </ButtonBar>
+         </bottom>
+         <center>
+            <SplitPane fx:id="splitPaneRoot" dividerPositions="0.3" prefHeight="400.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+               <items>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="1.7976931348623157E308" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="50.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="NEVER" />
+                        <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                     </rowConstraints>
+                     <children>
+                        <Label text="Jayuwoki ">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
+                        <Button mnemonicParsing="false" onAction="#onCollapseAction" GridPane.columnIndex="1">
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                           <graphic>
+                              <FontIcon iconLiteral="mdi2a-arrow-collapse-left" iconSize="10" text="󰞓" />
+                           </graphic>
+                        </Button>
+                        <Button fx:id="connectButton" maxWidth="1.7976931348623157E308" onAction="#onConnectAction" text="Connect" GridPane.rowIndex="1" />
+                        <Button fx:id="settingsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onSettingsAction" text="Settings" GridPane.rowIndex="3" />
+                        <Button fx:id="logButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogsAction" text="Logs" GridPane.rowIndex="5" />
+                        <Button fx:id="aboutButton" maxWidth="1.7976931348623157E308" onAction="#onAboutAction" text="About" GridPane.rowIndex="7" />
+                        <Button fx:id="contactButton" maxWidth="1.7976931348623157E308" onAction="#onContactAction" text="Contact" GridPane.rowIndex="9" />
+                        <Separator prefWidth="200.0" GridPane.rowIndex="2" />
+                        <Separator prefWidth="200.0" GridPane.rowIndex="4" />
+                        <Separator prefWidth="200.0" GridPane.rowIndex="6" />
+                        <Separator prefWidth="200.0" GridPane.rowIndex="8" />
+                        <Separator prefWidth="200.0" GridPane.rowIndex="10" />
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </GridPane>
+                  <StackPane fx:id="contentPane">
+                     <children>
+                        <ImageView fitHeight="147.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/placeholder.jpg" />
+                           </image>
+                        </ImageView>
+                     </children>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </StackPane>
+               </items>
                <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
-            </GridPane>
-              <StackPane fx:id="contentPane">
+            </SplitPane>
+         </center>
+      </BorderPane>
+      <AnchorPane fx:id="tutorialPane" prefHeight="500.0" prefWidth="800.0">
+         <children>
+            <VBox fx:id="connectBox" alignment="CENTER" layoutX="188.0" layoutY="4.800000190734863" spacing="10.0" AnchorPane.leftAnchor="188.0" AnchorPane.topAnchor="5.0">
                <children>
-                  <ImageView fitHeight="147.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/placeholder.jpg" />
-                     </image>
-                  </ImageView>
+                  <TextFlow fx:id="connectInfo" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <Button mnemonicParsing="false" onAction="#onNextAction">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
+                     </graphic>
+                  </Button>
                </children>
-               <padding>
-                  <Insets left="5.0" />
-               </padding>
-            </StackPane>
-         </items>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-      </SplitPane>
-   </center>
+            </VBox>
+            <VBox fx:id="settingsBox" alignment="CENTER" layoutX="188.0" layoutY="46.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
+               <children>
+                  <TextFlow fx:id="settingsInfo" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <Button mnemonicParsing="false" onAction="#onNextAction">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
+                     </graphic>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox fx:id="logsBox" alignment="CENTER" layoutX="188.0" layoutY="89.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
+               <children>
+                  <TextFlow fx:id="logsInfo" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <Button mnemonicParsing="false" onAction="#onNextAction">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
+                     </graphic>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox fx:id="aboutBox" alignment="CENTER" layoutX="188.0" layoutY="128.0" spacing="10.0">
+               <children>
+                  <TextFlow fx:id="aboutInfo" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <Button mnemonicParsing="false" onAction="#onNextAction">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
+                     </graphic>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox fx:id="contactBox" alignment="CENTER" layoutX="188.0" layoutY="170.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
+               <children>
+                  <TextFlow fx:id="contactInfo" />
+                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <Button mnemonicParsing="false" onAction="#onNextAction">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
+                     </graphic>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </children>
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
    </padding>
-   <bottom>
-      <ButtonBar maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="BOTTOM_RIGHT">
-         <buttons>
-            <Label text="Copyright © | All rights reserved" />
-            <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onChangeTheme" prefWidth="30.0">
-               <graphic>
-                  <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
-               </graphic>
-            </Button>
-            <Button fx:id="tutorialButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onTutorialAction" prefWidth="30.0">
-               <graphic>
-                  <FontIcon iconLiteral="mdi2a-account-question" iconSize="20" />
-               </graphic>
-            </Button>
-         </buttons>
-         <BorderPane.margin>
-            <Insets top="5.0" />
-         </BorderPane.margin>
-      </ButtonBar>
-   </bottom>
-</BorderPane>
+</StackPane>
