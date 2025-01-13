@@ -6,28 +6,84 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import org.controlsfx.control.PopOver;
 
-public class MainController implements Initializable{
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+public class MainController implements Initializable {
+
+    private int tutorialStep = 0;
+    private final Map<Integer, PopOver> tutorialPopOvers = new HashMap<>();
+
+    @FXML
+    private VBox aboutBox;
+
+    @FXML
+    private Button aboutButton;
+
+    @FXML
+    private TextFlow aboutInfo;
+
+    @FXML
+    private VBox connectBox;
+
+    @FXML
+    private Button connectButton;
+
+    @FXML
+    private TextFlow connectInfo;
+
+    @FXML
+    private VBox contactBox;
+
+    @FXML
+    private Button contactButton;
+
+    @FXML
+    private TextFlow contactInfo;
 
     @FXML
     private StackPane contentPane;
 
     @FXML
-    private BorderPane root;
+    private Button logButton;
+
+    @FXML
+    private VBox logsBox;
+
+    @FXML
+    private TextFlow logsInfo;
+
+    @FXML
+    private StackPane root;
+
+    @FXML
+    private VBox settingsBox;
+
+    @FXML
+    private Button settingsButton;
+
+    @FXML
+    private TextFlow settingsInfo;
 
     @FXML
     private SplitPane splitPaneRoot;
 
     @FXML
     private Button tutorialButton;
+
+    @FXML
+    private AnchorPane tutorialPane;
+
 
     public MainController() {
         try {
@@ -41,56 +97,141 @@ public class MainController implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //loadContent("/fxml/DashboardView.fxml"); example to load a menu by default
+        // Initialize text for each TextFlow
+        addTutorialText();
 
+        tutorialPopOvers.put(0, createPopOver(connectBox));
+        tutorialPopOvers.put(1, createPopOver(settingsBox));
+        tutorialPopOvers.put(2, createPopOver(logsBox));
+        tutorialPopOvers.put(3, createPopOver(aboutBox));
+        tutorialPopOvers.put(4, createPopOver(contactBox));
+
+        disableTutorialBox();
+
+        tutorialPane.setVisible(false);
         onCollapsedMenu();
     }
 
-    // adds a listener to the tutorial button to disable it while the menu is collapsed
+    private void addTutorialText() {
+        Text connectText = new Text("This button connects to the server.");
+        connectText.setStyle("-fx-font-size: 14; -fx-fill: black;");
+        connectInfo.getChildren().add(connectText);
+
+        Text settingsText = new Text("This button opens the settings.");
+        settingsText.setStyle("-fx-font-size: 14; -fx-fill: black;");
+        settingsInfo.getChildren().add(settingsText);
+
+        Text logsText = new Text("This button shows the logs.");
+        logsText.setStyle("-fx-font-size: 14; -fx-fill: black;");
+        logsInfo.getChildren().add(logsText);
+
+        Text aboutText = new Text("This button shows information about the application.");
+        aboutText.setStyle("-fx-font-size: 14; -fx-fill: black;");
+        aboutInfo.getChildren().add(aboutText);
+
+        Text contactText = new Text("This button opens the contact form.");
+        contactText.setStyle("-fx-font-size: 14; -fx-fill: black;");
+        contactInfo.getChildren().add(contactText);
+    }
+
+    private PopOver createPopOver(VBox content) {
+        PopOver popOver = new PopOver(content);
+        popOver.setOpacity(1);
+        popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
+        popOver.setDetachable(false);
+        return popOver;
+    }
+
+    private void disableTutorialBox() {
+        aboutBox.setVisible(false);
+        settingsBox.setVisible(false);
+        logsBox.setVisible(false);
+        contactBox.setVisible(false);
+        connectBox.setVisible(false);
+    }
+
     private void onCollapsedMenu() {
         splitPaneRoot.getDividers().getFirst().positionProperty().addListener((obs, oldVal, newVal) -> {
             tutorialButton.setDisable(newVal.doubleValue() < 0.2);
         });
     }
 
-    // side menu actions
     @FXML
     void onCollapseAction(ActionEvent event) {
         if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] > 0.2) {
             splitPaneRoot.setDividerPositions(0);
-        } else if(splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] < 0.2) {
+        } else if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] < 0.2) {
             splitPaneRoot.setDividerPositions(0.3);
         }
     }
 
     @FXML
-    void onAboutAction(ActionEvent event) {
+    void onTutorialAction(ActionEvent event) {
+        tutorialStep = 0;
+        showTutorialStep(tutorialStep);
+    }
 
+    @FXML
+    void onNextAction(ActionEvent event) {
+        tutorialStep++;
+        showTutorialStep(tutorialStep);
+        tutorialPopOvers.get(tutorialStep - 1).hide();
+
+        if (tutorialStep == 5) {
+            tutorialPane.setVisible(false);
+        }
+    }
+
+    private void showTutorialStep(int step) {
+        disableTutorialBox();
+
+        PopOver currentPopOver = tutorialPopOvers.get(step);
+        if (currentPopOver != null) {
+            switch (step) {
+                case 0:
+                    connectBox.setVisible(true);
+                    currentPopOver.show(connectButton);
+                    break;
+                case 1:
+                    settingsBox.setVisible(true);
+                    currentPopOver.show(settingsButton);
+                    break;
+                case 2:
+                    logsBox.setVisible(true);
+                    currentPopOver.show(logButton);
+                    break;
+                case 3:
+                    aboutBox.setVisible(true);
+                    currentPopOver.show(aboutButton);
+                    break;
+                case 4:
+                    contactBox.setVisible(true);
+                    currentPopOver.show(contactButton);
+                    break;
+            }
+        }
+
+        tutorialPane.setVisible(true);
+    }
+
+    @FXML
+    void onAboutAction(ActionEvent event) {
     }
 
     @FXML
     void onConnectAction(ActionEvent event) {
-
     }
 
     @FXML
     void onContactAction(ActionEvent event) {
-
     }
 
     @FXML
     void onLogsAction(ActionEvent event) {
-
     }
 
     @FXML
     void onSettingsAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void onTutorialAction(ActionEvent event) {
-
     }
 
     @FXML
@@ -100,10 +241,8 @@ public class MainController implements Initializable{
         } else {
             Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         }
-
     }
 
-    // allows to load the content of the main window
     private void loadContent(String fxmlPath) {
         try {
             StackPane pane = FXMLLoader.load(getClass().getResource(fxmlPath));
@@ -113,27 +252,43 @@ public class MainController implements Initializable{
         }
     }
 
+    public VBox getAboutBox() {
+        return aboutBox;
+    }
+
+    public VBox getConnectBox() {
+        return connectBox;
+    }
+
+    public VBox getContactBox() {
+        return contactBox;
+    }
+
     public StackPane getContentPane() {
         return contentPane;
     }
 
-    public void setContentPane(StackPane contentPane) {
-        this.contentPane = contentPane;
+    public VBox getLogsBox() {
+        return logsBox;
     }
 
-    public BorderPane getRoot() {
+    public StackPane getRoot() {
         return root;
     }
 
-    public void setRoot(BorderPane root) {
-        this.root = root;
+    public VBox getSettingsBox() {
+        return settingsBox;
     }
 
     public SplitPane getSplitPaneRoot() {
         return splitPaneRoot;
     }
 
-    public void setSplitPaneRoot(SplitPane splitPaneRoot) {
-        this.splitPaneRoot = splitPaneRoot;
+    public Button getTutorialButton() {
+        return tutorialButton;
+    }
+
+    public AnchorPane getTutorialPane() {
+        return tutorialPane;
     }
 }
