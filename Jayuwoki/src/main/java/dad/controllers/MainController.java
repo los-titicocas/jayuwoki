@@ -105,16 +105,32 @@ public class MainController implements Initializable {
         // Initialize text for each TextFlow
         addTutorialText();
 
+        // Initialize popOvers
+        popOverMap();
+
+        // Disable tutorial box and set tutorialPane to invisible
+        disableTutorialBox();
+        tutorialPane.setVisible(false);
+        onCollapsedMenu();
+
+        // add a listener to the menu buttons to disable while the menu is collapsed
+        buttonsListener();
+    }
+
+    private void popOverMap() {
         tutorialPopOvers.put(0, createPopOver(connectBox));
         tutorialPopOvers.put(1, createPopOver(settingsBox));
         tutorialPopOvers.put(2, createPopOver(logsBox));
         tutorialPopOvers.put(3, createPopOver(aboutBox));
         tutorialPopOvers.put(4, createPopOver(contactBox));
+    }
 
-        disableTutorialBox();
-
-        tutorialPane.setVisible(false);
-        onCollapsedMenu();
+    private void buttonsListener() {
+        connectButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
+        settingsButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
+        logButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
+        aboutButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
+        contactButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
     }
 
     private void addTutorialText() {
@@ -169,7 +185,7 @@ public class MainController implements Initializable {
         if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] > 0.2) {
             splitPaneRoot.setDividerPositions(0);
         } else if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] < 0.2) {
-            splitPaneRoot.setDividerPositions(0.3);
+            splitPaneRoot.setDividerPositions(0.2);
         }
     }
 

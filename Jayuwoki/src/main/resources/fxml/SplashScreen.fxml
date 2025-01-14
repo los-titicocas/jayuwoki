@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane fx:id="root" prefHeight="350.0" prefWidth="350.0" style="-fx-border-radius: 300px; -fx-background-radius: 300px; -fx-background-color: orange;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="161.0" layoutY="166.0" text="Clencho7" AnchorPane.bottomAnchor="166.79999999999998" AnchorPane.leftAnchor="161.0" AnchorPane.rightAnchor="161.4" AnchorPane.topAnchor="166.0">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
