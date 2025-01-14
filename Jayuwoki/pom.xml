@@ -66,5 +66,18 @@
       <artifactId>flexmark-all</artifactId>
       <version>0.62.2</version>
     </dependency>
+      
+    <dependency>
+      <groupId>net.dv8tion</groupId>
+      <artifactId>JDA</artifactId>
+      <version>5.2.2</version> <!-- replace $version with the latest version -->
+      <exclusions>
+          <exclusion>
+              <groupId>club.minnced</groupId>
+              <artifactId>opus-java</artifactId>
+          </exclusion>
+      </exclusions>
+  </dependency>
+
   </dependencies>
 </project>

@@ -2,6 +2,8 @@ package dad.controllers;
 
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
+import dad.custom.ui.CustomTitleBar;
+import dad.panels.LogTable;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -115,9 +117,6 @@ public class MainController implements Initializable {
         disableTutorialBox();
         tutorialPane.setVisible(false);
         onCollapsedMenu();
-
-        // add a listener to the menu buttons to disable while the menu is collapsed
-        buttonsListener();
     }
 
     private void popOverMap() {
@@ -126,14 +125,6 @@ public class MainController implements Initializable {
         tutorialPopOvers.put(2, createPopOver(logsBox));
         tutorialPopOvers.put(3, createPopOver(aboutBox));
         tutorialPopOvers.put(4, createPopOver(contactBox));
-    }
-
-    private void buttonsListener() {
-        connectButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
-        settingsButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
-        logButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
-        aboutButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
-        contactButton.disableProperty().bind(splitPaneRoot.getDividers().getFirst().positionProperty().lessThan(0.15));
     }
 
     private void addTutorialText() {
@@ -256,6 +247,8 @@ public class MainController implements Initializable {
 
     @FXML
     void onLogsAction(ActionEvent event) {
+        // load log table
+        splitPaneRoot.getItems().set(1, new LogTable().getRoot());
     }
 
     @FXML
@@ -271,14 +264,7 @@ public class MainController implements Initializable {
         }
     }
 
-    private void loadContent(String fxmlPath) {
-        try {
-            StackPane pane = FXMLLoader.load(getClass().getResource(fxmlPath));
-            contentPane.getChildren().setAll(pane);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    // getters and setters
 
     public VBox getAboutBox() {
         return aboutBox;
