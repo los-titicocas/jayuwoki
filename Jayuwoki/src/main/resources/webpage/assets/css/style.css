@@ -340,7 +340,7 @@ nav.navbar.bootsnav .navbar-toggle i{color: #d92cf9;}
 
 .single-horizontal-timeline .experience-time h3{text-transform: capitalize;}
 .single-horizontal-timeline .experience-time h3 span{text-transform:lowercase;}
-.single-horizontal-timeline .timeline-content h5 {margin: 15px 0;}
+.single-horizontal-timeline .timeline-content h5 {margin: 20px;}
 .single-horizontal-timeline p {color: #999fb3;max-width: 335px;}
 
 /*.timeline-horizontal-border*/
@@ -360,7 +360,7 @@ span.single-timeline-horizontal {
     height:  1px;
     width: 380px;
 }
-span.single-timeline-horizontal.spacial-horizontal-line {width: 88px;}
+span.single-timeline-horizontal.spacial-horizontal-line {width: 1088px;}
 /*.timeline-horizontal-border*/
 
 /*.education-horizontal-timeline*/
@@ -750,6 +750,7 @@ span.single-timeline-horizontal.spacial-horizontal-line {width: 88px;}
 /*--contct button--*/
 
 /* contact-adress */
+
 .contact-add-head h3 {
     font-size:  24px;
     color:  #3c4258;
