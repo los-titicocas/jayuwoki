@@ -31,3 +31,9 @@
 - Crear base de datos.
 - Modifier base de datos.
 - Gestión de usuarios.
+---------------------------
+
+# BOT
+
+- Cambiar el bot y gestionar la conexión mediante un método.
+- Implementar dicho método en el panel de connect
