@@ -22,11 +22,11 @@
          <image>
             <Image url="@../images/placeholder.jpg" />
          </image></ImageView>
-      <ButtonBar buttonMinWidth="20.0" GridPane.columnIndex="1">
+      <ButtonBar buttonMinWidth="15.0" GridPane.columnIndex="1">
          <buttons>
-            <Button mnemonicParsing="false" onAction="#onMinimizeWindow" text="-" />
-            <Button mnemonicParsing="false" onAction="#onMaximizeWindow" text="[ ]" />
-            <Button mnemonicParsing="false" onAction="#onCloseWindow" text="x" />
+            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onMinimizeWindow" prefHeight="15.0" prefWidth="5.0" style="-fx-background-radius: 20; -fx-background-color: green;" />
+            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onMaximizeWindow" prefHeight="15.0" prefWidth="5.0" style="-fx-background-radius: 20; -fx-background-color: yellow;" />
+            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCloseWindow" prefHeight="15.0" prefWidth="5.0" style="-fx-background-radius: 20; -fx-background-color: red;" />
          </buttons>
       </ButtonBar>
    </children>

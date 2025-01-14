@@ -19,7 +19,7 @@
 <?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane fx:id="borderPaneRoot" prefHeight="200.0" prefWidth="200.0">
          <bottom>
@@ -39,7 +39,7 @@
             </ButtonBar>
          </bottom>
          <center>
-            <SplitPane fx:id="splitPaneRoot" dividerPositions="0.3" prefHeight="400.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+            <SplitPane fx:id="splitPaneRoot" dividerPositions="0.2" prefHeight="400.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                <items>
                   <GridPane>
                      <columnConstraints>

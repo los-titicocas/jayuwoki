@@ -1,5 +1,6 @@
 package dad.controllers;
 
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
@@ -9,11 +10,12 @@ import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class LoginController implements Initializable {
 
@@ -27,13 +29,13 @@ public class LoginController implements Initializable {
         stage.close();
 
         // open main window
-        MainController mainController = new MainController();
-        Scene scene = new Scene(mainController.getRoot());
+        SplashScreenController splashScreenController = new SplashScreenController();
+        Scene scene = new Scene(splashScreenController.getRoot());
         Stage mainStage = new Stage();
         mainStage.initStyle(StageStyle.UNDECORATED);
-        mainStage.setTitle("JayuwokiBot");
         mainStage.setScene(scene);
         mainStage.show();
+        fadeIn(splashScreenController.getRoot());
     }
 
     @FXML
@@ -57,7 +59,13 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        root.setTop(new CustomTitleBar().getRoot());
+        root.setTop(new CustomTitleBar().getRoot());}
+
+    public void fadeIn(Node node) {
+        FadeTransition fade = new FadeTransition(Duration.seconds(2), node);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
     }
 
     public BorderPane getRoot() {
