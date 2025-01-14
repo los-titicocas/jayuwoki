@@ -55,6 +55,9 @@ public class MainController implements Initializable {
     private StackPane contentPane;
 
     @FXML
+    private BorderPane borderPaneRoot;
+
+    @FXML
     private Button logButton;
 
     @FXML
@@ -97,6 +100,8 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        borderPaneRoot.setTop(new CustomTitleBar().getRoot());
+
         // Initialize text for each TextFlow
         addTutorialText();
 
@@ -113,6 +118,7 @@ public class MainController implements Initializable {
     }
 
     private void addTutorialText() {
+        // TODO:add to css later on
         Text connectText = new Text("This button connects to the server.");
         connectText.setStyle("-fx-font-size: 14; -fx-fill: black;");
         connectInfo.getChildren().add(connectText);
@@ -136,7 +142,9 @@ public class MainController implements Initializable {
 
     private PopOver createPopOver(VBox content) {
         PopOver popOver = new PopOver(content);
-        popOver.setOpacity(1);
+        popOver.styleProperty().setValue("-fx-background-color: orange;");
+        popOver.setOpacity(0.6);
+        popOver.autoHideProperty().setValue(false);
         popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
         popOver.setDetachable(false);
         return popOver;
