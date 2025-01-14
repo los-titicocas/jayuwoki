@@ -707,7 +707,7 @@ span.single-timeline-horizontal.spacial-horizontal-line {width: 1088px;}
 }
 .single-contact-box {padding-top: 100px;}
 .contact-form  .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     
 }
 .contact-form .form-control {
@@ -729,7 +729,6 @@ span.single-timeline-horizontal.spacial-horizontal-line {width: 1088px;}
     justify-content:center;
     height:50px;
     text-transform:capitalize;
-    margin-top: 3px;
     background: #b636ff;
     border: 1px solid #b636ff;
     cursor:pointer;
