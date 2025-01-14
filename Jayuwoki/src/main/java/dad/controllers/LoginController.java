@@ -1,5 +1,7 @@
 package dad.controllers;
 
+import dad.custom.ui.CustomTitleBar;
+import dad.custom.ui.SplashScreenController;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;

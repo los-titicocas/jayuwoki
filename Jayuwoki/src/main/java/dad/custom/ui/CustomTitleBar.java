@@ -1,4 +1,4 @@
-package dad.controllers;
+package dad.custom.ui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
