@@ -3,6 +3,7 @@ package dad.controllers;
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import dad.custom.ui.CustomTitleBar;
+import dad.panels.ContactController;
 import dad.panels.LogTable;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -248,7 +249,7 @@ public class MainController implements Initializable {
     @FXML
     void onLogsAction(ActionEvent event) {
         // load log table
-        splitPaneRoot.getItems().set(1, new LogTable().getRoot());
+        contentPane.getChildren().setAll(new LogTable().getRoot());
     }
 
     @FXML
