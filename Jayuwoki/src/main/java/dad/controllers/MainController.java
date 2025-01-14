@@ -24,6 +24,9 @@ public class MainController implements Initializable {
     private int tutorialStep = 0;
     private final Map<Integer, PopOver> tutorialPopOvers = new HashMap<>();
 
+    // Controllers
+    private final ContactController contactController = new ContactController();
+
     @FXML
     private VBox aboutBox;
 
@@ -248,6 +251,7 @@ public class MainController implements Initializable {
 
     @FXML
     void onContactAction(ActionEvent event) {
+        contentPane.getChildren().setAll(contactController.getRoot());
     }
 
     @FXML
