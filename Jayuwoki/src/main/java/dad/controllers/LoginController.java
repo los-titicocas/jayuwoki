@@ -43,7 +43,7 @@ public class LoginController implements Initializable {
     @FXML
     void onLinkAction(ActionEvent event) {
         try {
-            Desktop.getDesktop().browse(new URL("https://www.github.com/dam-dad/jayuwoki").toURI());
+            Desktop.getDesktop().browse(new URL("https://dam-dad.github.io/jayuwoki/").toURI());
         } catch (Exception e) {
             e.printStackTrace();
         }
