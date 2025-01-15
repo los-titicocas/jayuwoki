@@ -33,8 +33,10 @@ public class Bot {
 
     public void stopConnection() {
         // Detener la conexión
-        jda.shutdown();
-        isConnected.set(false);
+        if (jda != null) {
+            jda.shutdown();
+            isConnected.set(false);
+        }
     }
 
     public boolean isIsconnected() {
