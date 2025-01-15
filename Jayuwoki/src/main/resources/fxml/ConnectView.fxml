@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<GridPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(images/bochudin.png); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/22">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Button fx:id="connectButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onConnectAction" GridPane.halignment="CENTER">
+         <GridPane.margin>
+            <Insets right="3.0" />
+         </GridPane.margin>
+         <graphic>
+            <FontIcon iconColor="#2edf2e" iconLiteral="mdi2p-play-box" iconSize="20" />
+         </graphic>
+      </Button>
+      <Button fx:id="disconnectButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onDisconnectAction" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+         <graphic>
+            <FontIcon iconColor="#dc0707" iconLiteral="mdi2s-stop-circle" iconSize="20" />
+         </graphic>
+      </Button>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</GridPane>
