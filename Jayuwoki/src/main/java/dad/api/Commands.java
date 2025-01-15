@@ -1,6 +1,8 @@
 package dad.api;
 
+import dad.api.models.LogEntry;
 import dad.api.models.Player;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,29 +18,41 @@ import java.util.List;
 public class Commands extends ListenerAdapter {
 
     private final ArrayList<String> roles = new ArrayList<>(List.of("Top", "Jungla", "Mid", "ADC", "Support"));
-    private  ObservableList<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    public ListProperty<LogEntry> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(ListProperty<LogEntry> logs) {
+        this.logs = logs;
+    }
 
     public ArrayList<String> getRoles() {
         return roles;
     }
 
-    public ObservableList<Player> getPlayers() {
+    public ListProperty<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(ObservableList<Player> players) {
+    public void setPlayers(ListProperty<Player> players) {
         this.players = players;
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        // Get the menssage content
-        System.out.println("Mensaje recibido");
         String message = event.getMessage().getContentRaw().toLowerCase();
         System.out.println(message);
         if (message.startsWith("$")) {
             String[] comando = message.split(" ");
-            // Switch with all the posible commands
+
+            // Introduce the command in the log
+            LogEntry logEntry = new LogEntry(event.getAuthor().getName(), message, event.getMessage().getTimeCreated().toLocalDateTime());
+            logs.add(logEntry);
+
+            // Switch with all the possible commands
             switch (comando[0]) {
                 case "$privadita":
                     // Check if the command has the correct number of players
@@ -47,7 +61,6 @@ public class Commands extends ListenerAdapter {
                     } else {
                         event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
                     }
-
             }
         }
     }

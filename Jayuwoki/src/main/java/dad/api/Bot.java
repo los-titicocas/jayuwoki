@@ -11,6 +11,11 @@ public class Bot {
 
     private static JDA jda;
     private final BooleanProperty isConnected = new SimpleBooleanProperty();
+    private final Commands commands = new Commands();
+
+    public Commands getCommands() {
+        return commands;
+    }
 
     public void startConnection() {
         // Leer el token desde la variable de entorno
@@ -27,8 +32,9 @@ public class Bot {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .build();
 
-        jda.addEventListener(new Commands());
+        jda.addEventListener(commands);
         isConnected.set(true);
+
     }
 
     public void stopConnection() {
