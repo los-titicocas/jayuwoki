@@ -27,7 +27,7 @@ public class Bot {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .build();
 
-        jda.addEventListener(new EventoPrueba());
+        jda.addEventListener(new Commands());
         isConnected.set(true);
     }
 
