@@ -2,6 +2,8 @@ package dad.api;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Bot {
 
@@ -16,7 +18,14 @@ public class Bot {
         }
 
         // Inicializar el bot con el token
-        jda = JDABuilder.createDefault(token).build();
+        jda = JDABuilder.createDefault(token)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS) // Intends so the Bot can see members and messages from the guild
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .enableIntents(GatewayIntent.GUILD_MESSAGES)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .build();
+
+        jda.addEventListener(new EventoPrueba());
     }
 
     public void stopConnection() {
