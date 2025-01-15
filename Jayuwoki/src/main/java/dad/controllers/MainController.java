@@ -58,9 +58,6 @@ public class MainController implements Initializable {
     private VBox contactBox;
 
     @FXML
-    private GridPane menuGridPane;
-
-    @FXML
     private Button contactButton;
 
     @FXML
@@ -282,18 +279,15 @@ public class MainController implements Initializable {
 
     @FXML
     void onChangeTheme(ActionEvent event) {
-        //TODO: Implement theme change with own css files
-        String lightTheme = getClass().getResource("/styles/light-theme.css").toExternalForm();
-        String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
-
-        if (Application.getUserAgentStylesheet().equals(darkTheme)) {
-            Application.setUserAgentStylesheet(lightTheme);
+        if (Application.getUserAgentStylesheet().equals(new PrimerDark().getUserAgentStylesheet())) {
+            Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         } else {
-            Application.setUserAgentStylesheet(darkTheme);
+            Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         }
     }
 
     // getters and setters
+
     public VBox getAboutBox() {
         return aboutBox;
     }

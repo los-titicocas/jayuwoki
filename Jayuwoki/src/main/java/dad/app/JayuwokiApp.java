@@ -18,9 +18,7 @@ public class JayuwokiApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-//        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-        String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
-        Application.setUserAgentStylesheet(darkTheme);
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/bochudin.png")).toString());
 
         Scene scene = new Scene(loginController.getRoot());

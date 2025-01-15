@@ -5,7 +5,6 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -28,17 +27,11 @@
                      <graphic>
                         <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
                      </graphic>
-                     <tooltip>
-                        <Tooltip text="Switch themes" />
-                     </tooltip>
                   </Button>
                   <Button fx:id="tutorialButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onTutorialAction" prefWidth="30.0">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-account-question" iconSize="20" />
                      </graphic>
-                     <tooltip>
-                        <Tooltip text="Show tutorial" />
-                     </tooltip>
                   </Button>
                </buttons>
                <BorderPane.margin>
@@ -49,7 +42,7 @@
          <center>
             <SplitPane fx:id="splitPaneRoot" dividerPositions="0.2" prefHeight="400.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                <items>
-                  <GridPane fx:id="menuGridPane">
+                  <GridPane>
                      <columnConstraints>
                         <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
                         <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="1.7976931348623157E308" />
@@ -94,6 +87,13 @@
                      </padding>
                   </GridPane>
                   <StackPane fx:id="contentPane">
+                     <children>
+                        <ImageView fitHeight="147.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/placeholder.jpg" />
+                           </image>
+                        </ImageView>
+                     </children>
                      <padding>
                         <Insets left="5.0" />
                      </padding>
