@@ -16,6 +16,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import org.controlsfx.control.PopOver;
 
 import java.net.URL;
@@ -97,7 +98,7 @@ public class MainController implements Initializable {
     private AnchorPane tutorialPane;
 
 
-    public MainController() {
+    public MainController(Stage stage) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainControllerView.fxml"));
             loader.setController(this);
@@ -109,7 +110,9 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        borderPaneRoot.setTop(new CustomTitleBar().getRoot());
+        CustomTitleBar customTitleBar = new CustomTitleBar();
+        customTitleBar.setBot(connectController.getBot());
+        borderPaneRoot.setTop(customTitleBar.getRoot());
 
         // Initialize text for each TextFlow
         addTutorialText();

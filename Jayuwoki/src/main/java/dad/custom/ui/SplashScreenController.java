@@ -1,5 +1,6 @@
 package dad.custom.ui;
 
+import dad.api.Bot;
 import dad.controllers.MainController;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -14,10 +15,11 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class SplashScreenController implements Initializable{
+public class SplashScreenController implements Initializable {
 
     @FXML
     private AnchorPane root;
+
 
     public SplashScreenController() {
         try {
@@ -35,9 +37,9 @@ public class SplashScreenController implements Initializable{
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(event -> {
             try {
-                MainController mainController = new MainController();
-                Scene scene = new Scene(mainController.getRoot());
                 Stage mainStage = new Stage();
+                MainController mainController = new MainController(mainStage);
+                Scene scene = new Scene(mainController.getRoot());
                 mainStage.initStyle(StageStyle.UNDECORATED);
                 mainStage.setScene(scene);
                 mainStage.show();
