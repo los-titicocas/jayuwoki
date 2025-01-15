@@ -7,11 +7,12 @@ import javafx.collections.ObservableList;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class Commands extends ListenerAdapter {
 
-    private String[] roles = {"Top", "Jungla", "Mid", "Adc", "Support"};
+    private List<String> roles = {"Top", "Jungla", "Mid", "Adc", "Support"};
     private ObservableList<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
 
 
@@ -46,19 +47,15 @@ public class Commands extends ListenerAdapter {
             players.add(player);
         }
 
-        ObservableList<String> blueTeam = new SimpleListProperty<>(FXCollections.observableArrayList());
-        ObservableList<String> redTeam = new SimpleListProperty<>(FXCollections.observableArrayList());
+        ObservableList<Player> blueTeam = new SimpleListProperty<>(FXCollections.observableArrayList());
+        ObservableList<Player> redTeam = new SimpleListProperty<>(FXCollections.observableArrayList());
 
         // Get a random number between 0 to 4 to select the role
         int rolsLeft = 5;
         for (int i = 0; i < 5; i++) {
             int randomRole = (int) (Math.random() * rolsLeft);
-            // Check if the role is already taken
-            if (roles[randomRole] != null) {
-                blueTeam.add(players.get(i) + " " + roles[randomRole]);
-                roles[randomRole] = null;
-            } else {
-                i--;
+            players.get(i).setRole(roles[randomRole]);
+            roles.
             }
         }
 
