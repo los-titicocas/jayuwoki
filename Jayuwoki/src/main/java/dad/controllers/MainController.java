@@ -148,32 +148,26 @@ public class MainController implements Initializable {
     }
 
     private void addTutorialText() {
-        // TODO:add to css later on
         Text connectText = new Text("This button connects to the server.");
-        connectText.setStyle("-fx-font-size: 14; -fx-fill: black;");
         connectInfo.getChildren().add(connectText);
 
         Text settingsText = new Text("This button opens the settings.");
-        settingsText.setStyle("-fx-font-size: 14; -fx-fill: black;");
         settingsInfo.getChildren().add(settingsText);
 
         Text logsText = new Text("This button shows the logs.");
-        logsText.setStyle("-fx-font-size: 14; -fx-fill: black;");
         logsInfo.getChildren().add(logsText);
 
         Text aboutText = new Text("This button shows information about the application.");
-        aboutText.setStyle("-fx-font-size: 14; -fx-fill: black;");
         aboutInfo.getChildren().add(aboutText);
 
         Text contactText = new Text("This button opens the contact form.");
-        contactText.setStyle("-fx-font-size: 14; -fx-fill: black;");
         contactInfo.getChildren().add(contactText);
     }
 
     private PopOver createPopOver(VBox content) {
         PopOver popOver = new PopOver(content);
         popOver.styleProperty().setValue("-fx-background-color: orange;");
-        popOver.setOpacity(0.6);
+        popOver.setOpacity(0.7);
         popOver.autoHideProperty().setValue(false);
         popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
         popOver.setDetachable(false);

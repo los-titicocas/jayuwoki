@@ -26,12 +26,12 @@ import javafx.scene.paint.Color;
 public class LoginController implements Initializable {
 
     @FXML
-    private BorderPane root;
+    private BorderPane loginRoot;
 
     @FXML
     void onAccessAction(ActionEvent event) {
         // Close login window
-        Stage stage = (Stage) root.getScene().getWindow();
+        Stage stage = (Stage) loginRoot.getScene().getWindow();
         stage.close();
 
         // Open main window (splash screen)
@@ -74,7 +74,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        root.setTop(new CustomTitleBar().getRoot());}
+        loginRoot.setTop(new CustomTitleBar().getRoot());}
 
     public void fadeIn(Node node) {
         FadeTransition fade = new FadeTransition(Duration.seconds(2), node);
@@ -84,6 +84,6 @@ public class LoginController implements Initializable {
     }
 
     public BorderPane getRoot() {
-        return root;
+        return loginRoot;
     }
 }

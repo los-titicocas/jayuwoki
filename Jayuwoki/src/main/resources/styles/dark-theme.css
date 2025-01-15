@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'WorkSans-SemiBold';
+    src: url('/fonts/WorkSans-Bold.ttf');
+}
+
+* {
+    -fx-font-family: 'WorkSans-Bold';
+}
+
 .button {
     -fx-border-color: black;
     -fx-border-width: 2;
@@ -41,7 +50,7 @@
 }
 
 #circularPane {
-    -fx-background-color: orange;
+    -fx-background-color: #1c0925;
     -fx-border-color: black;
     -fx-border-width: 2px;
     -fx-background-radius: 150px;
@@ -50,9 +59,62 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
     -fx-background-size: 80%;
+    -fx-effect: dropshadow(gaussian, rgba(173, 173, 237, 0.8), 20, 0.5, 0, 0);
 }
 
 #splashScreenRoot {
     -fx-background-color: transparent;
 }
 
+#loginRoot {
+    -fx-background-image: url("/images/bochudin.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: right center;
+    -fx-background-size: contain;
+
+    -fx-background-color: #3c214e;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+}
+
+#loginRoot .hyperlink {
+    -fx-text-fill: #C8C1E8;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+}
+#loginRoot .hyperlink:hover {
+    -fx-text-fill: #816af1;
+}
+
+#customTitleBar {
+    -fx-background-color: #120f12;
+    -fx-border-color: black;
+}
+
+#maximizeButton {
+    -fx-background-color: #938d59;
+    -fx-background-radius: 20;
+}
+
+#minimizeButton {
+    -fx-background-color: #3b6511;
+    -fx-background-radius: 20;
+}
+
+#closeButton {
+    -fx-background-color: #852222;
+    -fx-background-radius: 20;
+}
+
+#connectBox, #aboutBox, #settingsBox, #contactBox, #logsBox {
+    -fx-background-color: #ca930e;
+    -fx-border-color: black;
+    -fx-border-width: 3;
+    -fx-padding: 10;
+    -fx-background-radius: 5;
+}
+
+.text-info {
+    -fx-font-size: 18;
+    -fx-fill: black;
+}

@@ -13,11 +13,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-image: url(images/bochudin.png); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: bottom right;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="loginRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" stylesheets="@../styles/dark-theme.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Jayuwoki Bot ">
+            <Label text="Jayuwoki">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
@@ -50,7 +50,10 @@
                         <Light.Distant />
                      </light>
                   </Lighting>
-               </effect></Hyperlink>
+               </effect>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin></Hyperlink>
          </children>
          <BorderPane.margin>
             <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />

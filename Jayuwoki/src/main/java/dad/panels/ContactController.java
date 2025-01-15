@@ -13,10 +13,10 @@ public class ContactController implements Initializable {
 
 
     @FXML
-    private WebView root;
+    private WebView webRoot;
 
     public WebView getRoot() {
-        return root;
+        return webRoot;
     }
 
     public ContactController() {
@@ -31,10 +31,10 @@ public class ContactController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        root = new WebView();
+        webRoot = new WebView();
         URL webPageUrl = getClass().getResource("/webpage/index.html");
         if (webPageUrl != null) {
-            root.getEngine().load(webPageUrl.toExternalForm());
+            webRoot.getEngine().load(webPageUrl.toExternalForm());
         } else {
             System.err.println("Error: No se pudo encontrar el archivo index.html");
         }
