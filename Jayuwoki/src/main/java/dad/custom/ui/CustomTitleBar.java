@@ -63,7 +63,7 @@ public class CustomTitleBar implements Initializable {
     }
 
     @FXML
-    private void onCloseWindow() {
+    public void onCloseWindow() {
         Stage stage = (Stage) root.getScene().getWindow();
         stage.close();
 

@@ -13,6 +13,8 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -111,6 +113,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         CustomTitleBar customTitleBar = new CustomTitleBar();
+        // Set the bot on the title bar so it can be stopped when the window is closed
         customTitleBar.setBot(connectController.getBot());
         borderPaneRoot.setTop(customTitleBar.getRoot());
 
@@ -124,6 +127,15 @@ public class MainController implements Initializable {
         disableTutorialBox();
         tutorialPane.setVisible(false);
 //        onCollapsedMenu();
+
+        // listeners
+
+        // Listener to ensure that the connection is closed by also pressing alt + F4
+        root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.F4 && event.isAltDown()) {
+                customTitleBar.onCloseWindow();
+            }
+        });
     }
 
     private void popOverMap() {
