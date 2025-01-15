@@ -3,6 +3,7 @@ package dad.controllers;
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import dad.custom.ui.CustomTitleBar;
+import dad.panels.ConnectController;
 import dad.panels.ContactController;
 import dad.panels.LogTable;
 import javafx.application.Application;
@@ -18,6 +19,7 @@ import javafx.scene.text.TextFlow;
 import org.controlsfx.control.PopOver;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -29,6 +31,7 @@ public class MainController implements Initializable {
 
     // Controllers
     private final ContactController contactController = new ContactController();
+    private final ConnectController connectController = new ConnectController();
 
     @FXML
     private VBox aboutBox;
@@ -117,7 +120,7 @@ public class MainController implements Initializable {
         // Disable tutorial box and set tutorialPane to invisible
         disableTutorialBox();
         tutorialPane.setVisible(false);
-        onCollapsedMenu();
+//        onCollapsedMenu();
     }
 
     private void popOverMap() {
@@ -177,9 +180,10 @@ public class MainController implements Initializable {
 
     @FXML
     void onCollapseAction(ActionEvent event) {
-        if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] > 0.2) {
+        System.out.println(Arrays.toString(splitPaneRoot.getDividerPositions()));
+        if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] > 0.15) {
             splitPaneRoot.setDividerPositions(0);
-        } else if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] < 0.2) {
+        } else if (splitPaneRoot.getDividerPositions() != null && splitPaneRoot.getDividerPositions()[0] < 0.15) {
             splitPaneRoot.setDividerPositions(0.2);
         }
     }
@@ -239,6 +243,8 @@ public class MainController implements Initializable {
 
     @FXML
     void onConnectAction(ActionEvent event) {
+        contentPane.getChildren().setAll(connectController.getRoot());
+
     }
 
     @FXML
