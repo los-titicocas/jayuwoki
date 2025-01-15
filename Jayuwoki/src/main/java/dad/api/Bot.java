@@ -11,6 +11,7 @@ public class Bot {
 
     private static JDA jda;
     private final BooleanProperty isConnected = new SimpleBooleanProperty();
+    // Instance of the command class needed to bind the commands to the log
     private final Commands commands = new Commands();
 
     public Commands getCommands() {

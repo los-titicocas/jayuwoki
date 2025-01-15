@@ -275,6 +275,8 @@ public class MainController implements Initializable {
     void onLogsAction(ActionEvent event) {
         // load log table
         LogTable logTable = new LogTable();
+
+        // Bind the logs from the Command class to the one in the log table
         logTable.getLogs().bind(connectController.getBot().getCommands().getLogs());
         contentPane.getChildren().setAll(logTable.getRoot());
     }
