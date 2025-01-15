@@ -1,5 +1,6 @@
 package dad.custom.ui;
 
+import dad.api.Bot;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,6 +14,12 @@ public class CustomTitleBar implements Initializable {
 
     private double xOffset = 0;
     private double yOffset = 0;
+
+    private Bot bot;
+
+    public void setBot(Bot bot) {
+        this.bot = bot;
+    }
 
     @FXML
     private GridPane root;
@@ -56,9 +63,12 @@ public class CustomTitleBar implements Initializable {
     }
 
     @FXML
-    private void onCloseWindow() {
+    public void onCloseWindow() {
         Stage stage = (Stage) root.getScene().getWindow();
         stage.close();
+
+        bot.stopConnection();
+
     }
 
     public GridPane getRoot() {

@@ -16,6 +16,10 @@ public class ConnectController implements Initializable {
 
     private final Bot bot = new Bot();
 
+    public Bot getBot() {
+        return bot;
+    }
+
     @FXML
     private Button connectButton;
 
@@ -57,6 +61,7 @@ public class ConnectController implements Initializable {
             e.printStackTrace();
         }
     }
+
 
     public GridPane getRoot() {
         return root;
