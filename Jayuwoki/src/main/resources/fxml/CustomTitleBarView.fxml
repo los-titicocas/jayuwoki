@@ -20,7 +20,7 @@
    <children>
       <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" GridPane.hgrow="ALWAYS">
          <image>
-            <Image url="@../images/placeholder.jpg" />
+            <Image url="@../images/logo.png" />
          </image></ImageView>
       <ButtonBar buttonMinWidth="15.0" GridPane.columnIndex="1">
          <buttons>

@@ -4,12 +4,13 @@
     -fx-background-color: #4F3F8C;
     -fx-text-fill: #C8C1E8;
     -fx-alignment: center;
-    -fx-font-size: 20;
+    -fx-font-size: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 10, 0.5, 0, 0);
     -fx-background-radius: 5;
     -fx-border-radius: 5;
     -fx-padding: 10 20;
     -fx-transition: all 0.3s ease;
+    -fx-font-weight: bold;
 }
 
 .button:hover {
@@ -38,3 +39,20 @@
     -fx-background-position: right center;
     -fx-background-size: contain;
 }
+
+#circularPane {
+    -fx-background-color: orange;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-background-radius: 150px;
+    -fx-border-radius: 150px;
+    -fx-background-image: url("/images/logo.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: 80%;
+}
+
+#splashScreenRoot {
+    -fx-background-color: transparent;
+}
+

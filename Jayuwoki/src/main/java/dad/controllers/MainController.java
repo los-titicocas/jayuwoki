@@ -1,7 +1,5 @@
 package dad.controllers;
 
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
 import dad.custom.ui.CustomTitleBar;
 import dad.panels.ConnectController;
 import dad.panels.ContactController;
