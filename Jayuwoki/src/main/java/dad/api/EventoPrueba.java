@@ -4,8 +4,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class EventoPrueba extends ListenerAdapter {
 
-    public void PoloEvento(MessageReceivedEvent  event) {
-        if (event.getMessage().getContentRaw().equals("Marco")) {
+    @Override
+    public void onMessageReceived(MessageReceivedEvent event) {
+        String message = event.getMessage().getContentRaw().toLowerCase();
+
+        if (message.equals("marco")) {
             event.getChannel().sendMessage("Polo").queue();
         }
     }
