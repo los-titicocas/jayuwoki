@@ -67,7 +67,9 @@ public class CustomTitleBar implements Initializable {
         Stage stage = (Stage) root.getScene().getWindow();
         stage.close();
 
-        bot.stopConnection();
+        if (bot != null) {
+            bot.stopConnection();
+        }
 
     }
 

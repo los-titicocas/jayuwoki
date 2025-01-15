@@ -1,5 +1,7 @@
 package dad.api;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -8,7 +10,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Bot {
 
     private static JDA jda;
-    private boolean connected = false;
+    private final BooleanProperty isConnected = new SimpleBooleanProperty();
 
     public void startConnection() {
         // Leer el token desde la variable de entorno
@@ -26,14 +28,22 @@ public class Bot {
                 .build();
 
         jda.addEventListener(new EventoPrueba());
+        isConnected.set(true);
     }
 
     public void stopConnection() {
         // Detener la conexión
-        jda.shutdown();
+        if (jda != null) {
+            jda.shutdown();
+            isConnected.set(false);
+        }
     }
 
-    public boolean isConnected() {
-        return connected;
+    public boolean isIsconnected() {
+        return isConnected.get();
+    }
+
+    public BooleanProperty isconnectedProperty() {
+        return isConnected;
     }
 }

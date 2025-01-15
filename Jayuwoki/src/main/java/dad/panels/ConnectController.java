@@ -42,6 +42,11 @@ public class ConnectController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        // disable connect button if bot is already connected
+        connectButton.disableProperty().bind(bot.isconnectedProperty());
+
+        // disable disconnect button if bot is not connected
+        disconnectButton.disableProperty().bind(bot.isconnectedProperty().not());
     }
 
     @FXML
