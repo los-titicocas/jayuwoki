@@ -4,11 +4,16 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DisplacementMap?>
+<?import javafx.scene.effect.FloatMap?>
+<?import javafx.scene.effect.Light.Distant?>
+<?import javafx.scene.effect.Lighting?>
+<?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-image: url(images/bochudin.png); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: right center;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-image: url(images/bochudin.png); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: bottom right;" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <center>
       <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
          <children>
@@ -26,8 +31,26 @@
    <bottom>
       <VBox prefHeight="150.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#onAccessAction" prefHeight="50.0" prefWidth="200.0" text="Access" />
-            <Hyperlink onAction="#onLinkAction" text="Link a la página web" />
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onAccessAction" prefHeight="50.0" prefWidth="200.0" text="Access" />
+            <Hyperlink onAction="#onLinkAction" text="Visit our website!">
+               <effect>
+                  <Lighting>
+                     <bumpInput>
+                        <Shadow>
+                           <input>
+                              <DisplacementMap>
+                                 <mapData>
+                                    <FloatMap />
+                                 </mapData>
+                              </DisplacementMap>
+                           </input>
+                        </Shadow>
+                     </bumpInput>
+                     <light>
+                        <Light.Distant />
+                     </light>
+                  </Lighting>
+               </effect></Hyperlink>
          </children>
          <BorderPane.margin>
             <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
