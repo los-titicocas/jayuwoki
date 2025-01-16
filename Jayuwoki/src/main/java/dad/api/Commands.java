@@ -11,10 +11,7 @@ import javafx.collections.ObservableList;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class Commands extends ListenerAdapter {
@@ -30,8 +27,7 @@ public class Commands extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        String message = event.getMessage().getContentRaw().toLowerCase();
-        System.out.println(message);
+        String message = event.getMessage().getContentRaw();
         if (message.startsWith("$")) {
             String[] comando = message.split(" ");
 
@@ -43,25 +39,58 @@ public class Commands extends ListenerAdapter {
             switch (comando[0]) {
                 case "$privadita":
                     // Check if the command has the correct number of players
-                    if (comando.length == 11) {
+                    if (activeGame.get()) {
+                        event.getChannel().sendMessage("Ya hay una privadita en juego ACÁBALA (o $dropPrivadita)").queue();
+                    } else if (comando.length == 11) {
                         StartPrivadita(comando, event);
                     } else {
                         event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
                     }
                     break;
-                case "$prueba":
-                    event.getChannel().sendMessage("pruebate esta").queue();
+                case "$dropPrivadita":
+                    if (activeGame.get()) {
+                        activeGame.set(false);
+                        players.clear();
+                        event.getChannel().sendMessage("Se ha cancelado la privadita").queue();
+                    } else {
+                        event.getChannel().sendMessage("No hay ninguna privadita activa").queue();
+                    }
+                    break;
+                default:
+                    event.getChannel().sendMessage("Comando no encontrado").queue();
+
             }
         }
     }
 
     private void StartPrivadita(String[] comando, MessageReceivedEvent event) {
+        Set<String> uniqueNames = new HashSet<>();
         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
+        boolean repeated = false;
+
         for (String name : playersNames) {
+            if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
+                event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
+                repeated = true;
+                break;
+            }
+
+            if (name.startsWith("$")) {
+                event.getChannel().sendMessage("A donde vas listillo.").queue();
+                repeated = true;
+                break;
+            }
             Player player = new Player();
             player.setName(name);
             players.add(player);
         }
+
+        // if its repeated we don't want to continue
+        if (repeated) {
+            return;
+        }
+
+        activeGame.set(true);
 
         ObservableList<Player> blueTeam = new SimpleListProperty<>(FXCollections.observableArrayList());
         ObservableList<Player> redTeam = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -107,8 +136,6 @@ public class Commands extends ListenerAdapter {
 
         String formattedMessage = messageBuilder.toString();
         event.getChannel().sendMessage(formattedMessage).queue();
-
-        players.clear();
     }
 
     public ListProperty<LogEntry> getLogs() {
