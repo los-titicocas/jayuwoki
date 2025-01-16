@@ -2,7 +2,9 @@ package dad.api;
 
 import dad.api.models.LogEntry;
 import dad.api.models.Player;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,25 +22,10 @@ public class Commands extends ListenerAdapter {
     private final ArrayList<String> roles = new ArrayList<>(List.of("Top", "Jungla", "Mid", "ADC", "Support"));
     private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private BooleanProperty activeGame = new SimpleBooleanProperty();
 
-    public ListProperty<LogEntry> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(ListProperty<LogEntry> logs) {
-        this.logs = logs;
-    }
-
-    public ArrayList<String> getRoles() {
-        return roles;
-    }
-
-    public ListProperty<Player> getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(ListProperty<Player> players) {
-        this.players = players;
+    public Commands() {
+        activeGame.set(false);
     }
 
     @Override
@@ -61,6 +48,9 @@ public class Commands extends ListenerAdapter {
                     } else {
                         event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
                     }
+                    break;
+                case "$prueba":
+                    event.getChannel().sendMessage("pruebate esta").queue();
             }
         }
     }
@@ -118,5 +108,26 @@ public class Commands extends ListenerAdapter {
         String formattedMessage = messageBuilder.toString();
         event.getChannel().sendMessage(formattedMessage).queue();
 
+        players.clear();
+    }
+
+    public ListProperty<LogEntry> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(ListProperty<LogEntry> logs) {
+        this.logs = logs;
+    }
+
+    public ArrayList<String> getRoles() {
+        return roles;
+    }
+
+    public ListProperty<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(ListProperty<Player> players) {
+        this.players = players;
     }
 }

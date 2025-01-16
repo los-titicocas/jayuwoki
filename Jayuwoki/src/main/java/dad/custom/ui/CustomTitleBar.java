@@ -4,8 +4,12 @@ import dad.api.Bot;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -58,6 +62,7 @@ public class CustomTitleBar implements Initializable {
             stage.setX(event.getScreenX() + xOffset);
             stage.setY(event.getScreenY() + yOffset);
         });
+        
     }
 
     @FXML
@@ -69,7 +74,23 @@ public class CustomTitleBar implements Initializable {
     @FXML
     private void onMaximizeWindow() {
         Stage stage = (Stage) customTitleBar.getScene().getWindow();
-        stage.setMaximized(!stage.isMaximized());
+
+        // get screen size
+        Screen screen = Screen.getPrimary();
+
+        Rectangle2D visualBounds = screen.getVisualBounds();
+
+        // set stage to screen size depending on the maximized state
+        if (stage.getX() == visualBounds.getMinX() && stage.getY() == visualBounds.getMinY() && stage.getWidth() == visualBounds.getWidth() && stage.getHeight() == visualBounds.getHeight()) {
+            stage.setWidth(1000);
+            stage.setHeight(600);
+            stage.centerOnScreen();
+        } else {
+            stage.setX(visualBounds.getMinX());
+            stage.setY(visualBounds.getMinY());
+            stage.setWidth(visualBounds.getWidth());
+            stage.setHeight(visualBounds.getHeight());
+        }
     }
 
     @FXML

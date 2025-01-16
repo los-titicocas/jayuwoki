@@ -1,30 +1,26 @@
 # Connect 
 
-- Se conecta a la base de datos, botones para conectar y desconectar.
 - Muestra el estado de la conexión.
 ---------------------------
 # Settings 
 
 - Configuración de la base de datos.
 - Configuración de la conexión.
+- Crear canal de info (?)
 
 ---------------------------
 
 # Logs
 
-- Historial de eventos.
-- Comandos usados por los usuarios (Tabla con usuario, hora y comando).
-
+- Alerts para borrar 
+- Ver datos usuario (?)
 ---------------------------
 # About 
 
 - Información sobre la aplicación.
 - Cómo usar la aplicación.
----------------------------
-# Contact 
+- Lista comandos
 
-- Links a los repositorios.
-- Link a la página web.
 ---------------------------
 # Database (Opcional se puede incluir en Settings)
 
@@ -34,6 +30,4 @@
 ---------------------------
 
 # BOT
-
-- Cambiar el bot y gestionar la conexión mediante un método.
-- Implementar dicho método en el panel de connect
+- Comandos
