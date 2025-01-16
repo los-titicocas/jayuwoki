@@ -1,5 +1,10 @@
 package dad.panels;
 
+import dad.api.models.LogEntry;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,23 +19,33 @@ import java.util.ResourceBundle;
 
 public class LogTable implements Initializable {
 
+    private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    public ListProperty<LogEntry> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(ListProperty<LogEntry> logs) {
+        this.logs = logs;
+    }
+
     @FXML
     private Button clearButton;
 
     @FXML
-    private TableColumn<?, ?> dateColumn;
+    private TableView<LogEntry> logsTable;
 
     @FXML
-    private TableView<?> logsTable;
+    private TableColumn<LogEntry, String> userColumn;
 
     @FXML
-    private TableColumn<?, ?> promptColumn;
+    private TableColumn<LogEntry, String> promptColumn;
+
+    @FXML
+    private TableColumn<LogEntry, String> dateColumn;
 
     @FXML
     private BorderPane root;
-
-    @FXML
-    private TableColumn<?, ?> userColumn;
 
     @FXML
     void onClearAction(ActionEvent event) {
@@ -55,15 +70,18 @@ public class LogTable implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // initialize log columns
-        userColumn.setCellValueFactory(null);
-        promptColumn.setCellValueFactory(null);
-        dateColumn.setCellValueFactory(null);
+        userColumn.setCellValueFactory(cellData -> cellData.getValue().userProperty());
+        promptColumn.setCellValueFactory(cellData -> cellData.getValue().promptProperty());
+        dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
+
+        // bind logs to logsTable
+        logsTable.itemsProperty().bindBidirectional(logs);
 
         // bind clearButton to logsTable selection
         clearButton.disableProperty().bind(logsTable.getSelectionModel().selectedItemProperty().isNull());
     }
 
-    public TableView<?> getLogsTable() {
+    public TableView<LogEntry> getLogsTable() {
         return logsTable;
     }
 
