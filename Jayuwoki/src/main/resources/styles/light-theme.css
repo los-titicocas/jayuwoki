@@ -1,0 +1,113 @@
+@font-face {
+    font-family: 'WorkSans-SemiBold';
+    src: url('/fonts/WorkSans-Bold.ttf');
+}
+
+* {
+    -fx-font-family: 'WorkSans-Bold';
+}
+
+.button {
+    -fx-border-color: black;
+    -fx-border-width: 2;
+    -fx-background-color: #EDA618;
+    -fx-text-fill: black;
+    -fx-alignment: center;
+    -fx-font-size: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 10, 0.5, 0, 0);
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 10 20;
+    -fx-transition: all 0.3s ease;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: #BF4904;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 15, 0.5, 0, 0);
+}
+
+#menuGridPane{
+    -fx-background-color: #eaa85f;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+}
+
+#borderPaneRoot {
+    -fx-background-color: #7c634c;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+}
+
+#contentPane {
+    -fx-border-color: black;
+    -fx-border-width: 2;
+    -fx-background-color: #FFEBA3;
+    -fx-background-image: url("/images/bochudin.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: right center;
+    -fx-background-size: contain;
+}
+
+#splashScreenRoot {
+    -fx-background-color: transparent;
+}
+
+#loginRoot {
+    -fx-background-image: url("/images/bochudin.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: right center;
+    -fx-background-size: contain;
+
+    -fx-background-color: #FFEBA3;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+}
+
+#loginRoot .hyperlink {
+    -fx-text-fill: #fb7621;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+}
+#loginRoot .hyperlink:hover {
+    -fx-text-fill: rgba(250, 213, 193, 0.75);
+}
+
+#customTitleBar {
+    -fx-background-color: #120f12;
+    -fx-border-color: black;
+}
+
+#maximizeButton {
+    -fx-background-color: #938d59;
+    -fx-background-radius: 20;
+}
+
+#minimizeButton {
+    -fx-background-color: #3b6511;
+    -fx-background-radius: 20;
+}
+
+#closeButton {
+    -fx-background-color: #852222;
+    -fx-background-radius: 20;
+}
+
+#connectBox, #aboutBox, #settingsBox, #contactBox, #logsBox {
+    -fx-background-color: #9c66e6;
+    -fx-border-color: black;
+    -fx-border-width: 3;
+    -fx-padding: 10;
+    -fx-background-radius: 5;
+}
+
+.text-info {
+    -fx-font-size: 18;
+    -fx-fill: black;
+}
+
+.button:disabled {
+    -fx-background-color: #d3d3d3;
+    -fx-text-fill: #a9a9a9;
+    -fx-opacity: 50%;
+}
