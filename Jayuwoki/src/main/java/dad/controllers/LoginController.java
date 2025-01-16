@@ -8,34 +8,47 @@ import javafx.fxml.Initializable;
 
 import java.awt.*;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import javafx.scene.paint.Color;
+
 public class LoginController implements Initializable {
 
     @FXML
-    private BorderPane root;
+    private BorderPane loginRoot;
 
     @FXML
     void onAccessAction(ActionEvent event) {
-        // close login window
-        Stage stage = (Stage) root.getScene().getWindow();
+        // Close login window
+        Stage stage = (Stage) loginRoot.getScene().getWindow();
         stage.close();
 
-        // open main window
+        // Open main window (splash screen)
         SplashScreenController splashScreenController = new SplashScreenController();
+
+        // Create scene and stage for splash screen
         Scene scene = new Scene(splashScreenController.getRoot());
         Stage mainStage = new Stage();
-        mainStage.initStyle(StageStyle.UNDECORATED);
+        Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
+
+        mainStage.getIcons().add(appIcon);
+        mainStage.initStyle(StageStyle.TRANSPARENT);  // Ensure the splash screen has no border
         mainStage.setScene(scene);
+
+        // Set the scene's background to transparent after it is created
+        scene.setFill(Color.TRANSPARENT);  // Make the scene transparent
+
         mainStage.show();
         fadeIn(splashScreenController.getRoot());
     }
@@ -61,7 +74,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        root.setTop(new CustomTitleBar().getRoot());}
+        loginRoot.setTop(new CustomTitleBar().getRoot());}
 
     public void fadeIn(Node node) {
         FadeTransition fade = new FadeTransition(Duration.seconds(2), node);
@@ -71,6 +84,6 @@ public class LoginController implements Initializable {
     }
 
     public BorderPane getRoot() {
-        return root;
+        return loginRoot;
     }
 }

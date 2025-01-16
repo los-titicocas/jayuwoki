@@ -4,6 +4,7 @@ import dad.api.Bot;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -22,7 +23,16 @@ public class CustomTitleBar implements Initializable {
     }
 
     @FXML
-    private GridPane root;
+    private Button closeButton;
+
+    @FXML
+    private GridPane customTitleBar;
+
+    @FXML
+    private Button maximizeButton;
+
+    @FXML
+    private Button minimizeButton;
 
     public CustomTitleBar() {
         try {
@@ -37,14 +47,14 @@ public class CustomTitleBar implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        root.setOnMousePressed(event -> {
-            Stage stage = (Stage) root.getScene().getWindow();
+        customTitleBar.setOnMousePressed(event -> {
+            Stage stage = (Stage) customTitleBar.getScene().getWindow();
             xOffset = stage.getX() - event.getScreenX();
             yOffset = stage.getY() - event.getScreenY();
         });
 
-        root.setOnMouseDragged(event -> {
-            Stage stage = (Stage) root.getScene().getWindow();
+        customTitleBar.setOnMouseDragged(event -> {
+            Stage stage = (Stage) customTitleBar.getScene().getWindow();
             stage.setX(event.getScreenX() + xOffset);
             stage.setY(event.getScreenY() + yOffset);
         });
@@ -52,29 +62,28 @@ public class CustomTitleBar implements Initializable {
 
     @FXML
     private void onMinimizeWindow() {
-        Stage stage = (Stage) root.getScene().getWindow();
+        Stage stage = (Stage) customTitleBar.getScene().getWindow();
         stage.setIconified(true);
     }
 
     @FXML
     private void onMaximizeWindow() {
-        Stage stage = (Stage) root.getScene().getWindow();
+        Stage stage = (Stage) customTitleBar.getScene().getWindow();
         stage.setMaximized(!stage.isMaximized());
     }
 
     @FXML
     public void onCloseWindow() {
-        Stage stage = (Stage) root.getScene().getWindow();
+        Stage stage = (Stage) customTitleBar.getScene().getWindow();
         stage.close();
 
         if (bot != null) {
             bot.stopConnection();
         }
-
     }
 
     public GridPane getRoot() {
-        return root;
+        return customTitleBar;
     }
 }
 

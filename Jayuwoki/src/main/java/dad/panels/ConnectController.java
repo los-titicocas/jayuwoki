@@ -27,7 +27,7 @@ public class ConnectController implements Initializable {
     private Button disconnectButton;
 
     @FXML
-    private GridPane root;
+    private GridPane connectRoot;
 
     public ConnectController() {
         try {
@@ -69,6 +69,6 @@ public class ConnectController implements Initializable {
 
 
     public GridPane getRoot() {
-        return root;
+        return connectRoot;
     }
 }

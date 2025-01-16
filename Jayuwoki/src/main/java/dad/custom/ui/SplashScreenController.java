@@ -1,25 +1,32 @@
 package dad.custom.ui;
 
-import dad.api.Bot;
 import dad.controllers.MainController;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.image.Image;
+
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import jfxtras.scene.layout.CircularPane;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class SplashScreenController implements Initializable {
 
     @FXML
-    private AnchorPane root;
+    private StackPane splashScreenRoot;
 
+    @FXML
+    private CircularPane circularPane;
 
     public SplashScreenController() {
         try {
@@ -33,26 +40,39 @@ public class SplashScreenController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // loads the splash screen for 2 seconds and then loads the main window
+
+        // Apply the circular clip to make the splash screen circular
+        Circle clip = new Circle(150); // Half of CircularPane's width/height
+        clip.centerXProperty().bind(splashScreenRoot.widthProperty().divide(2));
+        clip.centerYProperty().bind(splashScreenRoot.heightProperty().divide(2));
+        splashScreenRoot.setClip(clip); // Clip root pane to make it circular
+
+        // Loads the splash screen for 2 seconds and then loads the main window
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(event -> {
             try {
                 Stage mainStage = new Stage();
                 MainController mainController = new MainController(mainStage);
-                Scene scene = new Scene(mainController.getRoot());
-                mainStage.initStyle(StageStyle.UNDECORATED);
-                mainStage.setScene(scene);
+                Scene sceneMain = new Scene(mainController.getRoot());
+                Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
+
+                mainStage.getIcons().add(appIcon);
+                mainStage.initStyle(StageStyle.UNDECORATED); // No border for the main window
+                mainStage.setScene(sceneMain);
                 mainStage.show();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.close();
+            Stage stage = (Stage) splashScreenRoot.getScene().getWindow();
+            stage.close(); // Close splash screen after 2 seconds
         });
         pause.play();
     }
 
-    public AnchorPane getRoot() {
-        return root;
+    public StackPane getRoot() {
+        return splashScreenRoot;
+    }
+    public CircularPane getCircularPane() {
+        return circularPane;
     }
 }
