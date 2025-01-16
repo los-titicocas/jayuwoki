@@ -50,7 +50,7 @@
 }
 
 #circularPane {
-    -fx-background-color: #1c0925;
+    -fx-background-color: #ffbaba;
     -fx-border-color: black;
     -fx-border-width: 2px;
     -fx-background-radius: 150px;
@@ -59,7 +59,7 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
     -fx-background-size: 80%;
-    -fx-effect: dropshadow(gaussian, rgba(173, 173, 237, 0.8), 20, 0.5, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(168, 168, 250, 0.8), 20, 0.5, 0, 0);
 }
 
 #splashScreenRoot {
@@ -117,4 +117,10 @@
 .text-info {
     -fx-font-size: 18;
     -fx-fill: black;
+}
+
+.button:disabled {
+    -fx-background-color: #d3d3d3;
+    -fx-text-fill: #a9a9a9;
+    -fx-opacity: 50%;
 }

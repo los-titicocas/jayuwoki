@@ -1,7 +1,7 @@
 package dad.app;
 
-import dad.controllers.LoginController;
 import dad.custom.ui.SplashScreenController;
+import dad.utils.Utils;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.scene.Node;
@@ -20,9 +20,12 @@ public class JayuwokiApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Utils.loadProperties();
 
-        String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
-        Application.setUserAgentStylesheet(darkTheme);
+        String theme = Utils.properties.getProperty("theme", "dark");
+        String themePath = getClass().getResource("/styles/" + theme + "-theme.css").toExternalForm();
+        Application.setUserAgentStylesheet(themePath);
+
         Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
 
         Scene scene = new Scene(splashScreenController.getRoot());
@@ -42,5 +45,4 @@ public class JayuwokiApp extends Application {
         fade.setToValue(1);
         fade.play();
     }
-
 }
