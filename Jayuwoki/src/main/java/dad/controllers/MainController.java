@@ -17,7 +17,6 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import org.apache.commons.logging.Log;
 import org.controlsfx.control.PopOver;
 
 import java.net.URL;
@@ -270,7 +269,7 @@ public class MainController implements Initializable {
 
         // Bind the logs from the Command class to the one in the log table
         logTable.getLogs().bind(connectController.getBot().getCommands().getLogs());
-        contentPane.getChildren().setAll(logTable.getRoot());
+        contentPane.getChildren().setAll(logTable.getLogRoot());
     }
 
     @FXML

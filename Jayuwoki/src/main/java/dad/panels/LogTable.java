@@ -6,7 +6,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -50,7 +49,7 @@ public class LogTable implements Initializable {
     private TableColumn<LogEntry, String> dateColumn;
 
     @FXML
-    private BorderPane root;
+    private BorderPane logRoot;
 
     @FXML
     void onClearAction(ActionEvent event) {
@@ -93,7 +92,7 @@ public class LogTable implements Initializable {
         return logsTable;
     }
 
-    public BorderPane getRoot() {
-        return root;
+    public BorderPane getLogRoot() {
+        return logRoot;
     }
 }

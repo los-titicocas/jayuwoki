@@ -6,6 +6,7 @@
 
 - Configuración de la base de datos.
 - Configuración de la conexión.
+- Crear canal de info (?)
 
 ---------------------------
 
@@ -18,6 +19,7 @@
 
 - Información sobre la aplicación.
 - Cómo usar la aplicación.
+- Lista comandos
 
 ---------------------------
 # Database (Opcional se puede incluir en Settings)

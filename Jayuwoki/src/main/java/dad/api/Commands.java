@@ -2,6 +2,7 @@ package dad.api;
 
 import dad.api.models.LogEntry;
 import dad.api.models.Player;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ public class Commands extends ListenerAdapter {
     private final ArrayList<String> roles = new ArrayList<>(List.of("Top", "Jungla", "Mid", "ADC", "Support"));
     private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private BooleanProperty activaGame
 
     public ListProperty<LogEntry> getLogs() {
         return logs;
@@ -119,5 +121,6 @@ public class Commands extends ListenerAdapter {
         String formattedMessage = messageBuilder.toString();
         event.getChannel().sendMessage(formattedMessage).queue();
 
+        players.clear();
     }
 }
