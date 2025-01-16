@@ -49,6 +49,7 @@ public class Bot {
                     .build();
 
             jda.addEventListener(commands);
+            jda.addEventListener(new EventoPrueba());
             isConnected.set(true);
         }
     }
@@ -68,4 +69,11 @@ public class Bot {
     public BooleanProperty isconnectedProperty() {
         return isConnected;
     }
+
+    public static void main(String[] args) throws IOException {
+        Bot bot = new Bot();
+        bot.startConnection();
+    }
+
 }
+
