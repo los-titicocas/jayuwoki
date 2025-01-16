@@ -61,6 +61,7 @@ public class Commands extends ListenerAdapter {
                     } else {
                         event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
                     }
+                    break;
             }
         }
     }

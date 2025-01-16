@@ -2,7 +2,9 @@ package dad.panels;
 
 import dad.api.models.LogEntry;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,9 +23,12 @@ public class LogTable implements Initializable {
 
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
 
+    private ObjectProperty<LogEntry> selectedLog = new SimpleObjectProperty<>();
+
     public ListProperty<LogEntry> getLogs() {
         return logs;
     }
+
 
     public void setLogs(ListProperty<LogEntry> logs) {
         this.logs = logs;
@@ -49,12 +54,12 @@ public class LogTable implements Initializable {
 
     @FXML
     void onClearAction(ActionEvent event) {
-
+        logs.remove(selectedLog.get());
     }
 
     @FXML
     void onRefreshAction(ActionEvent event) {
-
+        logs.clear();
     }
 
     public LogTable() {
@@ -79,6 +84,9 @@ public class LogTable implements Initializable {
 
         // bind clearButton to logsTable selection
         clearButton.disableProperty().bind(logsTable.getSelectionModel().selectedItemProperty().isNull());
+
+        // bind selectedLog to logsTable selection
+        selectedLog.bind(logsTable.getSelectionModel().selectedItemProperty());
     }
 
     public TableView<LogEntry> getLogsTable() {
