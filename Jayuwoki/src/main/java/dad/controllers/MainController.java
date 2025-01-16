@@ -1,9 +1,11 @@
 package dad.controllers;
 
+import dad.app.JayuwokiApp;
 import dad.custom.ui.CustomTitleBar;
 import dad.panels.ConnectController;
 import dad.panels.ContactController;
 import dad.panels.LogTable;
+import dad.utils.Utils;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +18,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Stage;
 import org.controlsfx.control.PopOver;
 
 import java.net.URL;
@@ -278,14 +279,16 @@ public class MainController implements Initializable {
 
     @FXML
     void onChangeTheme(ActionEvent event) {
-        //TODO: Implement theme change with own css files
         String lightTheme = getClass().getResource("/styles/light-theme.css").toExternalForm();
         String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
 
-        if (Application.getUserAgentStylesheet().equals(darkTheme)) {
+        String currentTheme = Utils.properties.getProperty("theme", "dark");
+        if (currentTheme.equals("dark")) {
             Application.setUserAgentStylesheet(lightTheme);
+            Utils.setTheme("light");
         } else {
             Application.setUserAgentStylesheet(darkTheme);
+            Utils.setTheme("dark");
         }
     }
 

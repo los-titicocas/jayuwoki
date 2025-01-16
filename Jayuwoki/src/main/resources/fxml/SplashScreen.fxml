@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import jfxtras.scene.layout.CircularPane?>
 
-<StackPane fx:id="splashScreenRoot" stylesheets="@../styles/dark-theme.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="splashScreenRoot" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <CircularPane fx:id="circularPane" childrenAreCircular="true" gap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" stylesheets="@../styles/dark-theme.css" StackPane.alignment="CENTER" />
    </children>
