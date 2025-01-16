@@ -1,7 +1,5 @@
 package dad.app;
 
-import atlantafx.base.theme.Dracula;
-import atlantafx.base.theme.PrimerDark;
 import dad.controllers.LoginController;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,7 +19,7 @@ public class JayuwokiApp extends Application {
 //        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
         Application.setUserAgentStylesheet(darkTheme);
-        Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/bochudin.png")).toString());
+        Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
 
         Scene scene = new Scene(loginController.getRoot());
         Stage stage = new Stage();

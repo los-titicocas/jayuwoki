@@ -18,7 +18,7 @@
 <?import javafx.scene.text.TextFlow?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" stylesheets="@../styles/dark-theme.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane fx:id="borderPaneRoot" prefHeight="200.0" prefWidth="200.0">
          <bottom>
@@ -70,12 +70,12 @@
                         <RowConstraints minHeight="10.0" vgrow="NEVER" />
                      </rowConstraints>
                      <children>
-                        <Button mnemonicParsing="false" onAction="#onCollapseAction" GridPane.columnIndex="1">
+                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCollapseAction" prefHeight="30.0" prefWidth="30.0" GridPane.columnIndex="1">
                            <GridPane.margin>
                               <Insets />
                            </GridPane.margin>
                            <graphic>
-                              <FontIcon iconLiteral="mdi2a-arrow-collapse-left" iconSize="10" text="󰞓" />
+                              <FontIcon iconLiteral="mdi2a-arrow-collapse-left" iconSize="15" text="󰞓" />
                            </graphic>
                         </Button>
                         <Button fx:id="connectButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onAction="#onConnectAction" text="Connect" GridPane.columnSpan="2" GridPane.rowIndex="1" />
