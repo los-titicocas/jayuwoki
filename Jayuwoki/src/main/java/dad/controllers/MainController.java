@@ -101,7 +101,7 @@ public class MainController implements Initializable {
     private AnchorPane tutorialPane;
 
 
-    public MainController(Stage stage) {
+    public MainController() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainControllerView.fxml"));
             loader.setController(this);

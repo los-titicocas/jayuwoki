@@ -35,22 +35,18 @@ public class LoginController implements Initializable {
         stage.close();
 
         // Open main window (splash screen)
-        SplashScreenController splashScreenController = new SplashScreenController();
+        MainController mainController = new MainController();
 
         // Create scene and stage for splash screen
-        Scene scene = new Scene(splashScreenController.getRoot());
+        Scene scene = new Scene(mainController.getRoot());
         Stage mainStage = new Stage();
         Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
 
         mainStage.getIcons().add(appIcon);
-        mainStage.initStyle(StageStyle.TRANSPARENT);  // Ensure the splash screen has no border
+        mainStage.initStyle(StageStyle.UNDECORATED);
         mainStage.setScene(scene);
 
-        // Set the scene's background to transparent after it is created
-        scene.setFill(Color.TRANSPARENT);  // Make the scene transparent
-
         mainStage.show();
-        fadeIn(splashScreenController.getRoot());
     }
 
     @FXML
@@ -75,13 +71,6 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loginRoot.setTop(new CustomTitleBar().getRoot());}
-
-    public void fadeIn(Node node) {
-        FadeTransition fade = new FadeTransition(Duration.seconds(2), node);
-        fade.setFromValue(0);
-        fade.setToValue(1);
-        fade.play();
-    }
 
     public BorderPane getRoot() {
         return loginRoot;

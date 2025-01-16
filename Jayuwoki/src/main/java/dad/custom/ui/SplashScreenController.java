@@ -1,5 +1,6 @@
 package dad.custom.ui;
 
+import dad.controllers.LoginController;
 import dad.controllers.MainController;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -52,7 +53,7 @@ public class SplashScreenController implements Initializable {
         pause.setOnFinished(event -> {
             try {
                 Stage mainStage = new Stage();
-                MainController mainController = new MainController(mainStage);
+                LoginController mainController = new LoginController();
                 Scene sceneMain = new Scene(mainController.getRoot());
                 Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
 
