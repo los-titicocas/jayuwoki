@@ -37,14 +37,6 @@
    <bottom>
       <ButtonBar buttonMinWidth="0.0" BorderPane.alignment="CENTER">
         <buttons>
-          <Button mnemonicParsing="false" onAction="#onRefreshAction">
-               <graphic>
-                  <FontIcon iconLiteral="mdi2r-refresh" iconSize="20" />
-               </graphic>
-               <tooltip>
-                  <Tooltip text="Refresh logs" />
-               </tooltip>
-            </Button>
             <Button fx:id="clearButton" mnemonicParsing="false" onAction="#onClearAction">
                <graphic>
                   <FontIcon iconLiteral="mdi2t-trash-can" iconSize="20" />
