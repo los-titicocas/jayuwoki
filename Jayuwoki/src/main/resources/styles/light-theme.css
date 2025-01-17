@@ -10,8 +10,8 @@
 .button {
     -fx-border-color: black;
     -fx-border-width: 2;
-    -fx-background-color: #EDA618;
-    -fx-text-fill: black;
+    -fx-background-color: #5b9edf;
+    -fx-text-fill: white;
     -fx-alignment: center;
     -fx-font-size: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 10, 0.5, 0, 0);
@@ -23,18 +23,18 @@
 }
 
 .button:hover {
-    -fx-background-color: #BF4904;
+    -fx-background-color: #0a78f4;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 15, 0.5, 0, 0);
 }
 
 #menuGridPane{
-    -fx-background-color: #eaa85f;
+    -fx-background-color: #DEE4E7;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
 
 #borderPaneRoot {
-    -fx-background-color: #7c634c;
+    -fx-background-color: #FFFFFF;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
@@ -42,11 +42,7 @@
 #contentPane {
     -fx-border-color: black;
     -fx-border-width: 2;
-    -fx-background-color: #FFEBA3;
-    -fx-background-image: url("/images/bochudin.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: right center;
-    -fx-background-size: contain;
+    -fx-background-color: #def0f4;
 }
 
 #splashScreenRoot {
@@ -59,7 +55,7 @@
     -fx-background-position: right center;
     -fx-background-size: contain;
 
-    -fx-background-color: #FFEBA3;
+    -fx-background-color: #FFFFFF;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
@@ -74,7 +70,7 @@
 }
 
 #customTitleBar {
-    -fx-background-color: #120f12;
+    -fx-background-color: #fae9e9;
     -fx-border-color: black;
 }
 
@@ -110,4 +106,9 @@
     -fx-background-color: #d3d3d3;
     -fx-text-fill: #a9a9a9;
     -fx-opacity: 50%;
+}
+
+#tutorialButton, #themeButton {
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
 }
