@@ -75,4 +75,5 @@ public class Bot {
         Bot bot = new Bot();
         bot.startConnection();
     }
+}
 

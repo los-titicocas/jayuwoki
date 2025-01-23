@@ -2,6 +2,7 @@ package dad.controllers;
 
 import dad.app.JayuwokiApp;
 import dad.custom.ui.CustomTitleBar;
+import dad.panels.AboutController;
 import dad.panels.ConnectController;
 import dad.panels.ContactController;
 import dad.panels.LogTable;
@@ -34,6 +35,7 @@ public class MainController implements Initializable {
     // Controllers
     private final ContactController contactController = new ContactController();
     private final ConnectController connectController = new ConnectController();
+    private final AboutController aboutController = new AboutController();
 
     @FXML
     private VBox aboutBox;
@@ -100,7 +102,6 @@ public class MainController implements Initializable {
 
     @FXML
     private AnchorPane tutorialPane;
-
 
     public MainController() {
         try {
@@ -250,6 +251,7 @@ public class MainController implements Initializable {
 
     @FXML
     void onAboutAction(ActionEvent event) {
+        contentPane.getChildren().setAll(aboutController.getRoot());
     }
 
     @FXML
