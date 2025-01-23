@@ -57,6 +57,9 @@ public class MainController implements Initializable {
     private TextFlow aboutInfo;
 
     @FXML
+    private BorderPane borderPaneRoot;
+
+    @FXML
     private VBox connectBox;
 
     @FXML
@@ -69,9 +72,6 @@ public class MainController implements Initializable {
     private VBox contactBox;
 
     @FXML
-    private GridPane menuGridPane;
-
-    @FXML
     private Button contactButton;
 
     @FXML
@@ -81,12 +81,6 @@ public class MainController implements Initializable {
     private StackPane contentPane;
 
     @FXML
-    private Button themeButton;
-
-    @FXML
-    private BorderPane borderPaneRoot;
-
-    @FXML
     private Button logButton;
 
     @FXML
@@ -94,6 +88,9 @@ public class MainController implements Initializable {
 
     @FXML
     private TextFlow logsInfo;
+
+    @FXML
+    private GridPane menuGridPane;
 
     @FXML
     private StackPane root;
@@ -109,6 +106,9 @@ public class MainController implements Initializable {
 
     @FXML
     private SplitPane splitPaneRoot;
+
+    @FXML
+    private Button themeButton;
 
     @FXML
     private Button tutorialButton;
@@ -182,7 +182,7 @@ public class MainController implements Initializable {
     private PopOver createPopOver(VBox content) {
         PopOver popOver = new PopOver(content);
         popOver.styleProperty().setValue("-fx-background-color: orange;");
-        popOver.setOpacity(0.7);
+        popOver.setOpacity(0.9);
         popOver.autoHideProperty().setValue(false);
         popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
         popOver.setDetachable(false);
@@ -229,46 +229,47 @@ public class MainController implements Initializable {
             stopTutorial();
         }
     }
+
     private void showTutorialStep(int step) {
         disableTutorialBox();
-
-        borderPaneRoot.setOpacity(0.3);
-
         tutorialPane.setVisible(true);
         tutorialPane.getChildren().clear();
 
+        borderPaneRoot.setOpacity(0.3);
+
         PopOver currentPopOver = tutorialPopOvers.get(step);
         if (currentPopOver != null) {
+
             switch (step) {
                 case 0:
                     connectBox.setVisible(true);
-                    connectButton.setEffect(glow);
                     currentPopOver.show(connectButton);
                     break;
+
                 case 1:
                     settingsBox.setVisible(true);
-                    settingsButton.setEffect(glow);
                     currentPopOver.show(settingsButton);
                     break;
+
                 case 2:
                     logsBox.setVisible(true);
-                    logButton.setEffect(glow);
                     currentPopOver.show(logButton);
                     break;
+
                 case 3:
                     aboutBox.setVisible(true);
-                    aboutButton.setEffect(glow);
                     currentPopOver.show(aboutButton);
                     break;
+
                 case 4:
                     contactBox.setVisible(true);
-                    contactButton.setEffect(glow);
                     currentPopOver.show(contactButton);
                     break;
             }
         }
         tutorialPane.setVisible(true);
     }
+
 
     @FXML
     void onAboutAction(ActionEvent event) {

@@ -10,7 +10,7 @@
 .button {
     -fx-border-color: black;
     -fx-border-width: 2;
-    -fx-background-color: #9c349c;
+    -fx-background-color: #00bcd4;
     -fx-text-fill: black;
     -fx-alignment: center;
     -fx-font-size: 16;
@@ -23,7 +23,7 @@
 }
 
 .button:hover {
-    -fx-background-color: #ef77ef;
+    -fx-background-color: #90f0fa;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 15, 0.5, 0, 0);
 }
 
@@ -46,7 +46,7 @@
 }
 
 #circularPane {
-    -fx-background-color: #ffbaba;
+    -fx-background-color: #0c0909;
     -fx-border-color: black;
     -fx-border-width: 2px;
     -fx-background-radius: 150px;
