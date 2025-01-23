@@ -6,8 +6,6 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -22,9 +20,9 @@
    <children>
       <BorderPane fx:id="borderPaneRoot" prefHeight="200.0" prefWidth="200.0">
          <bottom>
-            <ButtonBar buttonMinWidth="30.0" maxHeight="-Infinity" maxWidth="-Infinity" BorderPane.alignment="BOTTOM_RIGHT">
+            <ButtonBar buttonMinWidth="30.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="BOTTOM_RIGHT">
                <buttons>
-                  <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onChangeTheme" prefWidth="30.0">
+                  <Button fx:id="themeButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onChangeTheme" prefHeight="40.0" prefWidth="40.0">
                      <graphic>
                         <FontIcon iconLiteral="mdi2w-white-balance-sunny" iconSize="20" />
                      </graphic>
@@ -32,7 +30,7 @@
                         <Tooltip text="Switch themes" />
                      </tooltip>
                   </Button>
-                  <Button fx:id="tutorialButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onTutorialAction" prefWidth="30.0">
+                  <Button fx:id="tutorialButton" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onTutorialAction" prefHeight="40.0" prefWidth="40.0">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-account-question" iconSize="20" />
                      </graphic>
@@ -42,7 +40,7 @@
                   </Button>
                </buttons>
                <BorderPane.margin>
-                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                  <Insets bottom="3.0" right="3.0" />
                </BorderPane.margin>
             </ButtonBar>
          </bottom>
@@ -83,11 +81,11 @@
                         <Button fx:id="logButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogsAction" text="Logs" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                         <Button fx:id="aboutButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onAction="#onAboutAction" text="About" GridPane.columnSpan="2" GridPane.rowIndex="7" />
                         <Button fx:id="contactButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onAction="#onContactAction" text="Contact" GridPane.columnSpan="2" GridPane.rowIndex="9" />
-                        <Separator prefWidth="200.0" GridPane.rowIndex="2" />
-                        <Separator prefWidth="200.0" GridPane.rowIndex="4" />
-                        <Separator prefWidth="200.0" GridPane.rowIndex="6" />
-                        <Separator prefWidth="200.0" GridPane.rowIndex="8" />
-                        <Separator prefWidth="200.0" GridPane.rowIndex="10" />
+                        <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                        <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                        <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                        <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                        <Separator prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="10" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -110,10 +108,6 @@
             <VBox fx:id="connectBox" alignment="CENTER" layoutX="188.0" layoutY="4.800000190734863" spacing="10.0" AnchorPane.leftAnchor="188.0" AnchorPane.topAnchor="5.0">
                <children>
                   <TextFlow fx:id="connectInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/bochudin.png" />
-                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -124,10 +118,6 @@
             <VBox fx:id="settingsBox" alignment="CENTER" layoutX="188.0" layoutY="46.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
                <children>
                   <TextFlow fx:id="settingsInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/bochudin.png" />
-                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -138,10 +128,6 @@
             <VBox fx:id="logsBox" alignment="CENTER" layoutX="188.0" layoutY="89.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
                <children>
                   <TextFlow fx:id="logsInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/bochudin.png" />
-                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -152,10 +138,6 @@
             <VBox fx:id="aboutBox" alignment="CENTER" layoutX="188.0" layoutY="128.0" spacing="10.0">
                <children>
                   <TextFlow fx:id="aboutInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/bochudin.png" />
-                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />
@@ -166,10 +148,6 @@
             <VBox fx:id="contactBox" alignment="CENTER" layoutX="188.0" layoutY="170.0" spacing="10.0" AnchorPane.leftAnchor="188.0">
                <children>
                   <TextFlow fx:id="contactInfo" />
-                  <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/bochudin.png" />
-                     </image></ImageView>
                   <Button mnemonicParsing="false" onAction="#onNextAction">
                      <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-right-bold" />

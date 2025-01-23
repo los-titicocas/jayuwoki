@@ -8,24 +8,34 @@ import dad.panels.ContactController;
 import dad.panels.LogTable;
 import dad.utils.Utils;
 import javafx.application.Application;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.scene.SnapshotResult;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import okhttp3.internal.cache.DiskLruCache;
 import org.controlsfx.control.PopOver;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
 
@@ -69,6 +79,9 @@ public class MainController implements Initializable {
 
     @FXML
     private StackPane contentPane;
+
+    @FXML
+    private Button themeButton;
 
     @FXML
     private BorderPane borderPaneRoot;
@@ -213,39 +226,47 @@ public class MainController implements Initializable {
         tutorialPopOvers.get(tutorialStep - 1).hide();
 
         if (tutorialStep == 5) {
-            tutorialPane.setVisible(false);
+            stopTutorial();
         }
     }
-
     private void showTutorialStep(int step) {
         disableTutorialBox();
+
+        borderPaneRoot.setOpacity(0.3);
+
+        tutorialPane.setVisible(true);
+        tutorialPane.getChildren().clear();
 
         PopOver currentPopOver = tutorialPopOvers.get(step);
         if (currentPopOver != null) {
             switch (step) {
                 case 0:
                     connectBox.setVisible(true);
+                    connectButton.setEffect(glow);
                     currentPopOver.show(connectButton);
                     break;
                 case 1:
                     settingsBox.setVisible(true);
+                    settingsButton.setEffect(glow);
                     currentPopOver.show(settingsButton);
                     break;
                 case 2:
                     logsBox.setVisible(true);
+                    logButton.setEffect(glow);
                     currentPopOver.show(logButton);
                     break;
                 case 3:
                     aboutBox.setVisible(true);
+                    aboutButton.setEffect(glow);
                     currentPopOver.show(aboutButton);
                     break;
                 case 4:
                     contactBox.setVisible(true);
+                    contactButton.setEffect(glow);
                     currentPopOver.show(contactButton);
                     break;
             }
         }
-
         tutorialPane.setVisible(true);
     }
 
@@ -257,7 +278,6 @@ public class MainController implements Initializable {
     @FXML
     void onConnectAction(ActionEvent event) {
         contentPane.getChildren().setAll(connectController.getRoot());
-
     }
 
     @FXML
@@ -292,6 +312,13 @@ public class MainController implements Initializable {
             Application.setUserAgentStylesheet(darkTheme);
             Utils.setTheme("dark");
         }
+    }
+
+    private void stopTutorial() {
+        tutorialPopOvers.forEach((key, value) -> value.hide());
+        tutorialStep = 0;
+        tutorialPane.setVisible(false);
+        borderPaneRoot.setOpacity(1);
     }
 
     // getters and setters

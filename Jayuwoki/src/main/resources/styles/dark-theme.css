@@ -10,8 +10,8 @@
 .button {
     -fx-border-color: black;
     -fx-border-width: 2;
-    -fx-background-color: #4F3F8C;
-    -fx-text-fill: #C8C1E8;
+    -fx-background-color: #9c349c;
+    -fx-text-fill: black;
     -fx-alignment: center;
     -fx-font-size: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 10, 0.5, 0, 0);
@@ -23,18 +23,18 @@
 }
 
 .button:hover {
-    -fx-background-color: #6A5FBB;
+    -fx-background-color: #ef77ef;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 15, 0.5, 0, 0);
 }
 
 #menuGridPane{
-    -fx-background-color: #9d4dd3;
+    -fx-background-color: #121212;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
 
 #borderPaneRoot {
-    -fx-background-color: #7a27af;
+    -fx-background-color: #212121;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
@@ -42,11 +42,7 @@
 #contentPane {
     -fx-border-color: black;
     -fx-border-width: 2;
-    -fx-background-color: #c77ef4;
-    -fx-background-image: url("/images/bochudin.png");
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: right center;
-    -fx-background-size: contain;
+    -fx-background-color: #424242;
 }
 
 #circularPane {
@@ -72,7 +68,7 @@
     -fx-background-position: right center;
     -fx-background-size: contain;
 
-    -fx-background-color: #3c214e;
+    -fx-background-color: #212121;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
@@ -107,11 +103,13 @@
 }
 
 #connectBox, #aboutBox, #settingsBox, #contactBox, #logsBox {
-    -fx-background-color: #ca930e;
+    -fx-background-color: #434343;
     -fx-border-color: black;
+    -fx-text-fill: white;
     -fx-border-width: 3;
     -fx-padding: 10;
     -fx-background-radius: 5;
+    -fx-border-radius: 5;
 }
 
 .text-info {
@@ -123,4 +121,18 @@
     -fx-background-color: #d3d3d3;
     -fx-text-fill: #a9a9a9;
     -fx-opacity: 50%;
+}
+
+#tutorialButton, #themeButton {
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+}
+
+.tooltip {
+    -fx-background-color: #424242;
+    -fx-text-fill: white;
+    -fx-font-family: WorkSans;
+    -fx-font-size: 10;
+    -fx-border-radius: 5;
+    -fx-padding: 8;
 }
