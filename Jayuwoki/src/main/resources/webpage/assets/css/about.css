@@ -1,0 +1,126 @@
+/* General styles */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1c1c1c;
+    color: #f5f5f5;
+    line-height: 1.6;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #2c2c2c;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+}
+
+/* Header styles */
+h1, h2 {
+    color: #00e5ff; /* Color más claro para mejor legibilidad */
+    border-bottom: 2px solid #00bcd4;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-top: 30px;
+}
+
+/* Paragraph styles */
+p {
+    font-size: 1.125rem;
+    margin-bottom: 20px;
+}
+
+/* List styles */
+ol, ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+li::before {
+    content: '\f00c';
+    font-family: 'FontAwesome';
+    margin-right: 10px;
+    color: #00bcd4;
+}
+
+/* Code block styles */
+code {
+    background-color: #333;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #f5f5f5;
+}
+
+/* Ordered list styles */
+ol li {
+    counter-increment: step-counter;
+    margin-bottom: 15px;
+    padding-left: 25px;
+    position: relative;
+}
+
+ol li::before {
+    content: counter(step-counter) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    color: #888;
+}
+
+/* Button styles */
+button {
+    background-color: #00bcd4;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    display: inline-block;
+    font-size: 1em;
+    margin: 10px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #008c9e;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    p, li {
+        font-size: 1em;
+    }
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link rel="stylesheet" href="assets/css/about.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .flag {
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="language-switcher">
+    <img src="assets/images/banderas/spain.png" alt="Español" class="flag" onclick="changeLanguage('es')">
+    <img src="assets/images/banderas/uk.png" alt="English" class="flag" onclick="changeLanguage('en')">
+</div>
+<h1 id="title">About</h1>
+<h2 id="app-info">Información sobre la aplicación</h2>
+<p id="description">Esta aplicación permite gestionar un bot de Discord utilizando JavaFX y Firebase.</p>
+<h2 id="how-to-add">Cómo añadir el bot a tu servidor de Discord</h2>
+<ol id="steps">
+    <li>Ve a la página de desarrolladores de Discord y crea una nueva app</li>
+    <li>Genera un token para tu bot y configúralo en el archivo <code>api.config</code>.</li>
+    <li>Invita al bot a tu servidor de Discord utilizando el enlace de invitación generado.</li>
+</ol>
+<h2 id="commands-title">Lista de comandos del bot</h2>
+<ul id="commands-list">
+    <li><strong>$privadita</strong>: Inicia una partida privada con 10 jugadores.</li>
+    <li><strong>$dropPrivadita</strong>: Cancela la partida privada en curso.</li>
+    <li><strong>marco</strong>: Responde con 'Polo'.</li>
+    <li><strong>hola</strong>: Responde con un mensaje personalizado.</li>
+    <li><strong>razón</strong>: Responde con 'Que si, Que si'.</li>
+    <li><strong>mike</strong>: Responde con 'sáquelo a pasear'.</li>
+    <li><strong>5</strong>: Envía una imagen de Vegeta.</li>
+</ul>
+
+<script>
+    const translations = {
+        es: {
+            title: "Acerca de",
+            appInfo: "Información sobre la aplicación",
+            description: "Esta aplicación permite gestionar un bot de Discord utilizando JavaFX y Firebase.",
+            howToAdd: "Cómo añadir el bot a tu servidor de Discord",
+            steps: [
+                "Ve a la página de desarrolladores de Discord y crea una nueva app",
+                "Genera un token para tu bot y configúralo en el archivo <code>api.config</code>.",
+                "Invita al bot a tu servidor de Discord utilizando el enlace de invitación generado."
+            ],
+            commandsTitle: "Lista de comandos del bot",
+            commandsList: [
+                "<strong>$privadita</strong>: Inicia una partida privada con 10 jugadores.",
+                "<strong>$dropPrivadita</strong>: Cancela la partida privada en curso.",
+                "<strong>marco</strong>: Responde con 'Polo'.",
+                "<strong>hola</strong>: Responde con un mensaje personalizado.",
+                "<strong>razón</strong>: Responde con 'Que si, Que si'.",
+                "<strong>mike</strong>: Responde con 'sáquelo a pasear'.",
+                "<strong>5</strong>: Envía una imagen de Vegeta."
+            ]
+        },
+        en: {
+            title: "About",
+            appInfo: "Information about the application",
+            description: "This application allows you to manage a Discord bot using JavaFX and Firebase.",
+            howToAdd: "How to add the bot to your Discord server",
+            steps: [
+                "Go to the Discord developer page and create a new app",
+                "Generate a token for your bot and configure it in the <code>api.config</code> file.",
+                "Invite the bot to your Discord server using the generated invitation link."
+            ],
+            commandsTitle: "List of bot commands",
+            commandsList: [
+                "<strong>$privadita</strong>: Starts a private game with 10 players.",
+                "<strong>$dropPrivadita</strong>: Cancels the ongoing private game.",
+                "<strong>marco</strong>: Responds with 'Polo'.",
+                "<strong>hola</strong>: Responds with a personalized message.",
+                "<strong>razón</strong>: Responds with 'Que si, Que si'.",
+                "<strong>mike</strong>: Responds with 'sáquelo a pasear'.",
+                "<strong>5</strong>: Sends an image of Vegeta."
+            ]
+        }
+    };
+
+    function changeLanguage(lang) {
+        document.getElementById('title').innerText = translations[lang].title;
+        document.getElementById('app-info').innerText = translations[lang].appInfo;
+        document.getElementById('description').innerText = translations[lang].description;
+        document.getElementById('how-to-add').innerText = translations[lang].howToAdd;
+
+        const steps = document.getElementById('steps').children;
+        translations[lang].steps.forEach((step, index) => {
+            steps[index].innerHTML = step;
+        });
+
+        document.getElementById('commands-title').innerText = translations[lang].commandsTitle;
+
+        const commandsList = document.getElementById('commands-list').children;
+        translations[lang].commandsList.forEach((command, index) => {
+            commandsList[index].innerHTML = command;
+        });
+    }
+</script>
+</body>
+</html>
