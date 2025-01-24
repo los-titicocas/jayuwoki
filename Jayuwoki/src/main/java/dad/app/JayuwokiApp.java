@@ -20,6 +20,10 @@ public class JayuwokiApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        // if the properties file does not exist, create it
+        Utils.createPropertiesFile(Utils.CONFIG_FILE);
+
         Utils.loadProperties();
 
         String theme = Utils.properties.getProperty("theme", "dark");
