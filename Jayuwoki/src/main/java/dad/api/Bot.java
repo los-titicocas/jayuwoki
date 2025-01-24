@@ -48,6 +48,8 @@ public class Bot {
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build();
 
+            commands.setJda(jda);
+
             jda.addEventListener(commands);
             jda.addEventListener(new EventoPrueba());
             isConnected.set(true);

@@ -1,13 +1,15 @@
 package dad.api;
 
 import dad.api.models.LogEntry;
-import dad.api.models.Player;
+import dad.database.Player;
+import dad.database.DBManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -20,6 +22,8 @@ public class Commands extends ListenerAdapter {
     private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
     private BooleanProperty activeGame = new SimpleBooleanProperty();
+    private final DBManager dbManager = new DBManager();
+    private JDA jda;
 
     public Commands() {
         activeGame.set(false);
@@ -66,6 +70,7 @@ public class Commands extends ListenerAdapter {
     private void StartPrivadita(String[] comando, MessageReceivedEvent event) {
         Set<String> uniqueNames = new HashSet<>();
         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
+
         boolean repeated = false;
 
         for (String name : playersNames) {
@@ -87,6 +92,25 @@ public class Commands extends ListenerAdapter {
 
         // if its repeated we don't want to continue
         if (repeated) {
+            return;
+        }
+
+        List<Player> playersNotFound = dbManager.GetPlayersNotFound(players);
+
+        if (!playersNotFound.isEmpty()) {
+            StringBuilder messageBuilder = new StringBuilder();
+            messageBuilder.append("```")
+                    .append("Los siguientes jugadores no están en la base de datos: \n");
+            for (Player player : playersNotFound) {
+                messageBuilder.append(player.getName())
+                        .append("\n");
+            }
+            messageBuilder.append("Usa el comando $addPlayer para añadirlos a la base de datos");
+            messageBuilder.append("```");
+
+            String formattedMessage = messageBuilder.toString();
+            event.getChannel().sendMessage(formattedMessage).queue();
+            players.clear();
             return;
         }
 
@@ -116,7 +140,7 @@ public class Commands extends ListenerAdapter {
         messageBuilder.append("```")
                 .append("\nBlue Team\n");
         for (Player player : blueTeam) {
-            messageBuilder.append(player.getPlayerName())
+            messageBuilder.append(player.getName())
                     .append(" -> ")
                     .append(player.getRole())
                     .append("\n");
@@ -124,7 +148,7 @@ public class Commands extends ListenerAdapter {
 
         messageBuilder.append("\nRed Team\n");
         for (Player player : redTeam) {
-            messageBuilder.append(player.getPlayerName())
+            messageBuilder.append(player.getName())
                     .append(" -> ")
                     .append(player.getRole())
                     .append("\n");
@@ -156,5 +180,13 @@ public class Commands extends ListenerAdapter {
 
     public void setPlayers(ListProperty<Player> players) {
         this.players = players;
+    }
+
+    public JDA getJda() {
+        return jda;
+    }
+
+    public void setJda(JDA jda) {
+        this.jda = jda;
     }
 }
