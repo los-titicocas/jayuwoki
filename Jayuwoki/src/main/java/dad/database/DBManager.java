@@ -23,7 +23,7 @@ public class DBManager {
         try {
             // Cargar el archivo JSON desde la carpeta resources
             InputStream serviceAccount = pruebaDB.class.getClassLoader()
-                    .getResourceAsStream("jayuwokidb-firebase-adminsdk-4z17f-f9bfa41da2.json");
+                    .getResourceAsStream("jayuwokidb-firebase-adminsdk.json"); //change token file name to "jayuwokidb-firebase-adminsdk"
 
             if (serviceAccount == null) {
                 throw new RuntimeException("Archivo de credenciales no encontrado en resources");
