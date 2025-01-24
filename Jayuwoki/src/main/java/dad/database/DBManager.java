@@ -110,38 +110,6 @@ public class DBManager {
         }
     }
 
-    // Check if the players are in the database (List type)
-    public List<Player> GetPlayersNotFound(List<Player> players) {
-        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
-
-        // Get the name of each player to search it
-        List<String> playerNames = players.stream()
-                .map(Player::getName)
-                .collect(Collectors.toList());
-
-        try {
-            // Create the query to search the 10 player names
-            QuerySnapshot querySnapshot = playersCollection
-                    .whereIn("name", playerNames)
-                    .get()
-                    .get();
-
-            // List of the player names found in the database
-            List<String> foundPlayerNames = querySnapshot.getDocuments().stream()
-                    .map(doc -> doc.getString("name"))
-                    .collect(Collectors.toList());
-
-            // Return the players that are not in the database
-            return players.stream()
-                    .filter(player -> !foundPlayerNames.contains(player.getName()))
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return players; // Si hay un error, asumimos que ninguno está en la base de datos
-        }
-    }
-
     public void ShowPlayerElo(String name) {
         CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
 
@@ -184,6 +152,25 @@ public class DBManager {
         }
     }
 
+    public void DeletePlayer(String name) {
+        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
+
+        try {
+            // Get the player from the database
+            DocumentSnapshot playerDoc = playersCollection.document(name).get().get();
+
+            if (playerDoc.exists()) {
+                playersCollection.document(name).delete();
+                event.getChannel().sendMessage("El jugador ha sido eliminado de la base de datos").queue();
+            } else {
+                event.getChannel().sendMessage("El jugador no está en la base de datos").queue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // Check if the player is in the database (individual type)
     public boolean CheckPlayerFound(Player player) {
 
@@ -203,8 +190,40 @@ public class DBManager {
             e.printStackTrace();
             return true; // Si hay un error, asumimos que el jugador no está en la base de datos
         }
-
     }
+
+    // Check if the players are in the database (List type)
+    public List<Player> GetPlayersNotFound(List<Player> players) {
+        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
+
+        // Get the name of each player to search it
+        List<String> playerNames = players.stream()
+                .map(Player::getName)
+                .collect(Collectors.toList());
+
+        try {
+            // Create the query to search the 10 player names
+            QuerySnapshot querySnapshot = playersCollection
+                    .whereIn("name", playerNames)
+                    .get()
+                    .get();
+
+            // List of the player names found in the database
+            List<String> foundPlayerNames = querySnapshot.getDocuments().stream()
+                    .map(doc -> doc.getString("name"))
+                    .collect(Collectors.toList());
+
+            // Return the players that are not in the database
+            return players.stream()
+                    .filter(player -> !foundPlayerNames.contains(player.getName()))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return players; // Si hay un error, asumimos que ninguno está en la base de datos
+        }
+    }
+
     public Firestore getDb() {
         return db;
     }
@@ -221,5 +240,5 @@ public class DBManager {
         this.currentServer = currentServer;
     }
 
-    
+
 }
