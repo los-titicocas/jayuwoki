@@ -51,7 +51,6 @@ public class DBManager {
                 event.getChannel().sendMessage("El jugador ya está en la base de datos").queue();
                 return;
             }
-
             // Parce the name of the server to remove special characters and spaces
             CollectionReference playersCollection = db.collection(currentServer)
                     .document("Privadita")
@@ -66,41 +65,45 @@ public class DBManager {
     public void AddPlayers(List<Player> newPlayers) {
         try {
             System.out.println(currentServer);
+
+            // Obtener los jugadores que no están en la base de datos
             List<Player> playersNotInDB = GetPlayersNotFound(newPlayers);
 
-            // Si todos los jugadores ya están en la base de datos, solo enviamos un mensaje
-            if (playersNotInDB.isEmpty()) {
-                // Jugadores que ya están en la base de datos
-                List<Player> playersAlreadyInDB = newPlayers.stream()
-                        .filter(player -> !playersNotInDB.contains(player))
-                        .collect(Collectors.toList());
+            // Delete the players that are already in the database
+            List<Player> playersAlreadyInDB = newPlayers.stream()
+                    .filter(player -> !playersNotInDB.contains(player))
+                    .collect(Collectors.toList());
 
-                StringBuilder message = new StringBuilder("Jugadores ya en la base de datos:\n");
+            // Show the players that are already in the database
+            if (!playersAlreadyInDB.isEmpty()) {
+                StringBuilder message = new StringBuilder("Los siguientes jugadores ya están en la base de datos:\n");
                 for (Player player : playersAlreadyInDB) {
                     System.out.println("- " + player.getName());
                     message.append("- ").append(player.getName()).append("\n");
                 }
-
-                // Enviar un único mensaje al canal de Discord
                 event.getChannel().sendMessage(message.toString().trim()).queue();
-                return; // Aquí se puede continuar ya que no es necesario agregar jugadores si ya están en la base de datos
             }
 
-            // Si hay jugadores que no están en la base de datos, se agregan
+            // Message if everyone is already in the database
+            if (playersNotInDB.isEmpty()) {
+                event.getChannel().sendMessage("Todos los jugadores ya están en la base de datos. No se añaden nuevos jugadores.").queue();
+                return;
+            }
+
+            // Message if there are players to add and add them
+            StringBuilder addMessage = new StringBuilder("Los siguientes jugadores se van a añadir a la base de datos:\n");
             CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
             WriteBatch batch = db.batch();
 
-            // Agregar cada jugador que no esté en la base de datos
             for (Player player : playersNotInDB) {
                 DocumentReference playerDoc = playersCollection.document(player.getName());
                 batch.set(playerDoc, player);
+                addMessage.append("- ").append(player.getName()).append("\n");
             }
 
-            // Ejecutar la operación de batch para agregar todos los jugadores a la vez
             batch.commit().get();
-
-            // Mensaje en Discord indicando que los jugadores fueron añadidos
-            event.getChannel().sendMessage("Jugadores añadidos exitosamente a la base de datoss.").queue();
+            
+            event.getChannel().sendMessage(addMessage.toString().trim()).queue();
 
         } catch (Exception e) {
             e.printStackTrace();
