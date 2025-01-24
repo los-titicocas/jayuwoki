@@ -17,6 +17,22 @@
     <exec.mainClass>dad.app.Main</exec.mainClass>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>jitpack</id>
+      <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+      <id>dv8tion</id>
+      <name>m2-dv8tion</name>
+      <url>https://m2.dv8tion.net/releases</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -35,7 +51,6 @@
       <artifactId>ikonli-javafx</artifactId>
       <version>12.3.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-materialdesign2-pack -->
     <dependency>
       <groupId>org.kordamp.ikonli</groupId>
       <artifactId>ikonli-materialdesign2-pack</artifactId>
@@ -54,14 +69,12 @@
       <version>22.0.1</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.jfxtras/jfxtras-all -->
     <dependency>
       <groupId>org.jfxtras</groupId>
       <artifactId>jfxtras-all</artifactId>
       <version>10.0-r1</version>
     </dependency>
 
-    <!-- Dependency for WebView (.md files render) -->
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
@@ -71,7 +84,7 @@
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>5.2.2</version> <!-- replace $version with the latest version -->
+      <version>5.2.2</version>
       <exclusions>
         <exclusion>
           <groupId>club.minnced</groupId>
@@ -81,10 +94,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.vladsch.flexmark</groupId>
-      <artifactId>flexmark-all</artifactId>
-      <version>0.62.2</version>
+      <groupId>com.sedmelluq</groupId>
+      <artifactId>lavaplayer</artifactId>
+      <version>1.3.77</version>
     </dependency>
-
   </dependencies>
 </project>
