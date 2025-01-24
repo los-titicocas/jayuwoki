@@ -1,13 +1,15 @@
 package dad.api;
 
 import dad.api.models.LogEntry;
-import dad.api.models.Player;
+import dad.database.Player;
+import dad.database.DBManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -20,6 +22,8 @@ public class Commands extends ListenerAdapter {
     private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
     private BooleanProperty activeGame = new SimpleBooleanProperty();
+    private final DBManager dbManager = new DBManager();
+    private JDA jda;
 
     public Commands() {
         activeGame.set(false);
@@ -29,6 +33,8 @@ public class Commands extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
         if (message.startsWith("$")) {
+            dbManager.setEvent(event);
+            dbManager.setCurrentServer(event.getGuild().getName());
             String[] comando = message.split(" ");
 
             // Introduce the command in the log
@@ -37,6 +43,7 @@ public class Commands extends ListenerAdapter {
 
             // Switch with all the possible commands
             switch (comando[0]) {
+                // Start a privadita
                 case "$privadita":
                     // Check if the command has the correct number of players
                     if (activeGame.get()) {
@@ -47,6 +54,8 @@ public class Commands extends ListenerAdapter {
                         event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
                     }
                     break;
+
+                // Remove the current privadita
                 case "$dropPrivadita":
                     if (activeGame.get()) {
                         activeGame.set(false);
@@ -56,37 +65,83 @@ public class Commands extends ListenerAdapter {
                         event.getChannel().sendMessage("No hay ninguna privadita activa").queue();
                     }
                     break;
+
+                // Add only one player to the database to use it on privadita
+                case "$addPlayer":
+                    if (comando.length == 2) {
+                        Player newPlayer = new Player();
+                        newPlayer.setName(comando[1]);
+                        dbManager.AddPlayer(newPlayer);
+                    } else {
+                        event.getChannel().sendMessage("El comando $addPlayer necesita un nombre de jugador").queue();
+                    }
+                    break;
+
+                // Add multiple players to the database to use them on privadita
+                case "$addPlayers":
+                    if (comando.length > 1) {
+                        String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
+                        List<Player> newPlayers = new ArrayList<>();
+                        for (String name : playersNames) {
+                            Player newPlayer = new Player();
+                            newPlayer.setName(name);
+                            newPlayers.add(newPlayer);
+                        }
+                        dbManager.AddPlayers(newPlayers);
+                    } else {
+                        event.getChannel().sendMessage("El comando $addPlayers necesita al menos un nombre de jugador").queue();
+                    }
+                    break;
+
+                case "$verElo":
+                    if (comando.length == 2) {
+                        dbManager.ShowPlayerElo(comando[1]);
+                    } else {
+                        dbManager.ShowAllElo();
+                    }
+                    break;
+
+                case "$deletePlayer":
+                    if (comando.length == 2) {
+                        dbManager.DeletePlayer(comando[1]);
+                    } else {
+                        event.getChannel().sendMessage("El comando $deletePlayer necesita un nombre de jugador").queue();
+                    }
+                    break;
                 default:
                     event.getChannel().sendMessage("Comando no encontrado").queue();
+
 
             }
         }
     }
 
     private void StartPrivadita(String[] comando, MessageReceivedEvent event) {
-        Set<String> uniqueNames = new HashSet<>();
         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
-        boolean repeated = false;
 
-        for (String name : playersNames) {
-            if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
-                event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
-                repeated = true;
-                break;
-            }
-
-            if (name.startsWith("$")) {
-                event.getChannel().sendMessage("A donde vas listillo.").queue();
-                repeated = true;
-                break;
-            }
-            Player player = new Player();
-            player.setName(name);
-            players.add(player);
-        }
+        players = CheckPrivaditaCommand(playersNames, event);
 
         // if its repeated we don't want to continue
-        if (repeated) {
+        if (players == null) {
+            return;
+        }
+
+        List<Player> playersNotFound = dbManager.GetPlayersNotFound(players);
+
+        if (!playersNotFound.isEmpty()) {
+            StringBuilder messageBuilder = new StringBuilder();
+            messageBuilder.append("```")
+                    .append("Los siguientes jugadores no están en la base de datos: \n");
+            for (Player player : playersNotFound) {
+                messageBuilder.append(player.getName())
+                        .append("\n");
+            }
+            messageBuilder.append("Usa el comando $addPlayer para añadirlos a la base de datos");
+            messageBuilder.append("```");
+
+            String formattedMessage = messageBuilder.toString();
+            event.getChannel().sendMessage(formattedMessage).queue();
+            players.clear();
             return;
         }
 
@@ -116,7 +171,7 @@ public class Commands extends ListenerAdapter {
         messageBuilder.append("```")
                 .append("\nBlue Team\n");
         for (Player player : blueTeam) {
-            messageBuilder.append(player.getPlayerName())
+            messageBuilder.append(player.getName())
                     .append(" -> ")
                     .append(player.getRole())
                     .append("\n");
@@ -124,7 +179,7 @@ public class Commands extends ListenerAdapter {
 
         messageBuilder.append("\nRed Team\n");
         for (Player player : redTeam) {
-            messageBuilder.append(player.getPlayerName())
+            messageBuilder.append(player.getName())
                     .append(" -> ")
                     .append(player.getRole())
                     .append("\n");
@@ -136,6 +191,27 @@ public class Commands extends ListenerAdapter {
 
         String formattedMessage = messageBuilder.toString();
         event.getChannel().sendMessage(formattedMessage).queue();
+    }
+
+    // FUnction to check the command and fill the player list
+    private ListProperty<Player> CheckPrivaditaCommand(String[] playersNames, MessageReceivedEvent event) {
+        Set<String> uniqueNames = new HashSet<>();
+
+        for (String name : playersNames) {
+            if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
+                event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
+                return null;
+            }
+
+            if (name.startsWith("$")) {
+                event.getChannel().sendMessage("A donde vas listillo.").queue();
+                return null;
+            }
+            Player player = new Player();
+            player.setName(name);
+            players.add(player);
+        }
+        return players;
     }
 
     public ListProperty<LogEntry> getLogs() {
@@ -156,5 +232,13 @@ public class Commands extends ListenerAdapter {
 
     public void setPlayers(ListProperty<Player> players) {
         this.players = players;
+    }
+
+    public JDA getJda() {
+        return jda;
+    }
+
+    public void setJda(JDA jda) {
+        this.jda = jda;
     }
 }

@@ -9,11 +9,10 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
+import net.dv8tion.jda.api.entities.User;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -22,7 +21,7 @@ public class LogTable implements Initializable {
 
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private ObjectProperty<LogEntry> selectedLog = new SimpleObjectProperty<>();
+    private final ObjectProperty<LogEntry> selectedLog = new SimpleObjectProperty<>();
 
     public ListProperty<LogEntry> getLogs() {
         return logs;
@@ -53,13 +52,20 @@ public class LogTable implements Initializable {
 
     @FXML
     void onClearAction(ActionEvent event) {
-        logs.remove(selectedLog.get());
+        // Confirmation dialog
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirmar eliminación");
+        confirmAlert.setHeaderText("¿Estás seguro de que deseas eliminar este registro?");
+        confirmAlert.setContentText("No se podrá recuperar");
+
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                // Remove the selected log if user confirms
+                logs.remove(selectedLog.get());
+            }
+        });
     }
 
-    @FXML
-    void onRefreshAction(ActionEvent event) {
-        logs.clear();
-    }
 
     public LogTable() {
         try {
