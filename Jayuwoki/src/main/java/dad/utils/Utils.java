@@ -30,4 +30,16 @@ public class Utils {
         properties.setProperty("theme", theme);
         saveProperties();
     }
+
+    public static void createPropertiesFile(String filePath) {
+        Properties properties = new Properties();
+        try (FileOutputStream output = new FileOutputStream(filePath)) {
+            properties.setProperty("theme", "dark");
+            properties.setProperty("language", "en");
+            // Save properties to the specified file
+            properties.store(output, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

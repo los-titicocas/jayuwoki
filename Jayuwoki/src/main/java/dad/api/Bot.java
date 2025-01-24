@@ -70,3 +70,4 @@ public class Bot {
     public BooleanProperty isconnectedProperty() {
         return isConnected;
     }
+}

@@ -18,7 +18,7 @@
 
 <StackPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane fx:id="borderPaneRoot" prefHeight="200.0" prefWidth="200.0">
+      <BorderPane fx:id="borderPaneRoot">
          <bottom>
             <ButtonBar buttonMinWidth="30.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="BOTTOM_RIGHT">
                <buttons>
@@ -91,11 +91,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </GridPane>
-                  <StackPane fx:id="contentPane">
-                     <padding>
-                        <Insets left="5.0" />
-                     </padding>
-                  </StackPane>
+                  <StackPane fx:id="contentPane" />
                </items>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
