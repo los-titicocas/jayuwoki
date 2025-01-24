@@ -16,6 +16,8 @@ public class DBManager {
 
     // Attributes
     private Firestore db;
+    private MessageReceivedEvent event;
+    private String currentServer;
 
     public DBManager() {
         try {
@@ -42,16 +44,17 @@ public class DBManager {
         }
     }
 
-    public void AddPlayer(Player newPlayer, MessageReceivedEvent event) {
+    public void AddPlayer(Player newPlayer) {
         try {
-            // Get the name of the server from the event
-            String serverName = event.getGuild().getName();
+
+            if (!CheckPlayerFound(newPlayer)) {
+                event.getChannel().sendMessage("El jugador ya está en la base de datos").queue();
+                return;
+            }
 
             // Parce the name of the server to remove special characters and spaces
-            serverName = serverName.replaceAll("[^a-zA-Z0-9]", "_");
-
-            CollectionReference playersCollection = db.collection(serverName)
-                    .document("Players")
+            CollectionReference playersCollection = db.collection(currentServer)
+                    .document("Privadita")
                     .collection("Players");
 
             playersCollection.document(newPlayer.getName()).set(newPlayer);
@@ -60,36 +63,53 @@ public class DBManager {
         }
     }
 
-    public void AddPlayers(List<Player> newPlayers, MessageReceivedEvent event) {
+    public void AddPlayers(List<Player> newPlayers) {
         try {
-            // Get the name of the server from the event
-            String serverName = event.getGuild().getName();
+            System.out.println(currentServer);
+            List<Player> playersNotInDB = GetPlayersNotFound(newPlayers);
 
-            // Parce the name of the server to remove special characters and spaces
-            serverName = serverName.replaceAll("[^a-zA-Z0-9]", "_");
+            // Si todos los jugadores ya están en la base de datos, solo enviamos un mensaje
+            if (playersNotInDB.isEmpty()) {
+                // Jugadores que ya están en la base de datos
+                List<Player> playersAlreadyInDB = newPlayers.stream()
+                        .filter(player -> !playersNotInDB.contains(player))
+                        .collect(Collectors.toList());
 
-            // Create a batch to commit all the players at once
-            CollectionReference playersCollection = db.collection(serverName).document("Players").collection("Players");
+                StringBuilder message = new StringBuilder("Jugadores ya en la base de datos:\n");
+                for (Player player : playersAlreadyInDB) {
+                    System.out.println("- " + player.getName());
+                    message.append("- ").append(player.getName()).append("\n");
+                }
+
+                // Enviar un único mensaje al canal de Discord
+                event.getChannel().sendMessage(message.toString().trim()).queue();
+                return; // Aquí se puede continuar ya que no es necesario agregar jugadores si ya están en la base de datos
+            }
+
+            // Si hay jugadores que no están en la base de datos, se agregan
+            CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
             WriteBatch batch = db.batch();
 
-            // add each player to the batch
-            for (Player player : newPlayers) {
+            // Agregar cada jugador que no esté en la base de datos
+            for (Player player : playersNotInDB) {
                 DocumentReference playerDoc = playersCollection.document(player.getName());
                 batch.set(playerDoc, player);
             }
 
-            // Execute the batch
-            batch.commit().get(); // Llamada bloqueante para esperar que se complete
+            // Ejecutar la operación de batch para agregar todos los jugadores a la vez
+            batch.commit().get();
 
-            System.out.println("Jugadores añadidos exitosamente al servidor: " + serverName);
+            // Mensaje en Discord indicando que los jugadores fueron añadidos
+            event.getChannel().sendMessage("Jugadores añadidos exitosamente a la base de datoss.").queue();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Check if the players are in the database (List type)
     public List<Player> GetPlayersNotFound(List<Player> players) {
-        CollectionReference playersCollection = db.collection("Players");
+        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
 
         // Get the name of each player to search it
         List<String> playerNames = players.stream()
@@ -99,13 +119,13 @@ public class DBManager {
         try {
             // Create the query to search the 10 player names
             QuerySnapshot querySnapshot = playersCollection
-                    .whereIn("name", playerNames) // Cambia "name" si el campo es diferente
+                    .whereIn("name", playerNames)
                     .get()
                     .get();
 
             // List of the player names found in the database
             List<String> foundPlayerNames = querySnapshot.getDocuments().stream()
-                    .map(doc -> doc.getString("name")) // Cambia "name" según el campo en tu base de datos
+                    .map(doc -> doc.getString("name"))
                     .collect(Collectors.toList());
 
             // Return the players that are not in the database
@@ -119,8 +139,40 @@ public class DBManager {
         }
     }
 
+    // Check if the player is in the database (individual type)
+    public boolean CheckPlayerFound(Player player) {
+
+        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
+
+        try {
+            // Create the query to search the player name
+            QuerySnapshot querySnapshot = playersCollection
+                    .whereEqualTo("name", player.getName())
+                    .get()
+                    .get();
+
+            // Return true if the player is not in the database
+            return querySnapshot.isEmpty();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true; // Si hay un error, asumimos que el jugador no está en la base de datos
+        }
+
+    }
     public Firestore getDb() {
         return db;
     }
 
+    public void setEvent(MessageReceivedEvent event) {
+        this.event = event;
+    }
+
+    public String getCurrentServer() {
+        return currentServer;
+    }
+
+    public void setCurrentServer(String currentServer) {
+        this.currentServer = currentServer;
+    }
 }
