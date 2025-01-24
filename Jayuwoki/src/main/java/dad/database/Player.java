@@ -31,6 +31,18 @@ public class Player {
         this.elo.set(elo);
     }
 
+    public String PrintStats() {
+        StringBuilder stats = new StringBuilder("```");
+
+        stats.append("Player: ").append(name.get()).append("#").append(discriminator.get()).append("\n");
+        stats.append("Wins: ").append(wins.get()).append("\n");
+        stats.append("Losses: ").append(losses.get()).append("\n");
+        stats.append("Elo: ").append(elo.get()).append("\n");
+        stats.append("```");
+
+        return stats.toString(); // Retorna el mensaje como un String
+    }
+
     public int getIdPlayer() {
         return idPlayer.get();
     }

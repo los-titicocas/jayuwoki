@@ -92,8 +92,25 @@ public class Commands extends ListenerAdapter {
                         event.getChannel().sendMessage("El comando $addPlayers necesita al menos un nombre de jugador").queue();
                     }
                     break;
+
+                case "$verElo":
+                    if (comando.length == 2) {
+                        dbManager.ShowPlayerElo(comando[1]);
+                    } else {
+                        dbManager.ShowAllElo();
+                    }
+                    break;
+
+                case "$deletePlayer":
+                    if (comando.length == 2) {
+                        dbManager.DeletePlayer(comando[1]);
+                    } else {
+                        event.getChannel().sendMessage("El comando $deletePlayer necesita un nombre de jugador").queue();
+                    }
+                    break;
                 default:
                     event.getChannel().sendMessage("Comando no encontrado").queue();
+
 
             }
         }

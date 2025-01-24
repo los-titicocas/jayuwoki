@@ -102,7 +102,7 @@ public class DBManager {
             }
 
             batch.commit().get();
-            
+
             event.getChannel().sendMessage(addMessage.toString().trim()).queue();
 
         } catch (Exception e) {
@@ -142,6 +142,48 @@ public class DBManager {
         }
     }
 
+    public void ShowPlayerElo(String name) {
+        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
+
+        try {
+            // Get the player from the database
+            DocumentSnapshot playerDoc = playersCollection.document(name).get().get();
+
+            if (playerDoc.exists()) {
+                Player player = playerDoc.toObject(Player.class);
+                // Show all the player stats
+                event.getChannel().sendMessage(player.PrintStats()).queue();
+            } else {
+                event.getChannel().sendMessage("El jugador no está en la base de datos").queue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void ShowAllElo() {
+        CollectionReference playersCollection = db.collection(currentServer).document("Privadita").collection("Players");
+
+        try {
+            // Get all the players from the database
+            QuerySnapshot querySnapshot = playersCollection.get().get();
+
+            // Show the stats of all the players
+            StringBuilder message = new StringBuilder("```");
+            for (DocumentSnapshot playerDoc : querySnapshot.getDocuments()) {
+                Player player = playerDoc.toObject(Player.class);
+                message.append(player.PrintStats()).append("\n");
+            }
+            message.append("```");
+
+            event.getChannel().sendMessage(message.toString()).queue();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // Check if the player is in the database (individual type)
     public boolean CheckPlayerFound(Player player) {
 
@@ -178,4 +220,6 @@ public class DBManager {
     public void setCurrentServer(String currentServer) {
         this.currentServer = currentServer;
     }
+
+    
 }
