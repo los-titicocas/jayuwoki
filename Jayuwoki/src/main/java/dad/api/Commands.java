@@ -10,11 +10,14 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
-
 
 public class Commands extends ListenerAdapter {
 
@@ -108,12 +111,85 @@ public class Commands extends ListenerAdapter {
                         event.getChannel().sendMessage("El comando $deletePlayer necesita un nombre de jugador").queue();
                     }
                     break;
+
+                case "$join":
+                    joinVoiceChannel(event);
+                    break;
+
+                case "$leave":
+                    leaveVoiceChannel(event);
+                    break;
+
+                case "$play":
+                    if (comando.length < 2) {
+                        event.getChannel().sendMessage("Uso: $play <nombre del archivo>").queue();
+                    } else {
+                        String fileName = comando[1];
+                        playAudio(event, fileName);
+                    }
+                    break;
+
                 default:
                     event.getChannel().sendMessage("Comando no encontrado").queue();
-
-
             }
         }
+    }
+
+    private void joinVoiceChannel(MessageReceivedEvent event) {
+        Guild guild = event.getGuild();
+        Member selfMember = guild.getSelfMember();
+        AudioManager audioManager = guild.getAudioManager();
+
+        if (audioManager.isConnected()) {
+            event.getChannel().sendMessage("Ya estoy conectado a un canal de voz.").queue();
+            return;
+        }
+
+        Member member = event.getMember();
+        if (member != null) {
+            AudioChannel voiceChannel = member.getVoiceState().getChannel();
+            if (voiceChannel != null) {
+                audioManager.openAudioConnection(voiceChannel);
+                event.getChannel().sendMessage("Conectado al canal de voz: " + voiceChannel.getName()).queue();
+            } else {
+                event.getChannel().sendMessage("No estás en un canal de voz.").queue();
+            }
+        }
+    }
+
+    private void leaveVoiceChannel(MessageReceivedEvent event) {
+        Guild guild = event.getGuild();
+        AudioManager audioManager = guild.getAudioManager();
+
+        if (audioManager.isConnected()) {
+            audioManager.closeAudioConnection();
+            event.getChannel().sendMessage("Desconectado del canal de voz.").queue();
+        } else {
+            event.getChannel().sendMessage("No estoy conectado a ningún canal de voz.").queue();
+        }
+    }
+
+    private void playAudio(MessageReceivedEvent event, String fileName) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+
+        if (member == null || member.getVoiceState() == null || member.getVoiceState().getChannel() == null) {
+            event.getChannel().sendMessage("Debes estar en un canal de voz para usar este comando.").queue();
+            return;
+        }
+
+        AudioChannel voiceChannel = member.getVoiceState().getChannel();
+        AudioManager audioManager = guild.getAudioManager();
+
+        if (!audioManager.isConnected()) {
+            audioManager.openAudioConnection(voiceChannel);
+        }
+
+        String filePath = getClass().getResource("/audio/" + fileName).getPath();
+        AudioHandler audioHandler = new AudioHandler(guild);
+        audioHandler.loadAndPlay(filePath);
+
+        event.getChannel().sendMessage("Reproduciendo audio: " + fileName).queue();
     }
 
     private void StartPrivadita(String[] comando, MessageReceivedEvent event) {

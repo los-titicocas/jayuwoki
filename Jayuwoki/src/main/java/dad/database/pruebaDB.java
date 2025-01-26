@@ -1,3 +1,4 @@
+
 package dad.database;
 
 
@@ -19,7 +20,7 @@ public class pruebaDB {
         try {
             // Cargar el archivo JSON desde la carpeta resources
             InputStream serviceAccount = pruebaDB.class.getClassLoader()
-                    .getResourceAsStream("jayuwokidb-firebase-adminsdk-4z17f-f9bfa41da2.json");
+                    .getResourceAsStream("jayuwokidb-firebase-adminsdk.json");
 
             if (serviceAccount == null) {
                 throw new RuntimeException("Archivo de credenciales no encontrado en resources");
@@ -43,8 +44,8 @@ public class pruebaDB {
             ApiFuture<WriteResult> result = docRef.set(new User("pepe", 69));
 
             System.out.println("Datos escritos en Firestore en: " + result.get().getUpdateTime());
-       } catch (IOException | InterruptedException | ExecutionException e) {
-        e.printStackTrace();
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
     }
 
