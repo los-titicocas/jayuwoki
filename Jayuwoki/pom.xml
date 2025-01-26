@@ -91,6 +91,8 @@
       <artifactId>google-cloud-firestore</artifactId>
       <version>3.30.3</version> <!-- Usa la última versión disponible -->
     </dependency>
+
+    <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
       <version>0.62.2</version>

@@ -7,6 +7,8 @@
 - Configuración de la base de datos.
 - Configuración de la conexión.
 - Crear canal de info (?)
+- Activación/deactivación de respuestas del bot
+- Toggle para permitir que todos modifiquen la base de datos (ver referncia de "Permission" en la documentación)
 
 ---------------------------
 

@@ -31,6 +31,7 @@ public class Commands extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        System.out.println("imprime coño: " + event.getGuild().getName());
         String message = event.getMessage().getContentRaw();
         if (message.startsWith("$")) {
             dbManager.setEvent(event);
