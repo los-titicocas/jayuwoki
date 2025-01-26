@@ -6,6 +6,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -92,6 +93,21 @@ public class LogTable implements Initializable {
 
         // bind selectedLog to logsTable selection
         selectedLog.bind(logsTable.getSelectionModel().selectedItemProperty());
+
+        // Add a row factory to handle empty row styling
+        logsTable.setRowFactory(tv -> {
+            TableRow<LogEntry> row = new TableRow<>();
+            PseudoClass emptyPseudoClass = PseudoClass.getPseudoClass("empty");
+
+            // Update the pseudo-class based on the row's data
+            row.itemProperty().addListener((obs, oldItem, newItem) -> {
+                boolean isEmpty = newItem == null;
+                row.pseudoClassStateChanged(emptyPseudoClass, isEmpty);
+            });
+
+            return row;
+        });
+
     }
 
     public TableView<LogEntry> getLogsTable() {
