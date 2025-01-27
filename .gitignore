@@ -10,6 +10,7 @@ buildNumber.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 **/*.config
+**/jayuwokidb-firebase*.json
 .idea/
 # Eclipse m2e generated files
 # Eclipse Core
@@ -17,4 +18,4 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-**/*.properties
+*.properties
