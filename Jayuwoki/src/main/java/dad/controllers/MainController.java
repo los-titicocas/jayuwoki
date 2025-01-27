@@ -305,13 +305,17 @@ public class MainController implements Initializable {
         String lightTheme = getClass().getResource("/styles/light-theme.css").toExternalForm();
         String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
 
-        String currentTheme = Utils.properties.getProperty("theme", "dark");
+        String currentTheme = Utils.properties.getProperty("theme");
+        System.out.println("Current theme: " + currentTheme); // Debugging line
+
         if (currentTheme.equals("dark")) {
             Application.setUserAgentStylesheet(lightTheme);
             Utils.setTheme("light");
+            System.out.println("Theme changed to light"); // Debugging line
         } else {
             Application.setUserAgentStylesheet(darkTheme);
             Utils.setTheme("dark");
+            System.out.println("Theme changed to dark"); // Debugging line
         }
     }
 

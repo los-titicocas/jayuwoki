@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import jdk.jshell.execution.Util;
 
 import java.util.Objects;
 
@@ -20,13 +21,14 @@ public class JayuwokiApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         // if the properties file does not exist, create it
         Utils.createPropertiesFile(Utils.CONFIG_FILE);
 
+        // Load properties before accessing them
         Utils.loadProperties();
 
-        String theme = Utils.properties.getProperty("theme", "dark");
+        String theme = Utils.properties.getProperty("theme");
+        System.out.println("Loaded theme: " + theme); // Debugging line
         String themePath = getClass().getResource("/styles/" + theme + "-theme.css").toExternalForm();
         Application.setUserAgentStylesheet(themePath);
 

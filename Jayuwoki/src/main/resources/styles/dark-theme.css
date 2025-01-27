@@ -145,14 +145,12 @@
 }
 
 #logsTable .table-column-header {
-    -fx-font-size: 16;
     -fx-font-weight: bold;
-    -fx-text-fill: #00bcd4;
-    -fx-background-color: #424242;
 }
 
 #logsTable .table-row-cell:empty {
     -fx-background-color: transparent; /* No background for empty rows */
+    -fx-border-color: transparent; /* No border for empty rows */
 }
 
 #logsTable .table-row-cell:hover:empty {
@@ -161,6 +159,13 @@
 
 #logsTable .table-row-cell {
     -fx-background-color: transparent;
+    -fx-border-color: black; /* Border color */
+    -fx-border-width: 1; /* Border width */
+    -fx-border-style: solid; /* Border style */
+    -fx-font-size: 18;
+    /* add bigger line height */
+    -fx-padding: 10 10 10 10;
+    -fx-font-weight: bold;
 }
 
 #logsTable .table-row-cell:hover {
