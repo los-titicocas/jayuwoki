@@ -17,6 +17,24 @@
     <exec.mainClass>dad.app.Main</exec.mainClass>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>jitpack</id>
+      <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+      <id>dv8tion</id>
+      <name>m2-dv8tion</name>
+      <url>https://m2.dv8tion.net/releases</url>
+    </repository>
+  </repositories>
+
+
+
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -97,5 +115,13 @@
       <artifactId>flexmark-all</artifactId>
       <version>0.62.2</version>
     </dependency>
-    </dependencies>
+
+    <dependency>
+      <groupId>com.sedmelluq</groupId>
+      <artifactId>lavaplayer</artifactId>
+      <version>1.3.77</version>
+    </dependency>
+
+
+  </dependencies>
 </project>
