@@ -12,7 +12,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
 <BorderPane fx:id="settingsRoot" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <ButtonBar BorderPane.alignment="CENTER">
@@ -25,7 +24,7 @@
    <center>
       <GridPane fx:id="settingsGridPane" BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints hgrow="NEVER" minWidth="30.0" />
+          <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" />
             <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
         </columnConstraints>
         <rowConstraints>
@@ -58,12 +57,12 @@
             </Label>
             <Label fx:id="botSettingsLabel" text="Bot settings" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER">
                <graphic>
-                  <FontIcon iconLiteral="mdi2r-robot-confused" iconSize="15" />
+                  <FontIcon iconLiteral="mdi2r-robot-confused" iconSize="15" styleClass="font-icon" />
                </graphic>
             </Label>
             <Label fx:id="userSettingsLabel" text="User settings" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                <graphic>
-                  <FontIcon iconLiteral="mdi2a-account" iconSize="15" />
+                  <FontIcon iconLiteral="mdi2a-account" iconSize="15" styleClass="font-icon" />
                </graphic>
             </Label>
             <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
