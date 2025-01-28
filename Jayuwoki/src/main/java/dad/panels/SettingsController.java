@@ -5,11 +5,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import java.io.FileInputStream;
@@ -19,6 +23,8 @@ import java.util.Properties;
 import java.io.File;
 
 public class SettingsController implements Initializable {
+
+    private final Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
 
     @FXML
     private Label botSettingsLabel;
@@ -61,28 +67,52 @@ public class SettingsController implements Initializable {
 
     @FXML
     void onApplyAction(ActionEvent event) {
+        getApplyDialog();
         saveSettings();
-
-        // if any changes are made, it will show a dialog
-
-        Dialog savedDialog = new Dialog();
-        savedDialog.setContentText("Settings saved successfully!");
-        savedDialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        savedDialog.showAndWait();
     }
 
     @FXML
     void onResetAction(ActionEvent event) {
+        getResetDialog();
+    }
 
+    private void getResetDialog() {
         // show a dialog to confirm the reset
-        Dialog resetDialog = new Dialog();
+        Alert resetDialog = new Alert(Alert.AlertType.CONFIRMATION);
+
+        resetDialog.setTitle("Reset Settings");
+        resetDialog.setHeaderText(null);
         resetDialog.setContentText("Are you sure you want to reset all settings?");
-        resetDialog.getDialogPane().getButtonTypes().add(ButtonType.YES);
-        resetDialog.getDialogPane().getButtonTypes().add(ButtonType.NO);
-        if (resetDialog.showAndWait().get() == ButtonType.YES) {
+
+        ButtonType confirmButton = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        resetDialog.getButtonTypes().setAll(confirmButton, cancelButton);
+
+        // set icon for the dialog
+        Stage stage = (Stage) resetDialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(appIcon);
+
+        if (resetDialog.showAndWait().get() == confirmButton) {
             clearCheckBox();
             saveSettings();
         }
+    }
+
+    private void getApplyDialog() {
+        Alert applyDialog = new Alert(Alert.AlertType.INFORMATION);
+
+        applyDialog.setTitle("Settings Applied");
+        applyDialog.setHeaderText(null);
+        applyDialog.setContentText("Settings have been applied successfully.");
+
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        applyDialog.getButtonTypes().setAll(okButton);
+
+        // set icon for the dialog
+        Stage stage = (Stage) applyDialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(appIcon);
+
+        applyDialog.showAndWait();
     }
 
     private void loadSettings() {

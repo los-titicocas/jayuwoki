@@ -12,13 +12,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.fxml.Initializable;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import net.dv8tion.jda.api.entities.User;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LogTable implements Initializable {
+
+    private final Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
 
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -55,12 +60,20 @@ public class LogTable implements Initializable {
     void onClearAction(ActionEvent event) {
         // Confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle("Confirmar eliminación");
-        confirmAlert.setHeaderText("¿Estás seguro de que deseas eliminar este registro?");
-        confirmAlert.setContentText("No se podrá recuperar");
+
+        confirmAlert.setTitle("Confirm Delete");
+        confirmAlert.setHeaderText(null);
+        confirmAlert.setContentText("Are you sure you want to delete this register?");
+
+        ButtonType acceptButton = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        confirmAlert.getButtonTypes().setAll(acceptButton, cancelButton);
+
+        Stage stage = (Stage) confirmAlert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(appIcon);
 
         confirmAlert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
+            if (response == acceptButton) {
                 // Remove the selected log if user confirms
                 logs.remove(selectedLog.get());
             }

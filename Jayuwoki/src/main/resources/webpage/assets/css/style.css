@@ -191,7 +191,7 @@ nav.navbar.bootsnav .navbar-toggle i{color: #d92cf9;}
     justify-content: center;
     position: relative;
     background: url('webpage/assets/logo/page-background.png') no-repeat center;
-    background-size: cover;
+    background-size: contain;
     height: 890px;
 }
 
