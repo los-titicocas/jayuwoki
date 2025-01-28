@@ -1,5 +1,6 @@
 package dad.api;
 
+import dad.api.commands.RollaDie;
 import dad.api.models.LogEntry;
 import dad.api.models.Privadita;
 import dad.database.Player;
@@ -39,7 +40,7 @@ public class Commands extends ListenerAdapter {
 
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final DBManager dbManager = new DBManager();
-    private JDA jda;
+    protected JDA jda;
 
     public Commands() {
     }
@@ -149,6 +150,20 @@ public class Commands extends ListenerAdapter {
                     } else {
                         String fileName = comando[1];
                         playAudio(event, fileName);
+                    }
+                    break;
+
+                case "$rolladie":
+                    if (comando.length == 2) {
+                        if (Integer.parseInt(comando[1]) > 20 || Integer.parseInt(comando[1]) < 2) {
+                            event.getChannel().sendMessage("The die must have between 2 and 20 sides").queue();
+                            break;
+                        } else {
+                            RollaDie rollaDie = new RollaDie(Integer.parseInt(comando[1]));
+                            event.getChannel().sendMessage(rollaDie.toString()).queue();
+                        }
+                    } else {
+                        event.getChannel().sendMessage("The command $rolladie must have arguments").queue();
                     }
                     break;
 
