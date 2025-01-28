@@ -130,6 +130,8 @@ public class MainController implements Initializable {
         customTitleBar.setBot(connectController.getBot());
         borderPaneRoot.setTop(customTitleBar.getRoot());
 
+        connectController.setMainController(this);
+
         // Initialize text for each TextFlow
         addTutorialText();
 
@@ -140,8 +142,6 @@ public class MainController implements Initializable {
         disableTutorialBox();
         tutorialPane.setVisible(false);
 //        onCollapsedMenu();
-
-        // listeners
 
         // Listener to ensure that the connection is closed by also pressing alt + F4
         root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -348,6 +348,10 @@ public class MainController implements Initializable {
 
     public StackPane getRoot() {
         return root;
+    }
+
+    public Button getSettingsButton() {
+        return settingsButton;
     }
 
     public VBox getSettingsBox() {
