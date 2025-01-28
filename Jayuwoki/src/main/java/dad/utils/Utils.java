@@ -12,8 +12,17 @@ public class Utils {
     public static Properties properties = new Properties();
 
     public static void saveProperties() {
+        Properties existingProperties = new Properties();
+        try (FileInputStream input = new FileInputStream(CONFIG_FILE)) {
+            existingProperties.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        existingProperties.putAll(properties);
+
         try (FileOutputStream output = new FileOutputStream(CONFIG_FILE)) {
-            properties.store(output, null);
+            existingProperties.store(output, null);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -156,3 +156,49 @@
 #logsTable .table-row-cell:selected {
     -fx-background-color: #5b9edf; /* Selected row color */
 }
+
+#settingsGridPane {
+    -fx-font-size: 16;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
+
+#botSettingsLabel, #userSettingsLabel {
+    -fx-font-size: 22;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
+
+.check-box {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+    -fx-text-fill: white;
+    -fx-padding: 0; /* Remove padding to ensure square shape */
+    -fx-background-radius: 0; /* Ensure square corners */
+    -fx-border-radius: 0; /* Ensure square corners */
+    -fx-min-width: 20px; /* Set minimum width */
+    -fx-min-height: 20px; /* Set minimum height */
+    -fx-pref-width: 20px; /* Set preferred width */
+    -fx-pref-height: 20px; /* Set preferred height */
+}
+
+#settingsGridPane .font-icon {
+    -fx-font-size: 30;
+    -fx-fill: black;
+}
+
+.check-box:selected {
+    -fx-background-color: #5b9edf;
+    -fx-border-color: black;
+}
+
+.check-box:selected .box .mark {
+    -fx-background-color: white;
+}
+
+#settingsGridPane .separator {
+    -fx-background-color: black;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+}

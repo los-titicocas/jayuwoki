@@ -2,10 +2,7 @@ package dad.controllers;
 
 import dad.app.JayuwokiApp;
 import dad.custom.ui.CustomTitleBar;
-import dad.panels.AboutController;
-import dad.panels.ConnectController;
-import dad.panels.ContactController;
-import dad.panels.LogTable;
+import dad.panels.*;
 import dad.utils.Utils;
 import javafx.application.Application;
 import javafx.beans.property.ListProperty;
@@ -298,6 +295,8 @@ public class MainController implements Initializable {
 
     @FXML
     void onSettingsAction(ActionEvent event) {
+        SettingsController settingsController = new SettingsController();
+        contentPane.getChildren().setAll(settingsController.getRoot());
     }
 
     @FXML
