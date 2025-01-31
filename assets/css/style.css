@@ -190,9 +190,8 @@ nav.navbar.bootsnav .navbar-toggle i{color: #d92cf9;}
     align-items: center;
     justify-content: center;
     position:relative;
-    background:url(https://avatars.githubusercontent.com/u/150284797?v=4)no-repeat;
-    background-size:cover;
-    background-position: center;
+    background-size:contain;
+    background: url("../images/jayuwoki/bochudin.png") no-repeat center;
     height:890px;
 }
 .welcome-hero:before{
