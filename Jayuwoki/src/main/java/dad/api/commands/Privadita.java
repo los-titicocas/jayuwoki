@@ -1,4 +1,4 @@
-package dad.api.models;
+package dad.api.commands;
 
 import dad.database.Player;
 import javafx.beans.property.ListProperty;
@@ -19,9 +19,9 @@ public class Privadita {
   private StringProperty server = new SimpleStringProperty();
   private final ArrayList<String> roles = new ArrayList<>(List.of("Top", "Jungla", "Mid", "ADC", "Support"));
 
-  public Privadita(List<Player> players, MessageReceivedEvent event) {
+  public Privadita(String[] playersNames, MessageReceivedEvent event) {
     this.server.set(event.getGuild().getName());
-    this.players.addAll(players);
+    this.players.addAll(CheckPrivaditaCommand(playersNames,event));
     StartPrivadita(event);
   }
 
@@ -70,6 +70,28 @@ public class Privadita {
   // FUnction to check the command and fill the player list
   private ListProperty<Player> CheckPrivaditaCommand(List<String> playersNames, MessageReceivedEvent event) {
     Set<String> uniqueNames = new HashSet<>();
+
+    for (String name : playersNames) {
+      if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
+        event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
+        return null;
+      }
+
+      if (name.startsWith("$")) {
+        event.getChannel().sendMessage("A donde vas listillo.").queue();
+        return null;
+      }
+      Player player = new Player();
+      player.setName(name);
+      players.add(player);
+    }
+    return players;
+  }
+
+  // FUnction to check the command and fill the player list
+  private ListProperty<Player> CheckPrivaditaCommand(String[] playersNames, MessageReceivedEvent event) {
+    Set<String> uniqueNames = new HashSet<>();
+    ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     for (String name : playersNames) {
       if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
