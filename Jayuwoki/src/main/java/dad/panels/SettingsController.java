@@ -10,6 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.net.URL;
@@ -28,6 +29,12 @@ public class SettingsController implements Initializable {
 
     @FXML
     private Label botSettingsLabel;
+
+    @FXML
+    private FontIcon firebaseIcon;
+
+    @FXML
+    private Button dbFileButton;
 
     @FXML
     private Label userSettingsLabel;
@@ -49,6 +56,8 @@ public class SettingsController implements Initializable {
 
     @FXML
     private CheckBox soundCheck;
+
+
 
     public SettingsController() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));
@@ -74,6 +83,11 @@ public class SettingsController implements Initializable {
     @FXML
     void onResetAction(ActionEvent event) {
         getResetDialog();
+    }
+
+    @FXML
+    void onDbFileAction(ActionEvent event) {
+
     }
 
     private void getResetDialog() {
@@ -163,5 +177,9 @@ public class SettingsController implements Initializable {
 
     public BorderPane getRoot() {
         return settingsRoot;
+    }
+
+    public FontIcon getFirebaseIcon() {
+        return firebaseIcon;
     }
 }

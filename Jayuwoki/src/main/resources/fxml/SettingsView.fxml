@@ -12,10 +12,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
-<BorderPane fx:id="settingsRoot" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="settingsRoot" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
-      <ButtonBar BorderPane.alignment="CENTER">
+      <ButtonBar id="settingButtonBar" BorderPane.alignment="CENTER">
         <buttons>
           <Button fx:id="applyButton" defaultButton="true" mnemonicParsing="false" onAction="#onApplyAction" text="Apply" />
             <Button mnemonicParsing="false" onAction="#onResetAction" text="Reset" />
@@ -36,24 +35,26 @@
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
         </rowConstraints>
          <children>
-            <CheckBox fx:id="imageCheck" mnemonicParsing="false" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <CheckBox fx:id="massPermissionCheck" mnemonicParsing="false" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-            <CheckBox fx:id="soundCheck" mnemonicParsing="false" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <CheckBox fx:id="imageCheck" mnemonicParsing="false" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+            <CheckBox fx:id="massPermissionCheck" mnemonicParsing="false" GridPane.halignment="LEFT" GridPane.rowIndex="5" />
+            <CheckBox fx:id="soundCheck" mnemonicParsing="false" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
             <Label text="Disable bot images" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
-                  <Insets left="5.0" />
+                  <Insets />
                </GridPane.margin>
             </Label>
             <Label text="Enable permissions to all members" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <GridPane.margin>
-                  <Insets left="5.0" />
+                  <Insets />
                </GridPane.margin>
             </Label>
             <Label text="Disable bot sounds" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <GridPane.margin>
-                  <Insets left="5.0" />
+                  <Insets />
                </GridPane.margin>
             </Label>
             <Label fx:id="botSettingsLabel" text="Bot settings" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER">
@@ -67,6 +68,22 @@
                </graphic>
             </Label>
             <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
+            <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="6" />
+            <Label id="APISettingsLabel" text="APIs settings" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="7">
+               <graphic>
+                  <FontIcon iconLiteral="mdi2c-chip" iconSize="15" />
+               </graphic>
+            </Label>
+            <Button id="dbFileButton" fx:id="dbFileButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onDbFileAction" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+               <graphic>
+                  <FontIcon id="firebaseIcon" fx:id="firebaseIcon" iconLiteral="mdi2f-firebase" />
+               </graphic>
+            </Button>
+            <Label text="Add your Firebase token file" GridPane.columnIndex="1" GridPane.rowIndex="8">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </Label>
          </children>
       </GridPane>
    </center>
