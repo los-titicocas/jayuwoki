@@ -33,13 +33,6 @@ public class Bot {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String token = reader.readLine();
 
-
-            // Leer el token desde la variable de entorno
-//        String token = System.getenv("BOT_TOKEN");
-//        if (token == null || token.isEmpty()) {
-//            throw new IllegalStateException("Token is not set as an environment variable");
-//        }
-
             // Inicializar el bot con el token
             jda = JDABuilder.createDefault(token)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS) // Intends so the Bot can see members and messages from the guild
