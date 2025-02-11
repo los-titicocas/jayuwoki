@@ -2,33 +2,18 @@ package dad.api;
 
 import dad.api.commands.RollaDie;
 import dad.api.models.LogEntry;
-import dad.api.models.Privadita;
+import dad.api.commands.Privadita;
 import dad.database.Player;
 import dad.database.DBManager;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import dad.api.models.LogEntry;
-import dad.database.Player;
-import dad.database.DBManager;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
@@ -36,6 +21,7 @@ import java.util.*;
 
 public class Commands extends ListenerAdapter {
 
+    // Command objets
     private ListProperty<Privadita> privaditas = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -51,6 +37,7 @@ public class Commands extends ListenerAdapter {
         if (message.startsWith("$")) {
             dbManager.setEvent(event);
             dbManager.setCurrentServer(event.getGuild().getName());
+
             String[] comando = message.split(" ");
 
             // Introduce the command in the log
@@ -64,14 +51,13 @@ public class Commands extends ListenerAdapter {
                     // Check if the command has the correct number of players
                     boolean isPrivaditaActive = privaditas.stream()
                             .anyMatch(privadita -> privadita.getServer().equals(event.getGuild().getName()));
-
                     if (isPrivaditaActive) {
                         event.getChannel().sendMessage("Ya hay una privadita en juego en este servidor. ACÁBALA (o usa $dropPrivadita)").queue();
+                        // If the command has the right size and there is no privadita active, start a new one
                     } else if (comando.length == 11) {
                         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
-                        ListProperty<Player> players = CheckPrivaditaCommand(playersNames, event);
-                        if (players != null) {
-                            Privadita nuevaPrivadita = new Privadita(players, event);
+                        Privadita nuevaPrivadita = new Privadita(playersNames, event);
+                        if (nuevaPrivadita.getPlayers() != null) {
                             privaditas.add(nuevaPrivadita);
                         }
                     } else {
@@ -85,7 +71,6 @@ public class Commands extends ListenerAdapter {
                             .filter(privadita -> privadita.getServer().equals(event.getGuild().getName()))
                             .findFirst()
                             .orElse(null);
-
                     if (privaditaToDrop != null) {
                         privaditas.remove(privaditaToDrop);
                         event.getChannel().sendMessage("Se ha cancelado la privadita").queue();
@@ -96,6 +81,7 @@ public class Commands extends ListenerAdapter {
 
                 // Add only one player to the database to use it on privadita
                 case "$addPlayer":
+                    // Set the dbManager and the event to the playerManager
                     if (comando.length == 2) {
                         Player newPlayer = new Player();
                         newPlayer.setName(comando[1]);
@@ -108,6 +94,8 @@ public class Commands extends ListenerAdapter {
                 // Add multiple players to the database to use them on privadita
                 case "$addPlayers":
                     if (comando.length > 1) {
+                        // Set the dbManager and the event to the playerManager
+
                         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
                         List<Player> newPlayers = new ArrayList<>();
                         for (String name : playersNames) {
@@ -121,6 +109,14 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
 
+                    case "$deletePlayer":
+                    if (comando.length == 2) {
+                        dbManager.DeletePlayer(comando[1]);
+                    } else {
+                        event.getChannel().sendMessage("El comando $deletePlayer necesita un nombre de jugador").queue();
+                    }
+                    break;
+
                 case "$verElo":
                     if (comando.length == 2) {
                         dbManager.ShowPlayerElo(comando[1]);
@@ -129,13 +125,7 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
 
-                case "$deletePlayer":
-                    if (comando.length == 2) {
-                        dbManager.DeletePlayer(comando[1]);
-                    } else {
-                        event.getChannel().sendMessage("El comando $deletePlayer necesita un nombre de jugador").queue();
-                    }
-                    break;
+
                 case "$join":
                     joinVoiceChannel(event);
                     break;
@@ -238,27 +228,7 @@ public class Commands extends ListenerAdapter {
 
 
 
-    // FUnction to check the command and fill the player list
-    private ListProperty<Player> CheckPrivaditaCommand(String[] playersNames, MessageReceivedEvent event) {
-        Set<String> uniqueNames = new HashSet<>();
-        ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-        for (String name : playersNames) {
-            if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
-                event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
-                return null;
-            }
-
-            if (name.startsWith("$")) {
-                event.getChannel().sendMessage("A donde vas listillo.").queue();
-                return null;
-            }
-            Player player = new Player();
-            player.setName(name);
-            players.add(player);
-        }
-        return players;
-    }
 
     public ListProperty<LogEntry> getLogs() {
         return logs;

@@ -7,7 +7,7 @@
     -fx-font-family: 'WorkSans-Bold';
 }
 
-.button {
+#menuGridPane .button, #loginRoot .button, #themeButton, #tutorialButton, #settingButtonBar .button, #connectRoot .button, #logRoot .button, .alert .button {
     -fx-border-color: black;
     -fx-border-width: 2;
     -fx-background-color: #5b9edf;
@@ -22,7 +22,7 @@
     -fx-font-weight: bold;
 }
 
-.button:hover {
+#menuGridPane .button:hover, #loginRoot .button:hover, #themeButton:hover, #tutorialButton:hover, #settingsRoot .button:hover,#connectRoot .button:hover, #logRoot .button:hover, .alert .button:hover{
     -fx-background-color: #0a78f4;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 15, 0.5, 0, 0);
 }
@@ -163,10 +163,22 @@
     -fx-font-weight: bold;
 }
 
-#botSettingsLabel, #userSettingsLabel {
+ #botSettingsLabel, #userSettingsLabel, #APISettingsLabel {
     -fx-font-size: 22;
     -fx-text-fill: black;
     -fx-font-weight: bold;
+}
+
+#dbFileButton {
+    -fx-background-color: white;
+    -fx-pref-width: 50;
+    -fx-pref-height: 20;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+    -fx-alignment: center;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 10 20;
 }
 
 .check-box {
@@ -201,4 +213,44 @@
     -fx-background-color: black;
     -fx-border-color: black;
     -fx-border-width: 2;
+}
+
+.alert {
+    -fx-background-color: #DEE4E7FF; /* Dark background color */
+    -fx-text-fill: black; /* White text color */
+    -fx-border-color: #555555; /* Border color */
+    -fx-border-width: 2; /* Border width */
+    -fx-border-radius: 5; /* Rounded corners */
+    -fx-background-radius: 5; /* Rounded corners */
+    -fx-padding: 5;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+}
+
+.alert .dialog-pane {
+    -fx-background-color: #DEE4E7FF; /* Dark background color for the dialog pane */
+    -fx-border-color: #555555; /* Border color for the dialog pane */
+    -fx-border-width: 2; /* Border width for the dialog pane */
+    -fx-border-radius: 5; /* Rounded corners for the dialog pane */
+    -fx-background-radius: 5; /* Rounded corners for the dialog pane */
+}
+
+.alert .header-panel {
+    -fx-background-color: #DEE4E7FF; /* Slightly lighter background for the header */
+    -fx-text-fill: black; /* White text color for the header */
+}
+
+.alert .content {
+    -fx-background-color: #DEE4E7FF; /* Dark background color for the content */
+    -fx-text-fill: black; /* White text color for the content */
+}
+
+.alert .button-bar {
+    -fx-border-width: 1; /* Border width for the button bar */
+    -fx-padding: 5;
+    -fx-alignment: center;
+}
+
+.alert .button-bar .button {
+    -fx-pref-height: 20;
 }

@@ -25,6 +25,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -43,6 +44,7 @@ public class MainController implements Initializable {
     private final ContactController contactController = new ContactController();
     private final ConnectController connectController = new ConnectController();
     private final AboutController aboutController = new AboutController();
+    private final SettingsController settingsController = new SettingsController();
 
     @FXML
     private VBox aboutBox;
@@ -149,6 +151,8 @@ public class MainController implements Initializable {
                 customTitleBar.onCloseWindow();
             }
         });
+
+        // bind setting checkbox
     }
 
     private void popOverMap() {
@@ -295,7 +299,6 @@ public class MainController implements Initializable {
 
     @FXML
     void onSettingsAction(ActionEvent event) {
-        SettingsController settingsController = new SettingsController();
         contentPane.getChildren().setAll(settingsController.getRoot());
     }
 
