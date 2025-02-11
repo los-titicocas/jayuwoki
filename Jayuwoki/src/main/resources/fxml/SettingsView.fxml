@@ -6,13 +6,15 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="settingsRoot" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="settingsRoot" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <bottom>
       <ButtonBar id="settingButtonBar" BorderPane.alignment="CENTER">
         <buttons>
@@ -37,22 +39,23 @@
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
         </rowConstraints>
          <children>
             <CheckBox fx:id="imageCheck" mnemonicParsing="false" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
             <CheckBox fx:id="massPermissionCheck" mnemonicParsing="false" GridPane.halignment="LEFT" GridPane.rowIndex="5" />
             <CheckBox fx:id="soundCheck" mnemonicParsing="false" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
-            <Label text="Disable bot images" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <Label text="Disable bot images" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
             </Label>
-            <Label text="Enable permissions to all members" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <Label text="Enable permissions to all members" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="5">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
             </Label>
-            <Label text="Disable bot sounds" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <Label text="Disable bot sounds" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
@@ -84,6 +87,15 @@
                   <Insets left="5.0" />
                </GridPane.margin>
             </Label>
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnSpan="2" GridPane.rowIndex="9">
+               <children>
+                  <TextField fx:id="tokenTextField" />
+                  <Label text="Introduce  el token de tu bot" />
+               </children>
+               <GridPane.margin>
+                  <Insets top="5.0" />
+               </GridPane.margin>
+            </HBox>
          </children>
       </GridPane>
    </center>

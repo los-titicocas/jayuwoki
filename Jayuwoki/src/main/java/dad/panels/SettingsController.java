@@ -59,6 +59,8 @@ public class SettingsController implements Initializable {
     @FXML
     private CheckBox soundCheck;
 
+    @FXML
+    private TextField tokenTextField;
 
 
     public SettingsController() {
