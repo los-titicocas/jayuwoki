@@ -6,14 +6,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -87,7 +89,31 @@ public class SettingsController implements Initializable {
 
     @FXML
     void onDbFileAction(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        fileChooser.setTitle("Seleccionar archivo JSON");
 
+        File selectedFile = fileChooser.showOpenDialog(settingsRoot.getScene().getWindow());
+
+        if (selectedFile != null) {
+            File destination = new File(getClass().getResource("/resources/").getPath(), selectedFile.getName());
+
+            try {
+                Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                showFileAlert("Archivo Guardado", "El archivo JSON se ha guardado correctamente en resources.");
+            } catch (IOException e) {
+                showFileAlert("Error", "No se pudo copiar el archivo JSON.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void showFileAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void getResetDialog() {
