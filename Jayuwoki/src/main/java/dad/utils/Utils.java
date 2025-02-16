@@ -49,6 +49,9 @@ public class Utils {
             try (FileOutputStream output = new FileOutputStream(filePath)) {
                 properties.setProperty("theme", "dark");
                 properties.setProperty("language", "en");
+                properties.setProperty("massPermissionCheck", "false");
+                properties.setProperty("imageCheck", "false");
+                properties.setProperty("soundCheck", "false");
                 properties.store(output, null);
             } catch (IOException e) {
                 e.printStackTrace();
