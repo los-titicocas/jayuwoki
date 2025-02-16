@@ -38,7 +38,7 @@ public class Commands extends ListenerAdapter {
             dbManager.setEvent(event);
             dbManager.setCurrentServer(event.getGuild().getName());
 
-            String[] comando = message.split(" ", 2);
+            String[] comando = message.split(" ", 11);
 
             // Introduce the command in the log
             LogEntry logEntry = new LogEntry(event.getAuthor().getName(), message, event.getMessage().getTimeCreated().toLocalDateTime());
