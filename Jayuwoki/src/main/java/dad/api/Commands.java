@@ -7,7 +7,10 @@ import dad.api.music.GuildMusicManager;
 import dad.api.music.PlayerManager;
 import dad.database.Player;
 import dad.database.DBManager;
+import dad.utils.Utils;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import net.dv8tion.jda.api.JDA;
@@ -28,7 +31,19 @@ public class Commands extends ListenerAdapter {
     private final DBManager dbManager = new DBManager();
     protected JDA jda;
 
+    // define the state of the command
+    private final BooleanProperty isActive = new SimpleBooleanProperty(true);
+
     public Commands() {
+        Utils.loadProperties();
+        loadCommandStatus();
+    }
+
+    // checks if the commands are active
+    private void loadCommandStatus() {
+        // fill with the commands
+        boolean rollaDieActive = Boolean.parseBoolean(Utils.properties.getProperty("rollaDie", "true"));
+        setIsActive(rollaDieActive);
     }
 
     @Override
@@ -138,6 +153,9 @@ public class Commands extends ListenerAdapter {
                     break;
 
                 case "$rolladie":
+                    if (!checkCommandActive(event, "$rolladie")) {
+                        break;
+                    }
                     if (comando.length == 2) {
                         if (Integer.parseInt(comando[1]) > 20 || Integer.parseInt(comando[1]) < 2) {
                             event.getChannel().sendMessage("The die must have between 2 and 20 sides").queue();
@@ -159,6 +177,14 @@ public class Commands extends ListenerAdapter {
                     event.getChannel().sendMessage("Comando no encontrado").queue();
             }
         }
+    }
+
+    public boolean checkCommandActive(MessageReceivedEvent event, String commandName) {
+        if (!isActive()) {
+            event.getChannel().sendMessage("The " + commandName + " command is currently disabled").queue();
+            return false;
+        }
+        return true;
     }
 
     // Function to join the voice channel
@@ -220,6 +246,24 @@ public class Commands extends ListenerAdapter {
             e.printStackTrace();
             event.getChannel().sendMessage("Ocurrió un error al leer el archivo de comandos.").queue();
         }
+    }
+    // change the state of the command
+    public void setIsActive(boolean isActive) {
+        this.isActive.set(isActive);
+    }
+
+    public void disableCommand() {
+        setIsActive(false);
+        Utils.properties.setProperty("rollaDie", "false");
+        Utils.saveProperties();
+    }
+
+    public boolean isActive() {
+        return isActive.get();
+    }
+
+    public BooleanProperty isActiveProperty() {
+        return isActive;
     }
 
     public ListProperty<LogEntry> getLogs() {
