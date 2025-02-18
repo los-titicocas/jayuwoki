@@ -31,9 +31,12 @@
       <name>m2-dv8tion</name>
       <url>https://m2.dv8tion.net/releases</url>
     </repository>
+    <repository>
+      <id>arbjergDev-snapshots</id>
+      <name>Lavalink Repository</name>
+      <url>https://maven.lavalink.dev/snapshots</url>
+    </repository>
   </repositories>
-
-
 
   <dependencies>
     <dependency>
@@ -117,11 +120,107 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.walkyst</groupId>
+      <artifactId>lavaplayer-fork</artifactId>
+      <version>1.4.3</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.sedmelluq</groupId>
       <artifactId>lavaplayer</artifactId>
       <version>1.3.77</version>
     </dependency>
 
+    <dependency>
+      <groupId>dev.arbjerg</groupId>
+      <artifactId>lavaplayer</artifactId>
+      <version>0eaeee195f0315b2617587aa3537fa202df07ddc-SNAPSHOT</version>
+    </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.github.fvarrui</groupId>
+        <artifactId>javapackager</artifactId>
+        <version>1.7.6</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>package</goal>
+            </goals>
+            <configuration>
+              <!-- mandatory -->
+              <mainClass>dad.app.Main</mainClass>
+
+              <bundleJre>false</bundleJre>
+              <generateInstaller>true</generateInstaller>
+              <administratorRequired>true</administratorRequired>
+              <platform>windows</platform>
+              <winConfig>
+
+                <!-- general properties -->
+                <icoFile>assets/installer-icon.ico</icoFile>
+                <generateSetup>true</generateSetup>
+                <generateMsi>false</generateMsi>
+                <generateMsm>false</generateMsm>
+
+                <!-- exe creation properties -->
+                <headerType>gui</headerType>
+                <wrapJar>true</wrapJar>
+                <fileVersion>1.0.0.0</fileVersion>
+                <txtFileVersion>${version}</txtFileVersion>
+                <productVersion>1.0.0.0</productVersion>
+                <txtProductVersion>${version}</txtProductVersion>
+                <fileDescription>${description}</fileDescription>
+                <productName>${name}</productName>
+                <internalName>${name}</internalName>
+                <originalFilename>${name}.exe</originalFilename>
+
+                <!-- choose EXE creation tool -->
+                <exeCreationTool>launch4j</exeCreationTool>
+
+                <!-- setup generation properties -->
+                <setupMode>installForCurrentUser</setupMode>
+                <setupLanguages>
+                  <english>compiler:Default.isl</english>
+                  <german>compiler:Languages\German.isl</german>
+                  <spanish>compiler:Languages\Spanish.isl,${project.basedir}\languages\Custom_es.isl</spanish>
+                </setupLanguages>
+                <disableDirPage>false</disableDirPage>
+                <disableProgramGroupPage>false</disableProgramGroupPage>
+                <disableFinishedPage>false</disableFinishedPage>
+                <disableRunAfterInstall>true</disableRunAfterInstall>
+                <disableWelcomePage>false</disableWelcomePage>
+                <createDesktopIconTask>true</createDesktopIconTask>
+                <removeOldLibs>true</removeOldLibs>
+
+                <!-- signing properties -->
+                <signing>
+                  <keystore>path/to/keystore</keystore>
+                  <storepass>password</storepass>
+                  <alias>cert_alias</alias>
+                </signing>
+
+                <!-- windows registry entries added during installation -->
+                <registry>
+                  <entries>
+                    <entry>
+                      <key>root:path/to/my/key</key>
+                      <valueName>name</valueName>
+                      <valueData>data</valueData>
+                    </entry>
+                  </entries>
+                </registry>
+
+              </winConfig>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

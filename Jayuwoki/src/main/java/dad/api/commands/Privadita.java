@@ -14,6 +14,8 @@ import java.util.*;
 public class Privadita {
 
   // Atributtes
+
+  //TODO:
   private MessageReceivedEvent event;
   private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
   private StringProperty server = new SimpleStringProperty();

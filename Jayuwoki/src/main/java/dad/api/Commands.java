@@ -3,6 +3,8 @@ package dad.api;
 import dad.api.commands.RollaDie;
 import dad.api.models.LogEntry;
 import dad.api.commands.Privadita;
+import dad.api.music.GuildMusicManager;
+import dad.api.music.PlayerManager;
 import dad.database.Player;
 import dad.database.DBManager;
 import javafx.beans.property.ListProperty;
@@ -13,17 +15,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
+import java.io.InputStream;
 import java.util.*;
-
 
 public class Commands extends ListenerAdapter {
 
-    // Command objets
+    // Command objects
     private ListProperty<Privadita> privaditas = new SimpleListProperty<>(FXCollections.observableArrayList());
-
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final DBManager dbManager = new DBManager();
     protected JDA jda;
@@ -38,7 +38,7 @@ public class Commands extends ListenerAdapter {
             dbManager.setEvent(event);
             dbManager.setCurrentServer(event.getGuild().getName());
 
-            String[] comando = message.split(" ");
+            String[] comando = message.split(" ", 11);
 
             // Introduce the command in the log
             LogEntry logEntry = new LogEntry(event.getAuthor().getName(), message, event.getMessage().getTimeCreated().toLocalDateTime());
@@ -53,7 +53,6 @@ public class Commands extends ListenerAdapter {
                             .anyMatch(privadita -> privadita.getServer().equals(event.getGuild().getName()));
                     if (isPrivaditaActive) {
                         event.getChannel().sendMessage("Ya hay una privadita en juego en este servidor. ACÁBALA (o usa $dropPrivadita)").queue();
-                        // If the command has the right size and there is no privadita active, start a new one
                     } else if (comando.length == 11) {
                         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
                         Privadita nuevaPrivadita = new Privadita(playersNames, event);
@@ -81,7 +80,6 @@ public class Commands extends ListenerAdapter {
 
                 // Add only one player to the database to use it on privadita
                 case "$addPlayer":
-                    // Set the dbManager and the event to the playerManager
                     if (comando.length == 2) {
                         Player newPlayer = new Player();
                         newPlayer.setName(comando[1]);
@@ -94,8 +92,6 @@ public class Commands extends ListenerAdapter {
                 // Add multiple players to the database to use them on privadita
                 case "$addPlayers":
                     if (comando.length > 1) {
-                        // Set the dbManager and the event to the playerManager
-
                         String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
                         List<Player> newPlayers = new ArrayList<>();
                         for (String name : playersNames) {
@@ -109,7 +105,7 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
 
-                    case "$deletePlayer":
+                case "$deletePlayer":
                     if (comando.length == 2) {
                         dbManager.DeletePlayer(comando[1]);
                     } else {
@@ -125,7 +121,6 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
 
-
                 case "$join":
                     joinVoiceChannel(event);
                     break;
@@ -136,10 +131,9 @@ public class Commands extends ListenerAdapter {
 
                 case "$play":
                     if (comando.length < 2) {
-                        event.getChannel().sendMessage("Uso: $play <nombre del archivo>").queue();
+                        event.getChannel().sendMessage("Uso: $play <URL>").queue();
                     } else {
-                        String fileName = comando[1];
-                        playAudio(event, fileName);
+                        play(event, comando[1]);
                     }
                     break;
 
@@ -157,19 +151,19 @@ public class Commands extends ListenerAdapter {
                     }
                     break;
 
+                case "$help":
+                    sendHelpMessage(event);
+                    break;
+
                 default:
                     event.getChannel().sendMessage("Comando no encontrado").queue();
-
-
             }
         }
     }
 
     // Function to join the voice channel
-
     private void joinVoiceChannel(MessageReceivedEvent event) {
         Guild guild = event.getGuild();
-        Member selfMember = guild.getSelfMember();
         AudioManager audioManager = guild.getAudioManager();
 
         if (audioManager.isConnected()) {
@@ -178,17 +172,13 @@ public class Commands extends ListenerAdapter {
         }
 
         Member member = event.getMember();
-        if (member != null) {
-            AudioChannel voiceChannel = member.getVoiceState().getChannel();
-            if (voiceChannel != null) {
-                audioManager.openAudioConnection(voiceChannel);
-                event.getChannel().sendMessage("Conectado al canal de voz: " + voiceChannel.getName()).queue();
-            } else {
-                event.getChannel().sendMessage("No estás en un canal de voz.").queue();
-            }
+        if (member != null && member.getVoiceState().getChannel() != null) {
+            audioManager.openAudioConnection(member.getVoiceState().getChannel());
+            event.getChannel().sendMessage("Conectado al canal de voz.").queue();
+        } else {
+            event.getChannel().sendMessage("No estás en un canal de voz.").queue();
         }
     }
-
 
     // Function to leave the voice channel
     private void leaveVoiceChannel(MessageReceivedEvent event) {
@@ -203,32 +193,34 @@ public class Commands extends ListenerAdapter {
         }
     }
 
-    private void playAudio(MessageReceivedEvent event, String fileName) {
+    private void play(MessageReceivedEvent event, String trackUrl) {
         Guild guild = event.getGuild();
-        Member member = event.getMember();
-
-        if (member == null || member.getVoiceState() == null || member.getVoiceState().getChannel() == null) {
-            event.getChannel().sendMessage("Debes estar en un canal de voz para usar este comando.").queue();
-            return;
-        }
-
-        AudioChannel voiceChannel = member.getVoiceState().getChannel();
-        AudioManager audioManager = guild.getAudioManager();
-
-        if (!audioManager.isConnected()) {
-            audioManager.openAudioConnection(voiceChannel);
-        }
-
-        String filePath = getClass().getResource("/audio/" + fileName).getPath();
-        AudioHandler audioHandler = new AudioHandler(guild);
-        audioHandler.loadAndPlay(filePath);
-
-        event.getChannel().sendMessage("Reproduciendo audio: " + fileName).queue();
+        PlayerManager playerManager = PlayerManager.get();
+        playerManager.play(guild, trackUrl);
+        event.getChannel().sendMessage("Reproduciendo: " + trackUrl).queue();
     }
 
+    private void sendHelpMessage(MessageReceivedEvent event) {
+        try {
+            // Leer el archivo Markdown que contiene los comandos
+            InputStream inputStream = getClass().getResourceAsStream("/commands.md");
+            if (inputStream == null) {
+                event.getChannel().sendMessage("No se pudo encontrar el archivo de comandos.").queue();
+                return;
+            }
+            Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+            String helpMessage = scanner.hasNext() ? scanner.next() : "No hay comandos disponibles.";
+            scanner.close();
 
-
-
+            // Enviar el mensaje de ayuda
+            event.getAuthor().openPrivateChannel().queue((channel) -> {
+                channel.sendMessage(helpMessage).queue();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            event.getChannel().sendMessage("Ocurrió un error al leer el archivo de comandos.").queue();
+        }
+    }
 
     public ListProperty<LogEntry> getLogs() {
         return logs;
