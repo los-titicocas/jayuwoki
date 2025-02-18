@@ -1,5 +1,6 @@
 package dad.api.commands;
 
+import dad.database.DBManager;
 import dad.database.Player;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -21,9 +22,10 @@ public class Privadita {
   private StringProperty server = new SimpleStringProperty();
   private final ArrayList<String> roles = new ArrayList<>(List.of("Top", "Jungla", "Mid", "ADC", "Support"));
 
-  public Privadita(String[] playersNames, MessageReceivedEvent event) {
+  public Privadita(List<Player> players, MessageReceivedEvent event) {
     this.server.set(event.getGuild().getName());
-    this.players.addAll(CheckPrivaditaCommand(playersNames,event));
+    CheckPrivaditaCommand(players,event);
+    this.players.addAll(players);
     StartPrivadita(event);
   }
 
@@ -69,11 +71,15 @@ public class Privadita {
     event.getChannel().sendMessage(formattedMessage).queue();
   }
 
-  // FUnction to check the command and fill the player list
-  private ListProperty<Player> CheckPrivaditaCommand(List<String> playersNames, MessageReceivedEvent event) {
-    Set<String> uniqueNames = new HashSet<>();
 
-    for (String name : playersNames) {
+  // Function to check the command and fill the player list
+  private ListProperty<Player> CheckPrivaditaCommand(List<Player> playerList, MessageReceivedEvent event) {
+    Set<String> uniqueNames = new HashSet<>();
+    ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    for (Player player : playerList) {
+      String name = player.getName();
+
       if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
         event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
         return null;
@@ -83,33 +89,81 @@ public class Privadita {
         event.getChannel().sendMessage("A donde vas listillo.").queue();
         return null;
       }
-      Player player = new Player();
-      player.setName(name);
+
       players.add(player);
     }
     return players;
   }
 
-  // FUnction to check the command and fill the player list
-  private ListProperty<Player> CheckPrivaditaCommand(String[] playersNames, MessageReceivedEvent event) {
-    Set<String> uniqueNames = new HashSet<>();
-    ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-    for (String name : playersNames) {
-      if (!uniqueNames.add(name)) { // Si el nombre ya existe en el conjunto
-        event.getChannel().sendMessage(name + " está repetido, prueba otra vez.").queue();
-        return null;
-      }
-
-      if (name.startsWith("$")) {
-        event.getChannel().sendMessage("A donde vas listillo.").queue();
-        return null;
-      }
-      Player player = new Player();
-      player.setName(name);
-      players.add(player);
+  public void ResultadoPrivadita(String ganador, MessageReceivedEvent event) {
+    System.out.println("Elo de todos los jugadores:");
+    for (Player p : players) {
+      System.out.println(p.getName() + " - Elo: " + p.getElo());
     }
-    return players;
+
+    double averageEloEquipo1 = players.subList(0, 5).stream()
+            .mapToInt(Player::getElo)
+            .average()
+            .orElse(0);
+
+    double averageEloEquipo2 = players.subList(5, 10).stream()
+            .mapToInt(Player::getElo)
+            .average()
+            .orElse(0);
+
+    StringBuilder messageBuilder = new StringBuilder();
+    messageBuilder.append("Resultado de la partida:\n");
+
+    switch (ganador) {
+      case "equipo1":
+        messageBuilder.append("\n🏆 **Equipo Azul ha ganado!** 🏆\n");
+        break;
+      case "equipo2":
+        messageBuilder.append("\n🔥 **Equipo Rojo ha ganado!** 🔥\n");
+        break;
+      default:
+        event.getChannel().sendMessage("Pon el equipo bien tolete").queue();
+        return;
+    }
+
+    messageBuilder.append("```\n**Cambios de Elo:**\n");
+
+    for (int i = 0; i < 5; i++) {
+      if (ganador.equals("equipo1")) {
+        players.get(i).setWins(players.get(i).getWins() + 1);
+        players.get(i + 5).setLosses(players.get(i + 5).getLosses() + 1);
+        int oldEloWin = players.get(i).getElo();
+        int oldEloLose = players.get(i + 5).getElo();
+        players.get(i).ActualizarElo(averageEloEquipo2, true);
+        players.get(i + 5).ActualizarElo(averageEloEquipo1, false);
+
+        messageBuilder.append(players.get(i).getName()).append(": ")
+                .append(oldEloWin).append(" ➝ ").append(players.get(i).getElo())
+                .append(" (+").append(players.get(i).getElo() - oldEloWin).append(")\n");
+
+        messageBuilder.append(players.get(i + 5).getName()).append(": ")
+                .append(oldEloLose).append(" ➝ ").append(players.get(i + 5).getElo())
+                .append(" (").append(players.get(i + 5).getElo() - oldEloLose).append(")\n");
+      } else {
+        players.get(i + 5).setWins(players.get(i + 5).getWins() + 1);
+        players.get(i).setLosses(players.get(i).getLosses() + 1);
+        int oldEloWin = players.get(i + 5).getElo();
+        int oldEloLose = players.get(i).getElo();
+        players.get(i + 5).ActualizarElo(averageEloEquipo1, true);
+        players.get(i).ActualizarElo(averageEloEquipo2, false);
+
+        messageBuilder.append(players.get(i + 5).getName()).append(": ")
+                .append(oldEloWin).append(" ➝ ").append(players.get(i + 5).getElo())
+                .append(" (+").append(players.get(i + 5).getElo() - oldEloWin).append(")\n");
+
+        messageBuilder.append(players.get(i).getName()).append(": ")
+                .append(oldEloLose).append(" ➝ ").append(players.get(i).getElo())
+                .append(" (").append(players.get(i).getElo() - oldEloLose).append(")\n");
+      }
+    }
+
+    messageBuilder.append("```");
+    event.getChannel().sendMessage(messageBuilder.toString()).queue();
   }
 
   public MessageReceivedEvent getEvent() {

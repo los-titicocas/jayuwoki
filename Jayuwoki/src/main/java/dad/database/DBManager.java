@@ -6,16 +6,17 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import dad.utils.Utils;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,73 @@ public class DBManager {
             e.printStackTrace();
         }
     }
+
+    public List<Player> GetPlayers(String[] nombres, MessageReceivedEvent event) {
+        List<Player> players = new ArrayList<>();
+        CollectionReference playersCollection = db.collection(currentServer.get()).document("Privadita").collection("Players");
+
+        try {
+            // Buscar los jugadores en la base de datos usando whereIn
+            QuerySnapshot querySnapshot = playersCollection
+                    .whereIn("name", Arrays.asList(nombres))
+                    .get()
+                    .get();
+
+            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                Player player = doc.toObject(Player.class);
+                if (player != null) {
+                    players.add(player);
+                }
+            }
+
+            // Verificar si faltan jugadores
+            List<String> jugadoresEncontrados = players.stream()
+                    .map(Player::getName)
+                    .collect(Collectors.toList());
+
+            List<String> jugadoresNoEncontrados = Arrays.stream(nombres)
+                    .filter(nombre -> !jugadoresEncontrados.contains(nombre))
+                    .collect(Collectors.toList());
+
+            if (!jugadoresNoEncontrados.isEmpty()) {
+                StringBuilder message = new StringBuilder("Los siguientes jugadores no están en la base de datos:\n");
+                for (String nombre : jugadoresNoEncontrados) {
+                    message.append("- ").append(nombre).append("\n");
+                }
+                event.getChannel().sendMessage(message.toString().trim()).queue();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return players;
+    }
+
+    // updates the data from the players list in the database
+    public void updatePlayers(String server, ObservableList<Player> players) {
+        System.out.println("Actualizando jugadores en el servidor: " + server);
+
+        CollectionReference playersCollection = db.collection(server).document("Privadita").collection("Players");
+
+        WriteBatch batch = db.batch();
+
+        for (Player player : players) {
+            System.out.println("Actualizando jugador: " + player.getName() + " con Elo " + player.getElo());
+
+            DocumentReference playerDoc = playersCollection.document(player.getName());
+            batch.set(playerDoc, player);
+        }
+
+        try {
+            batch.commit().get();  // Se espera a que termine la operación
+            System.out.println("Jugadores actualizados correctamente.");
+        } catch (Exception e) {
+            System.out.println("Error al actualizar jugadores: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     public void AddPlayer(Player newPlayer) {
         try {
@@ -156,7 +224,9 @@ public class DBManager {
             if (playerDoc.exists()) {
                 Player player = playerDoc.toObject(Player.class);
                 // Show all the player stats
-                event.getChannel().sendMessage(player.PrintStats()).queue();
+                StringBuilder message = new StringBuilder("```");
+                message.append(player.PrintStats()).append("```");
+                event.getChannel().sendMessage(message.toString()).queue();
             } else {
                 event.getChannel().sendMessage("El jugador no está en la base de datos").queue();
             }
@@ -173,10 +243,15 @@ public class DBManager {
             // Get all the players from the database
             QuerySnapshot querySnapshot = playersCollection.get().get();
 
+            // Convert the documents to Player objects and sort them by Elo in descending order
+            List<Player> players = querySnapshot.getDocuments().stream()
+                    .map(doc -> doc.toObject(Player.class))
+                    .sorted((p1, p2) -> Integer.compare(p2.getElo(), p1.getElo()))
+                    .collect(Collectors.toList());
+
             // Show the stats of all the players
             StringBuilder message = new StringBuilder("```");
-            for (DocumentSnapshot playerDoc : querySnapshot.getDocuments()) {
-                Player player = playerDoc.toObject(Player.class);
+            for (Player player : players) {
                 message.append(player.PrintStats()).append("\n");
             }
             message.append("```");
@@ -285,5 +360,30 @@ public class DBManager {
 
     public void setOpenPermissions(boolean openPermissions) {
         this.openPermissions.set(openPermissions);
+    }
+
+
+
+
+    public static void main(String[] args) {
+        DBManager dbManager = new DBManager();
+        dbManager.setCurrentServer("Jayuwoki");
+
+        // Lista de jugadores con 2000 de Elo
+        ObservableList<Player> players = FXCollections.observableArrayList(
+                new Player("Chris", 2000),
+                new Player("Estucaquio", 2000),
+                new Player("Frodo", 2000),
+                new Player("Guamero", 2000),
+                new Player("Jonathan", 2000),
+                new Player("Jorge", 1000),
+                new Player("Messi", 1000),
+                new Player("Nuriel", 1000),
+                new Player("Nestor", 1000),
+                new Player("Nuha", 1000)
+        );
+
+        dbManager.updatePlayers(dbManager.getCurrentServer(), players);
+
     }
 }
