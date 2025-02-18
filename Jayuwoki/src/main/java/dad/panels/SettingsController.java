@@ -1,5 +1,7 @@
 package dad.panels;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +30,7 @@ import java.io.File;
 public class SettingsController implements Initializable {
 
     private final Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
+    private StringProperty token = new SimpleStringProperty();
 
     @FXML
     private Label botSettingsLabel;
@@ -75,6 +78,7 @@ public class SettingsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        token.bindBidirectional(tokenTextField.textProperty());
         loadSettings();
     }
 
@@ -172,6 +176,19 @@ public class SettingsController implements Initializable {
         imageCheck.setSelected(Boolean.parseBoolean(properties.getProperty("imageCheck", "false")));
         massPermissionCheck.setSelected(Boolean.parseBoolean(properties.getProperty("massPermissionCheck", "false")));
         soundCheck.setSelected(Boolean.parseBoolean(properties.getProperty("soundCheck", "false")));
+
+        // Load token from api.config
+        File apiConfigFile = new File("Jayuwoki/src/main/resources/api.config");
+        if (apiConfigFile.exists()) {
+            try (FileInputStream input = new FileInputStream(apiConfigFile)) {
+                byte[] data = new byte[(int) apiConfigFile.length()];
+                input.read(data);
+                String tokenValue = new String(data);
+                token.set(tokenValue.trim());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void saveSettings() {
@@ -195,6 +212,15 @@ public class SettingsController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Save token to api.config
+        File apiConfigFile = new File("Jayuwoki/src/main/resources/api.config");
+        try (FileOutputStream output = new FileOutputStream(apiConfigFile)) {
+            output.write(token.get().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void clearCheckBox() {
@@ -209,5 +235,17 @@ public class SettingsController implements Initializable {
 
     public FontIcon getFirebaseIcon() {
         return firebaseIcon;
+    }
+
+    public String getToken() {
+        return token.get();
+    }
+
+    public StringProperty tokenProperty() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token.set(token);
     }
 }

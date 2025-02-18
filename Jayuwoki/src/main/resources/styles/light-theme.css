@@ -7,6 +7,16 @@
     -fx-font-family: 'WorkSans-Bold';
 }
 
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: black;
+    -fx-padding: 3;
+}
+
 #menuGridPane .button, #loginRoot .button, #themeButton, #tutorialButton, #settingButtonBar .button, #connectRoot .button, #logRoot .button, .alert .button {
     -fx-border-color: black;
     -fx-border-width: 2;
