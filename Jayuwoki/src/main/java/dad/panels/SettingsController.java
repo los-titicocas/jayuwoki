@@ -98,11 +98,11 @@ public class SettingsController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(settingsRoot.getScene().getWindow());
 
         if (selectedFile != null) {
-            File destination = new File(getClass().getResource("/resources/").getPath(), selectedFile.getName());
+            File destination = new File(getClass().getResource("/resources/").getPath(), "jayuwokidb-firebase-adminsdk.json");
 
             try {
                 Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                showFileAlert("Archivo Guardado", "El archivo JSON se ha guardado correctamente en resources.");
+                showFileAlert("Archivo Guardado", "El archivo JSON se ha guardado correctamente en resources como jayuwokidb-firebase-adminsdk.json.");
             } catch (IOException e) {
                 showFileAlert("Error", "No se pudo copiar el archivo JSON.");
                 e.printStackTrace();
