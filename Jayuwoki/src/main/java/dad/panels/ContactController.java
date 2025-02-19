@@ -31,11 +31,6 @@ public class ContactController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         webRoot = new WebView();
-        URL webPageUrl = getClass().getResource("/webpage/index.html");
-        if (webPageUrl != null) {
-            webRoot.getEngine().load(webPageUrl.toExternalForm());
-        } else {
-            System.err.println("Error: No se pudo encontrar el archivo index.html");
-        }
+        webRoot.getEngine().load("https://dam-dad.github.io/jayuwoki/");
     }
 }

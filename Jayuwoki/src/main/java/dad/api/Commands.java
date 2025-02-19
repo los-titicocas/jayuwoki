@@ -61,21 +61,42 @@ public class Commands extends ListenerAdapter {
 
             // Switch with all the possible commands
             switch (comando[0]) {
+
                 // Start a privadita
                 case "$privadita":
                     // Check if the command has the correct number of players
                     boolean isPrivaditaActive = privaditas.stream()
                             .anyMatch(privadita -> privadita.getServer().equals(event.getGuild().getName()));
+
                     if (isPrivaditaActive) {
                         event.getChannel().sendMessage("Ya hay una privadita en juego en este servidor. ACÁBALA (o usa $dropPrivadita)").queue();
                     } else if (comando.length == 11) {
-                        String[] playersNames = Arrays.copyOfRange(comando, 1, comando.length);
-                        Privadita nuevaPrivadita = new Privadita(playersNames, event);
-                        if (nuevaPrivadita.getPlayers() != null) {
+                        // Obtener jugadores desde la base de datos usando DBManager
+                        List<Player> players = dbManager.GetPlayers(Arrays.copyOfRange(comando, 1, comando.length), event);
+
+                        if (players.size() == 10) { // Asegurarse de que encontró los 10 jugadores
+                            Privadita nuevaPrivadita = new Privadita(players, event);
                             privaditas.add(nuevaPrivadita);
+                        } else {
+                            event.getChannel().sendMessage("Uno o más jugadores no fueron encontrados en la base de datos.").queue();
                         }
                     } else {
                         event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
+                    }
+                    break;
+
+                // Set the winner of the privadita
+                case "$resultadoPrivadita":
+                    Privadita privaditaResultado = privaditas.stream()
+                            .filter(privadita -> privadita.getServer().equals(event.getGuild().getName()))
+                            .findFirst()
+                            .orElse(null);
+                    if (privaditaResultado != null) {
+                        privaditaResultado.ResultadoPrivadita(comando[1], event);
+                        privaditas.remove(privaditaResultado);
+                        dbManager.updatePlayers(privaditaResultado.getServer() ,privaditaResultado.getPlayers());
+                    } else {
+                        event.getChannel().sendMessage("No hay ninguna privadita activa en este servidor").queue();
                     }
                     break;
 
@@ -98,6 +119,7 @@ public class Commands extends ListenerAdapter {
                     if (comando.length == 2) {
                         Player newPlayer = new Player();
                         newPlayer.setName(comando[1]);
+                    newPlayer.setElo(1000);
                         dbManager.AddPlayer(newPlayer);
                     } else {
                         event.getChannel().sendMessage("El comando $addPlayer necesita un nombre de jugador").queue();

@@ -4,6 +4,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Player {
 
@@ -31,16 +33,34 @@ public class Player {
         this.elo.set(elo);
     }
 
+    public Player(String name, int elo) {
+        this.name.set(name);
+        this.elo.set(elo);
+    }
+
     public String PrintStats() {
-        StringBuilder stats = new StringBuilder("```");
+        StringBuilder stats = new StringBuilder();
 
         stats.append("Player: ").append(name.get()).append("#").append(discriminator.get()).append("\n");
         stats.append("Wins: ").append(wins.get()).append("\n");
         stats.append("Losses: ").append(losses.get()).append("\n");
         stats.append("Elo: ").append(elo.get()).append("\n");
-        stats.append("```");
 
         return stats.toString(); // Retorna el mensaje como un String
+    }
+
+
+    public void ActualizarElo(double averageElo, boolean winOrLoose) {
+        // Max elo change
+        double K = 40;
+        double expectedScore = 1 / (1 + Math.pow(10, (averageElo - this.getElo()) / 400));
+        double actualScore = winOrLoose ? 1 : 0;
+
+        // Standar elo formula
+        int eloChange = (int) ((K * (actualScore - expectedScore)) + this.getElo());
+
+        // Actualizar el Elo del jugador
+        this.setElo(eloChange);
     }
 
     public int getIdPlayer() {

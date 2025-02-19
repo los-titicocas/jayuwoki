@@ -1,19 +1,23 @@
 package dad.panels;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -26,6 +30,7 @@ import java.io.File;
 public class SettingsController implements Initializable {
 
     private final Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
+    private StringProperty token = new SimpleStringProperty();
 
     @FXML
     private Label botSettingsLabel;
@@ -58,7 +63,11 @@ public class SettingsController implements Initializable {
     private CheckBox soundCheck;
 
     @FXML
+    private TextField tokenTextField;
+
+    @FMXL
     private CheckBox rolladieCheck;
+
 
     public SettingsController() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));
@@ -72,6 +81,7 @@ public class SettingsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        token.bindBidirectional(tokenTextField.textProperty());
         loadSettings();
     }
 
@@ -88,7 +98,31 @@ public class SettingsController implements Initializable {
 
     @FXML
     void onDbFileAction(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        fileChooser.setTitle("Seleccionar archivo JSON");
 
+        File selectedFile = fileChooser.showOpenDialog(settingsRoot.getScene().getWindow());
+
+        if (selectedFile != null) {
+            File destination = new File(getClass().getResource("/resources/").getPath(), "jayuwokidb-firebase-adminsdk.json");
+
+            try {
+                Files.copy(selectedFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                showFileAlert("Archivo Guardado", "El archivo JSON se ha guardado correctamente en resources como jayuwokidb-firebase-adminsdk.json.");
+            } catch (IOException e) {
+                showFileAlert("Error", "No se pudo copiar el archivo JSON.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void showFileAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void getResetDialog() {
@@ -145,7 +179,22 @@ public class SettingsController implements Initializable {
         imageCheck.setSelected(Boolean.parseBoolean(properties.getProperty("imageCheck", "false")));
         massPermissionCheck.setSelected(Boolean.parseBoolean(properties.getProperty("massPermissionCheck", "false")));
         soundCheck.setSelected(Boolean.parseBoolean(properties.getProperty("soundCheck", "false")));
+
+        // Load token from api.config
+        File apiConfigFile = new File("Jayuwoki/src/main/resources/api.config");
+        if (apiConfigFile.exists()) {
+            try (FileInputStream input = new FileInputStream(apiConfigFile)) {
+                byte[] data = new byte[(int) apiConfigFile.length()];
+                input.read(data);
+                String tokenValue = new String(data);
+                token.set(tokenValue.trim());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         rolladieCheck.setSelected(Boolean.parseBoolean(properties.getProperty("rollaDie", "true")));
+
     }
 
     private void saveSettings() {
@@ -170,6 +219,15 @@ public class SettingsController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Save token to api.config
+        File apiConfigFile = new File("Jayuwoki/src/main/resources/api.config");
+        try (FileOutputStream output = new FileOutputStream(apiConfigFile)) {
+            output.write(token.get().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void clearCheckBox() {
@@ -183,4 +241,19 @@ public class SettingsController implements Initializable {
         return settingsRoot;
     }
 
+    public FontIcon getFirebaseIcon() {
+        return firebaseIcon;
+    }
+
+    public String getToken() {
+        return token.get();
+    }
+
+    public StringProperty tokenProperty() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token.set(token);
+    }
 }
