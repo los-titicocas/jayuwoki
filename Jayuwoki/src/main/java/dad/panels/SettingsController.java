@@ -65,6 +65,9 @@ public class SettingsController implements Initializable {
     @FXML
     private TextField tokenTextField;
 
+    @FMXL
+    private CheckBox rolladieCheck;
+
 
     public SettingsController() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));
@@ -149,7 +152,7 @@ public class SettingsController implements Initializable {
 
         applyDialog.setTitle("Settings Applied");
         applyDialog.setHeaderText(null);
-        applyDialog.setContentText("Settings have been applied successfully.");
+        applyDialog.setContentText("Settings have been applied successfully. Please restart the application for changes to take effect.");
 
         ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         applyDialog.getButtonTypes().setAll(okButton);
@@ -189,6 +192,9 @@ public class SettingsController implements Initializable {
                 e.printStackTrace();
             }
         }
+
+        rolladieCheck.setSelected(Boolean.parseBoolean(properties.getProperty("rollaDie", "true")));
+
     }
 
     private void saveSettings() {
@@ -206,6 +212,7 @@ public class SettingsController implements Initializable {
         properties.setProperty("imageCheck", String.valueOf(imageCheck.isSelected()));
         properties.setProperty("massPermissionCheck", String.valueOf(massPermissionCheck.isSelected()));
         properties.setProperty("soundCheck", String.valueOf(soundCheck.isSelected()));
+        properties.setProperty("rollaDie", String.valueOf(rolladieCheck.isSelected()));
 
         try (FileOutputStream output = new FileOutputStream(settingsFile)) {
             properties.store(output, null);
@@ -227,6 +234,7 @@ public class SettingsController implements Initializable {
         imageCheck.setSelected(false);
         massPermissionCheck.setSelected(false);
         soundCheck.setSelected(false);
+        rolladieCheck.setSelected(true);
     }
 
     public BorderPane getRoot() {
