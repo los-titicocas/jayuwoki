@@ -52,6 +52,7 @@ public class Utils {
                 properties.setProperty("massPermissionCheck", "false");
                 properties.setProperty("imageCheck", "false");
                 properties.setProperty("soundCheck", "false");
+                properties.setProperty("rollaDie", "true");
                 properties.store(output, null);
             } catch (IOException e) {
                 e.printStackTrace();
