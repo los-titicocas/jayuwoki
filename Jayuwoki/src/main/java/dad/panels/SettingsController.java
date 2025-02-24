@@ -65,17 +65,17 @@ public class SettingsController implements Initializable {
     @FXML
     private TextField tokenTextField;
 
-    @FMXL
+    @FXML
     private CheckBox rolladieCheck;
 
 
     public SettingsController() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));
-        fxmlLoader.setController(this);
         try {
-            settingsRoot = fxmlLoader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SettingsView.fxml"));
+            loader.setController(this);
+            loader.load();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
