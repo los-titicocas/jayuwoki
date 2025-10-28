@@ -52,7 +52,6 @@ public class Bot {
             commands.setJda(jda);
 
             jda.addEventListener(commands);
-            jda.addEventListener(new EventoPrueba());
             isConnected.set(true);
 
         }
