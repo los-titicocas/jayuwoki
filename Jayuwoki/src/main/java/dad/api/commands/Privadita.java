@@ -1,6 +1,5 @@
 package dad.api.commands;
 
-import dad.database.DBManager;
 import dad.database.Player;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -115,10 +114,10 @@ public class Privadita {
     messageBuilder.append("Resultado de la partida:\n");
 
     switch (ganador) {
-      case "equipo1":
+      case "blue":
         messageBuilder.append("\n🏆 **Equipo Azul ha ganado!** 🏆\n");
         break;
-      case "equipo2":
+      case "red":
         messageBuilder.append("\n🔥 **Equipo Rojo ha ganado!** 🔥\n");
         break;
       default:

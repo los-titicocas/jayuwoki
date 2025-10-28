@@ -6,9 +6,10 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import dad.utils.Utils;
-import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -54,30 +55,97 @@ public class DBManager {
         }
     }
 
+    /**
+     * Obtiene jugadores desde Firebase por sus nombres.
+     * Si algún jugador tiene Elo = 0, lo inicializa automáticamente a 1000 y lo persiste en Firebase.
+     * 
+     * @param nombres Array con los nombres de los jugadores a buscar
+     * @param event Evento de Discord para enviar mensajes
+     * @return Lista de jugadores encontrados con sus datos actualizados
+     */
     public List<Player> GetPlayers(String[] nombres, MessageReceivedEvent event) {
         List<Player> players = new ArrayList<>();
-        CollectionReference playersCollection = db.collection(currentServer.get()).document("Privadita").collection("Players");
+        CollectionReference playersCollection = db.collection(currentServer.get())
+                .document("Privadita")
+                .collection("Players");
 
         try {
-            // Buscar los jugadores en la base de datos usando whereIn
             QuerySnapshot querySnapshot = playersCollection
-                    .whereIn("name", Arrays.asList(nombres))
+                    .whereIn("name", java.util.Arrays.asList(nombres))
                     .get()
                     .get();
+
+            WriteBatch batch = db.batch();
+            boolean hasDefaultEloUpdates = false;
 
             for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
                 Player player = doc.toObject(Player.class);
                 if (player != null) {
+                    // ✨ NUEVA LÓGICA: Solo corregir Elos anómalos por BUGS
+                    // Un jugador tiene Elo anómalo SI:
+                    // 1. Tiene Elo < 800 Y
+                    // 2. (Tiene 0 partidas jugadas O tiene pocas partidas donde es matemáticamente imposible)
+                    
+                    int totalGames = player.getWins() + player.getLosses();
+                    boolean hasAnomalousElo = false;
+                    
+                    // Caso 1: Elo bajo sin partidas (bug de inicialización)
+                    if (player.getElo() < 800 && totalGames == 0) {
+                        hasAnomalousElo = true;
+                        System.out.println("⚠️ BUG DETECTADO: Jugador '" + player.getName() + 
+                                         "' tiene Elo = " + player.getElo() + " pero 0 partidas. " +
+                                         "Reiniciando a 1000...");
+                    }
+                    // Caso 2: Elo imposible matemáticamente (ej: 29 con 1-1 record)
+                    // Con pocas partidas (≤3), es imposible bajar de 800 legítimamente
+                    // Peor caso: 3 derrotas seguidas contra Elo 2000 = 1000 - 32 - 32 - 32 = 904
+                    else if (player.getElo() < 800 && totalGames > 0 && totalGames <= 3) {
+                        hasAnomalousElo = true;
+                        System.out.println("⚠️ BUG DETECTADO: Jugador '" + player.getName() + 
+                                         "' tiene Elo = " + player.getElo() + 
+                                         " con solo " + totalGames + " partidas. " +
+                                         "Esto es imposible matemáticamente. Reiniciando a 1000...");
+                    }
+                    // Caso 3: Elo muy bajo pero legítimo (muchas derrotas)
+                    else if (player.getElo() < 800 && totalGames > 3) {
+                        // Este es un jugador legítimamente malo, NO corregir
+                        System.out.println("ℹ️ INFO: Jugador '" + player.getName() + 
+                                         "' tiene Elo bajo (" + player.getElo() + 
+                                         ") pero es legítimo (W:" + player.getWins() + 
+                                         " L:" + player.getLosses() + ")");
+                    }
+                    
+                    // Solo resetear si es un bug confirmado
+                    if (hasAnomalousElo) {
+                        player.setElo(1000);
+                        player.setWins(0);
+                        player.setLosses(0);
+                        
+                        DocumentReference playerDoc = playersCollection.document(player.getName());
+                        batch.set(playerDoc, player);
+                        hasDefaultEloUpdates = true;
+                    }
+                    
                     players.add(player);
                 }
             }
 
-            // Verificar si faltan jugadores
+            if (hasDefaultEloUpdates) {
+                try {
+                    batch.commit().get();
+                    System.out.println("✅ Bugs de Elo corregidos y guardados en Firebase");
+                } catch (Exception be) {
+                    System.out.println("⚠️ Error al guardar correcciones: " + be.getMessage());
+                    be.printStackTrace();
+                }
+            }
+
+            // Validar jugadores no encontrados
             List<String> jugadoresEncontrados = players.stream()
                     .map(Player::getName)
                     .collect(Collectors.toList());
 
-            List<String> jugadoresNoEncontrados = Arrays.stream(nombres)
+            List<String> jugadoresNoEncontrados = java.util.Arrays.stream(nombres)
                     .filter(nombre -> !jugadoresEncontrados.contains(nombre))
                     .collect(Collectors.toList());
 
@@ -96,16 +164,27 @@ public class DBManager {
         return players;
     }
 
-    // updates the data from the players list in the database
-    public void updatePlayers(String server, ObservableList<Player> players) {
+    /**
+     * Actualiza la lista de jugadores en Firebase.
+     * Este método se llama después de una privadita para guardar los cambios de Elo, wins y losses.
+     * 
+     * @param server Nombre del servidor
+     * @param players Lista de jugadores con datos actualizados
+     */
+    public void updatePlayers(String server, javafx.collections.ObservableList<Player> players) {
         System.out.println("Actualizando jugadores en el servidor: " + server);
 
-        CollectionReference playersCollection = db.collection(server).document("Privadita").collection("Players");
+        CollectionReference playersCollection = db.collection(server)
+                .document("Privadita")
+                .collection("Players");
 
         WriteBatch batch = db.batch();
 
         for (Player player : players) {
-            System.out.println("Actualizando jugador: " + player.getName() + " con Elo " + player.getElo());
+            System.out.println("Actualizando jugador: " + player.getName() + 
+                             " - Elo: " + player.getElo() + 
+                             " - Wins: " + player.getWins() + 
+                             " - Losses: " + player.getLosses());
 
             DocumentReference playerDoc = playersCollection.document(player.getName());
             batch.set(playerDoc, player);
@@ -113,13 +192,12 @@ public class DBManager {
 
         try {
             batch.commit().get();  // Se espera a que termine la operación
-            System.out.println("Jugadores actualizados correctamente.");
+            System.out.println("✅ Jugadores actualizados correctamente en Firebase.");
         } catch (Exception e) {
-            System.out.println("Error al actualizar jugadores: " + e.getMessage());
+            System.out.println("❌ Error al actualizar jugadores: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
 
     public void AddPlayer(Player newPlayer) {
         try {
@@ -224,9 +302,7 @@ public class DBManager {
             if (playerDoc.exists()) {
                 Player player = playerDoc.toObject(Player.class);
                 // Show all the player stats
-                StringBuilder message = new StringBuilder("```");
-                message.append(player.PrintStats()).append("```");
-                event.getChannel().sendMessage(message.toString()).queue();
+                event.getChannel().sendMessage(player.PrintStats()).queue();
             } else {
                 event.getChannel().sendMessage("El jugador no está en la base de datos").queue();
             }
@@ -243,15 +319,10 @@ public class DBManager {
             // Get all the players from the database
             QuerySnapshot querySnapshot = playersCollection.get().get();
 
-            // Convert the documents to Player objects and sort them by Elo in descending order
-            List<Player> players = querySnapshot.getDocuments().stream()
-                    .map(doc -> doc.toObject(Player.class))
-                    .sorted((p1, p2) -> Integer.compare(p2.getElo(), p1.getElo()))
-                    .collect(Collectors.toList());
-
             // Show the stats of all the players
             StringBuilder message = new StringBuilder("```");
-            for (Player player : players) {
+            for (DocumentSnapshot playerDoc : querySnapshot.getDocuments()) {
+                Player player = playerDoc.toObject(Player.class);
                 message.append(player.PrintStats()).append("\n");
             }
             message.append("```");
@@ -362,28 +433,49 @@ public class DBManager {
         this.openPermissions.set(openPermissions);
     }
 
+    /**
+     * Permite a un admin resetear manualmente el Elo de un jugador.
+     * Útil para segundas oportunidades o casos especiales.
+     */
+    public void AdminResetPlayerElo(String name) {
+        openPermissions.set(Boolean.parseBoolean(Utils.properties.getProperty("massPermissionCheck")));
+        if (CheckPermissions(openPermissions.get())) {
+            CollectionReference playersCollection = db.collection(currentServer.get())
+                    .document("Privadita")
+                    .collection("Players");
 
+            try {
+                DocumentSnapshot playerDoc = playersCollection.document(name).get().get();
 
+                if (playerDoc.exists()) {
+                    Player player = playerDoc.toObject(Player.class);
+                    int oldElo = player.getElo();
+                    int oldWins = player.getWins();
+                    int oldLosses = player.getLosses();
+                    
+                    player.setElo(1000);
+                    player.setWins(0);
+                    player.setLosses(0);
+                    
+                    playersCollection.document(name).set(player);
+                    
+                    event.getChannel().sendMessage(
+                        "✅ **" + name + "** ha sido reseteado manualmente por un admin:\n" +
+                        "```\n" +
+                        "Antes:  Elo: " + oldElo + " | W:" + oldWins + " L:" + oldLosses + "\n" +
+                        "Ahora:  Elo: 1000 | W:0 L:0\n" +
+                        "```"
+                    ).queue();
+                } else {
+                    event.getChannel().sendMessage("❌ El jugador no está en la base de datos").queue();
+                }
 
-    public static void main(String[] args) {
-        DBManager dbManager = new DBManager();
-        dbManager.setCurrentServer("Jayuwoki");
-
-        // Lista de jugadores con 2000 de Elo
-        ObservableList<Player> players = FXCollections.observableArrayList(
-                new Player("Chris", 2000),
-                new Player("Estucaquio", 2000),
-                new Player("Frodo", 2000),
-                new Player("Guamero", 2000),
-                new Player("Jonathan", 2000),
-                new Player("Jorge", 1000),
-                new Player("Messi", 1000),
-                new Player("Nuriel", 1000),
-                new Player("Nestor", 1000),
-                new Player("Nuha", 1000)
-        );
-
-        dbManager.updatePlayers(dbManager.getCurrentServer(), players);
-
+            } catch (Exception e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage("❌ Error al resetear el jugador").queue();
+            }
+        } else {
+            event.getChannel().sendMessage("❌ Solo administradores pueden usar este comando").queue();
+        }
     }
 }

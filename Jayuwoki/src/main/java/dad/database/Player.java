@@ -4,8 +4,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 public class Player {
 
@@ -50,17 +48,47 @@ public class Player {
     }
 
 
-    public void ActualizarElo(double averageElo, boolean winOrLoose) {
-        // Max elo change
-        double K = 40;
-        double expectedScore = 1 / (1 + Math.pow(10, (averageElo - this.getElo()) / 400));
-        double actualScore = winOrLoose ? 1 : 0;
-
-        // Standar elo formula
-        int eloChange = (int) ((K * (actualScore - expectedScore)) + this.getElo());
-
-        // Actualizar el Elo del jugador
-        this.setElo(eloChange);
+    /**
+     * Actualiza el Elo del jugador basándose en el resultado de la partida.
+     * Utiliza el sistema de clasificación Elo similar al de League of Legends.
+     * 
+     * La fórmula calcula:
+     * 1. Probabilidad esperada de victoria: E = 1 / (1 + 10^((EloEnemigo - EloJugador) / 400))
+     * 2. Cambio de Elo: ΔElo = K × (Resultado - Probabilidad Esperada)
+     * 
+     * El factor K determina la volatilidad del cambio:
+     * - K alto (40) = Cambios más drásticos, ideal para jugadores nuevos
+     * - K medio (32) = Balance entre estabilidad y movilidad
+     * - K bajo (16-24) = Cambios graduales, para jugadores experimentados
+     * 
+     * @param averageEnemyElo El Elo promedio del equipo enemigo
+     * @param won true si el jugador ganó la partida, false si perdió
+     */
+    public void ActualizarElo(double averageEnemyElo, boolean won) {
+        // Constante K - En LoL varía según el rango y partidas jugadas
+        // Usamos K=32 como valor estándar (balance entre cambios significativos y estabilidad)
+        final int K = 32;
+        
+        // Calcular la probabilidad esperada de victoria usando la fórmula de Elo
+        // E = 1 / (1 + 10^((R_enemigo - R_jugador) / 400))
+        double expectedScore = 1.0 / (1.0 + Math.pow(10, (averageEnemyElo - this.elo.get()) / 400.0));
+        
+        // El resultado real: 1 si ganó, 0 si perdió
+        double actualScore = won ? 1.0 : 0.0;
+        
+        // Calcular el cambio de Elo
+        // ΔElo = K × (S - E) donde S es el resultado real y E es el esperado
+        int eloChange = (int) Math.round(K * (actualScore - expectedScore));
+        
+        // Aplicar el cambio al Elo actual
+        int newElo = this.elo.get() + eloChange;
+        
+        // Aplicar límites: El Elo mínimo es 0 (no puede ser negativo)
+        if (newElo < 0) {
+            newElo = 0;
+        }
+        
+        this.elo.set(newElo);
     }
 
     public int getIdPlayer() {

@@ -195,6 +195,17 @@ public class Commands extends ListenerAdapter {
                     sendHelpMessage(event);
                     break;
 
+                // Admin commands
+                case "$adminResetElo":
+                case "adminresetelo":
+                    if (comando.length < 2) {
+                        event.getChannel().sendMessage("❌ Uso: `$adminResetElo <nombre>`\n" +
+                                                      "Este comando resetea manualmente el Elo de un jugador a 1000.").queue();
+                        return;
+                    }
+                    dbManager.AdminResetPlayerElo(comando[1]);
+                    break;
+
                 default:
                     event.getChannel().sendMessage("Comando no encontrado").queue();
             }
