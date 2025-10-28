@@ -12,11 +12,8 @@ Jayuwoki Bot es un bot de Discord que proporciona varias funcionalidades, incluy
 ## Requisitos
 
 - Java 11 o superior
-- Gradle
 - Una cuenta de Discord con permisos para crear bots
 - Token del bot de Discord
-- Archivo de configuración `api.config` con el token del bot
-- Archivo de configuración `jayuwokidb-firebase-adminsdk.json` con las credenciales de Firebase'
 
 ## Instalación
 
@@ -90,3 +87,9 @@ En esta sección se mostrarán capturas de pantalla de la interfaz de usuario y 
 - **$rolladie <número de lados>**: Lanza un dado con el número especificado de lados.
   ```sh
   $rolladie 20
+
+---
+### Archivos relevantes
+- [Sistema Elo](SISTEMA_ELO.md)
+
+- [Elo Examples](ELO_EXAMPLES.md)
