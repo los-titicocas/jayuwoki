@@ -10,15 +10,30 @@
 - `$verElo` - Muestra ranking completo ordenado por Elo
 - `$verElo <nombre>` - Muestra estadísticas de un jugador
 
+## 🎵 Sistema de Música (YouTube, SoundCloud, etc.)
+- `$play <URL o búsqueda>` - Reproduce música o añade a la cola
+  - **Ejemplos:**
+    - `$play https://youtube.com/watch?v=dQw4w9WgXcQ`
+    - `$play Never Gonna Give You Up`
+- `$pause` - Pausa la reproducción actual
+- `$resume` - Reanuda la reproducción
+- `$skip` - Salta a la siguiente canción en la cola
+- `$stop` - Detiene la reproducción y limpia la cola completa
+- `$queue` o `$cola` - Muestra la cola de reproducción
+- `$nowplaying` o `$np` - Muestra la canción actual con progreso
+- `$join` - Une al bot a tu canal de voz
+- `$leave` - Desconecta al bot del canal de voz
+
 ## 🔧 Administración (solo admins)
 - `$deletePlayer <nombre>` - Elimina un jugador de la base de datos
 - `$adminResetElo <nombre>` - Resetea el Elo de un jugador a 1000
 
 ## 🎲 Otros Comandos
-- `$join` - Une al bot a tu canal de voz
-- `$leave` - Desconecta al bot del canal de voz
-- `$play <URL>` - Reproduce música de YouTube (⚠️ actualmente no funciona)
 - `$rolladie <número>` - Lanza un dado (ej: `$rolladie 20`)
 - `$help` - Muestra esta lista de comandos
 
 ---
+
+💡 **Tip:** El sistema detecta y corrige automáticamente bugs de Elo (jugadores con Elo anómalo por bugs se resetean a 1000 automáticamente)
+
+🎵 **Fuentes soportadas:** YouTube (no funcha), SoundCloud, Bandcamp, Vimeo, Twitch, archivos HTTP

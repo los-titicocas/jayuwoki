@@ -3,25 +3,30 @@ package dad.api;
 import dad.api.commands.RollaDie;
 import dad.api.models.LogEntry;
 import dad.api.commands.Privadita;
-import dad.api.music.GuildMusicManager;
-import dad.api.music.PlayerManager;
-import dad.database.Player;
+import dad.audio.PlayerManager;
+import dad.audio.GuildMusicManager;
 import dad.database.DBManager;
+import dad.database.Player;
 import dad.utils.Utils;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 public class Commands extends ListenerAdapter {
 
@@ -47,7 +52,7 @@ public class Commands extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
         if (message.startsWith("$")) {
             dbManager.setEvent(event);
@@ -167,11 +172,167 @@ public class Commands extends ListenerAdapter {
                     break;
 
                 case "$play":
+                    // Verificar que haya argumentos (comando[1] en adelante)
                     if (comando.length < 2) {
-                        event.getChannel().sendMessage("Uso: $play <URL>").queue();
-                    } else {
-                        play(event, comando[1]);
+                        event.getChannel().sendMessage("❌ **Uso:** `$play <URL o búsqueda>`\n" +
+                                "**Ejemplos:**\n" +
+                                "`$play https://www.youtube.com/watch?v=dQw4w9WgXcQ`\n" +
+                                "`$play Never Gonna Give You Up`").queue();
+                        break;
                     }
+
+                    // Verificar que el usuario esté en un canal de voz
+                    Member playMember = event.getMember();
+                    if (playMember == null) {
+                        event.getChannel().sendMessage("❌ No se pudo verificar tu estado de voz").queue();
+                        break;
+                    }
+
+                    GuildVoiceState playVoiceState = playMember.getVoiceState();
+                    if (playVoiceState == null || !playVoiceState.inAudioChannel()) {
+                        event.getChannel().sendMessage("❌ **Debes estar en un canal de voz para reproducir música!**").queue();
+                        break;
+                    }
+
+                    // Unir al bot al canal de voz si no está conectado
+                    AudioManager playAudioManager = event.getGuild().getAudioManager();
+                    VoiceChannel playVoiceChannel = (VoiceChannel) playVoiceState.getChannel();
+
+                    if (!playAudioManager.isConnected()) {
+                        playAudioManager.openAudioConnection(playVoiceChannel);
+                        event.getChannel().sendMessage("✅ Conectado a `" + playVoiceChannel.getName() + "`").queue();
+                    }
+
+                    // Construir URL o búsqueda (tomar desde comando[1] en adelante, NO desde comando[0])
+                    String[] playArgs = Arrays.copyOfRange(comando, 1, comando.length);
+                    String playInput = String.join(" ", playArgs);
+
+                    // Si no es una URL, hacer búsqueda en YouTube
+                    if (!playInput.startsWith("http://") && !playInput.startsWith("https://")) {
+                        playInput = "ytsearch:" + playInput;
+                    }
+
+                    // Cargar y reproducir
+                    PlayerManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), playInput);
+                    break;
+
+                case "$pause":
+                    GuildMusicManager pauseMusicManager = PlayerManager.getInstance()
+                            .getMusicManager(event.getGuild());
+
+                    if (pauseMusicManager.getPlayer().getPlayingTrack() == null) {
+                        event.getChannel().sendMessage("❌ **No hay nada reproduciéndose!**").queue();
+                        break;
+                    }
+
+                    pauseMusicManager.getPlayer().setPaused(true);
+                    event.getChannel().sendMessage("⏸️ **Pausado**").queue();
+                    break;
+
+                case "$resume":
+                    GuildMusicManager resumeMusicManager = PlayerManager.getInstance()
+                            .getMusicManager(event.getGuild());
+
+                    if (resumeMusicManager.getPlayer().getPlayingTrack() == null) {
+                        event.getChannel().sendMessage("❌ **No hay nada pausado!**").queue();
+                        break;
+                    }
+
+                    resumeMusicManager.getPlayer().setPaused(false);
+                    event.getChannel().sendMessage("▶️ **Reanudado**").queue();
+                    break;
+
+                case "$skip":
+                    GuildMusicManager skipMusicManager = PlayerManager.getInstance()
+                            .getMusicManager(event.getGuild());
+
+                    if (skipMusicManager.getPlayer().getPlayingTrack() == null) {
+                        event.getChannel().sendMessage("❌ **No hay nada reproduciéndose!**").queue();
+                        break;
+                    }
+
+                    skipMusicManager.getScheduler().nextTrack();
+                    event.getChannel().sendMessage("⏭️ **Canción saltada**").queue();
+                    break;
+
+                case "$stop":
+                    GuildMusicManager stopMusicManager = PlayerManager.getInstance()
+                            .getMusicManager(event.getGuild());
+
+                    stopMusicManager.getScheduler().getQueue().clear();
+                    stopMusicManager.getPlayer().stopTrack();
+                    event.getGuild().getAudioManager().closeAudioConnection();
+                    event.getChannel().sendMessage("⏹️ **Reproducción detenida y cola limpiada**").queue();
+                    break;
+
+                case "$queue":
+                case "$cola":
+                    GuildMusicManager queueMusicManager = PlayerManager.getInstance()
+                            .getMusicManager(event.getGuild());
+
+                    BlockingQueue<AudioTrack> queue = queueMusicManager.getScheduler().getQueue();
+
+                    if (queueMusicManager.getPlayer().getPlayingTrack() == null && queue.isEmpty()) {
+                        event.getChannel().sendMessage("❌ **La cola está vacía!**").queue();
+                        break;
+                    }
+
+                    StringBuilder queueMessage = new StringBuilder("🎵 **Cola de reproducción:**\n\n");
+
+                    // Canción actual
+                    AudioTrack currentTrack = queueMusicManager.getPlayer().getPlayingTrack();
+                    if (currentTrack != null) {
+                        queueMessage.append("▶️ **Reproduciendo ahora:**\n")
+                                   .append("`").append(currentTrack.getInfo().title).append("`")
+                                   .append(" por `").append(currentTrack.getInfo().author).append("`\n\n");
+                    }
+
+                    // Próximas canciones
+                    if (!queue.isEmpty()) {
+                        queueMessage.append("**Próximas canciones:**\n");
+                        List<AudioTrack> trackList = new ArrayList<>(queue);
+                        int count = 1;
+                        for (AudioTrack track : trackList) {
+                            if (count > 10) {
+                                queueMessage.append("\n*... y ").append(trackList.size() - 10)
+                                           .append(" canciones más*");
+                                break;
+                            }
+                            queueMessage.append(count++).append(". `")
+                                       .append(track.getInfo().title).append("`\n");
+                        }
+                    }
+
+                    event.getChannel().sendMessage(queueMessage.toString()).queue();
+                    break;
+
+                case "$nowplaying":
+                case "$np":
+                    GuildMusicManager npMusicManager = PlayerManager.getInstance()
+                            .getMusicManager(event.getGuild());
+
+                    AudioTrack npTrack = npMusicManager.getPlayer().getPlayingTrack();
+
+                    if (npTrack == null) {
+                        event.getChannel().sendMessage("❌ **No hay nada reproduciéndose!**").queue();
+                        break;
+                    }
+
+                    long position = npTrack.getPosition() / 1000; // Convertir a segundos
+                    long duration = npTrack.getDuration() / 1000;
+
+                    String npMessage = String.format(
+                        "🎵 **Reproduciendo ahora:**\n" +
+                        "`%s`\n" +
+                        "**Autor:** `%s`\n" +
+                        "**Progreso:** `%d:%02d / %d:%02d`",
+                        npTrack.getInfo().title,
+                        npTrack.getInfo().author,
+                        position / 60, position % 60,
+                        duration / 60, duration % 60
+                    );
+
+                    event.getChannel().sendMessage(npMessage).queue();
                     break;
 
                 case "$rolladie":
@@ -250,13 +411,6 @@ public class Commands extends ListenerAdapter {
         } else {
             event.getChannel().sendMessage("No estoy conectado a ningún canal de voz.").queue();
         }
-    }
-
-    private void play(MessageReceivedEvent event, String trackUrl) {
-        Guild guild = event.getGuild();
-        PlayerManager playerManager = PlayerManager.get();
-        playerManager.play(guild, trackUrl);
-        event.getChannel().sendMessage("Reproduciendo: " + trackUrl).queue();
     }
 
     private void sendHelpMessage(MessageReceivedEvent event) {

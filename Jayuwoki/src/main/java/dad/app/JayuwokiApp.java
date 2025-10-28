@@ -11,9 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import jdk.jshell.execution.Util;
 
-import java.util.Objects;
+import java.net.URL;
 
 public class JayuwokiApp extends Application {
 
@@ -27,22 +26,46 @@ public class JayuwokiApp extends Application {
         // Load properties before accessing them
         Utils.loadProperties();
 
+        // Read theme with fallback
         String theme = Utils.properties.getProperty("theme");
-        System.out.println("Loaded theme: " + theme); // Debugging line
-        String themePath = getClass().getResource("/styles/" + theme + "-theme.css").toExternalForm();
-        Application.setUserAgentStylesheet(themePath);
+        if (theme == null || theme.isBlank()) {
+            System.err.println("Theme property missing, using default 'light'");
+            theme = "light";
+        }
 
-        Image appIcon = new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toString());
+        // Try to load theme resource; if missing, fall back to Modena
+        URL themeUrl = getClass().getResource("/styles/" + theme + "-theme.css");
+        if (themeUrl != null) {
+            Application.setUserAgentStylesheet(themeUrl.toExternalForm());
+        } else {
+            System.err.println("Theme resource not found: /styles/" + theme + "-theme.css. Using default stylesheet.");
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+        }
 
-        Scene scene = new Scene(splashScreenController.getRoot());
-        Stage stage = new Stage();
+        // Load app icon with null check
+        URL iconUrl = getClass().getResource("/images/logo.png");
+        if (iconUrl != null) {
+            Image appIcon = new Image(iconUrl.toString());
+            // Use a new stage for the splash as before
+            Scene scene = new Scene(splashScreenController.getRoot());
+            Stage stage = new Stage();
 
-        stage.getIcons().add(appIcon);
-        stage.initStyle(StageStyle.TRANSPARENT);
-        scene.setFill(Color.TRANSPARENT);
-        stage.setScene(scene);
-        fadeIn(splashScreenController.getRoot());
-        stage.show();
+            stage.getIcons().add(appIcon);
+            stage.initStyle(StageStyle.TRANSPARENT);
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
+            fadeIn(splashScreenController.getRoot());
+            stage.show();
+        } else {
+            System.err.println("Icon resource not found: /images/logo.png. Continuing without icon.");
+            Scene scene = new Scene(splashScreenController.getRoot());
+            Stage stage = new Stage();
+            stage.initStyle(StageStyle.TRANSPARENT);
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
+            fadeIn(splashScreenController.getRoot());
+            stage.show();
+        }
     }
 
     public void fadeIn(Node node) {
