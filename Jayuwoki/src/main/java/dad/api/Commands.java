@@ -85,8 +85,7 @@ public class Commands extends ListenerAdapter {
                             Privadita nuevaPrivadita = new Privadita(players, event);
                             dbManager.setActivePrivadita(event, nuevaPrivadita);
                             
-                            // Enviar mensaje con los equipos
-                            event.getChannel().sendMessage(nuevaPrivadita.toString()).queue();
+                            // event.getChannel().sendMessage(nuevaPrivadita.toString()).queue();
                         } else {
                             event.getChannel().sendMessage("❌ **Uno o más jugadores no fueron encontrados en la base de datos de este servidor.**").queue();
                         }
