@@ -4,8 +4,8 @@
 - `$addPlayer <nombre>` - Añade un jugador con Elo inicial 1000
 - `$addPlayers <nombre1> <nombre2> ...` - Añade múltiples jugadores
 - `$privadita <10 jugadores>` - Crea equipos 5v5 aleatorios con roles
-- `$resultadoPrivadita equipo1` - Registra victoria del Equipo Azul
-- `$resultadoPrivadita equipo2` - Registra victoria del Equipo Rojo
+- `$resultadoPrivadita blue` - Registra victoria del Equipo Azul
+- `$resultadoPrivadita red` - Registra victoria del Equipo Rojo
 - `$dropPrivadita` - Cancela la privadita actual
 - `$verElo` - Muestra ranking completo ordenado por Elo
 - `$verElo <nombre>` - Muestra estadísticas de un jugador
@@ -13,7 +13,7 @@
 ## 🎵 Sistema de Música (YouTube, SoundCloud, etc.)
 - `$play <URL o búsqueda>` - Reproduce música o añade a la cola
   - **Ejemplos:**
-    - `$play https://youtube.com/watch?v=dQw4w9WgXcQ`
+    - `$play https://soundcloud.com/`
     - `$play Never Gonna Give You Up`
 - `$pause` - Pausa la reproducción actual
 - `$resume` - Reanuda la reproducción

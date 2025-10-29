@@ -222,6 +222,29 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.6.2</version>
+        <executions>
+          <!-- Ejecución normal del bot -->
+          <execution>
+            <id>run-bot</id>
+            <configuration>
+              <mainClass>dad.app.Main</mainClass>
+            </configuration>
+          </execution>
+          
+          <!-- Ejecución del script de migración -->
+          <execution>
+            <id>migrate-data</id>
+            <configuration>
+              <mainClass>dad.utils.MigrationScript</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 

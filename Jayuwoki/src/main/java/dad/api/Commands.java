@@ -31,7 +31,9 @@ import java.util.concurrent.BlockingQueue;
 public class Commands extends ListenerAdapter {
 
     // Command objects
-    private ListProperty<Privadita> privaditas = new SimpleListProperty<>(FXCollections.observableArrayList());
+    // ❌ ELIMINAR: Ya no usamos esta lista local, ahora se gestiona en DBManager por servidor
+    // private ListProperty<Privadita> privaditas = new SimpleListProperty<>(FXCollections.observableArrayList());
+    
     private ListProperty<LogEntry> logs = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final DBManager dbManager = new DBManager();
     protected JDA jda;
@@ -56,7 +58,8 @@ public class Commands extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         if (message.startsWith("$")) {
             dbManager.setEvent(event);
-            dbManager.setCurrentServer(event.getGuild().getName());
+            // ❌ ELIMINAR esta línea (ya no existe setCurrentServer):
+            // dbManager.setCurrentServer(event.getGuild().getName());
 
             String[] comando = message.split(" ", 11);
 
@@ -69,53 +72,60 @@ public class Commands extends ListenerAdapter {
 
                 // Start a privadita
                 case "$privadita":
-                    // Check if the command has the correct number of players
-                    boolean isPrivaditaActive = privaditas.stream()
-                            .anyMatch(privadita -> privadita.getServer().equals(event.getGuild().getName()));
-
-                    if (isPrivaditaActive) {
-                        event.getChannel().sendMessage("Ya hay una privadita en juego en este servidor. ACÁBALA (o usa $dropPrivadita)").queue();
+                    // ✅ ACTUALIZAR: Verificar privadita activa usando DBManager
+                    if (dbManager.hasActivePrivadita(event)) {
+                        event.getChannel().sendMessage("❌ **Ya hay una privadita activa en este servidor.**\n" +
+                                "Usa `$dropPrivadita` para cancelarla primero.").queue();
                     } else if (comando.length == 11) {
                         // Obtener jugadores desde la base de datos usando DBManager
                         List<Player> players = dbManager.GetPlayers(Arrays.copyOfRange(comando, 1, comando.length), event);
 
-                        if (players.size() == 10) { // Asegurarse de que encontró los 10 jugadores
+                        if (players.size() == 10) {
+                            // ✅ ACTUALIZAR: Crear y guardar privadita en DBManager
                             Privadita nuevaPrivadita = new Privadita(players, event);
-                            privaditas.add(nuevaPrivadita);
+                            dbManager.setActivePrivadita(event, nuevaPrivadita);
+                            
+                            // Enviar mensaje con los equipos
+                            event.getChannel().sendMessage(nuevaPrivadita.toString()).queue();
                         } else {
-                            event.getChannel().sendMessage("Uno o más jugadores no fueron encontrados en la base de datos.").queue();
+                            event.getChannel().sendMessage("❌ **Uno o más jugadores no fueron encontrados en la base de datos de este servidor.**").queue();
                         }
                     } else {
-                        event.getChannel().sendMessage("El comando $privadita necesita 10 jugadores").queue();
+                        event.getChannel().sendMessage("❌ **El comando $privadita necesita 10 jugadores.**").queue();
                     }
                     break;
 
                 // Set the winner of the privadita
                 case "$resultadoPrivadita":
-                    Privadita privaditaResultado = privaditas.stream()
-                            .filter(privadita -> privadita.getServer().equals(event.getGuild().getName()))
-                            .findFirst()
-                            .orElse(null);
-                    if (privaditaResultado != null) {
-                        privaditaResultado.ResultadoPrivadita(comando[1], event);
-                        privaditas.remove(privaditaResultado);
-                        dbManager.updatePlayers(privaditaResultado.getServer() ,privaditaResultado.getPlayers());
-                    } else {
-                        event.getChannel().sendMessage("No hay ninguna privadita activa en este servidor").queue();
+                    if (comando.length < 2) {
+                        event.getChannel().sendMessage("❌ **Uso:** `$resultadoPrivadita <equipo1|equipo2>`").queue();
+                        break;
                     }
+                    
+                    // ✅ ACTUALIZAR: Obtener privadita desde DBManager
+                    if (!dbManager.hasActivePrivadita(event)) {
+                        event.getChannel().sendMessage("❌ **No hay ninguna privadita activa en este servidor.**").queue();
+                        break;
+                    }
+                    
+                    Privadita privaditaResultado = dbManager.getActivePrivadita(event);
+                    privaditaResultado.ResultadoPrivadita(comando[1], event);
+                    
+                    // Actualizar jugadores en Firebase
+                    dbManager.updatePlayers(event, privaditaResultado.getPlayers());
+                    
+                    // Limpiar privadita
+                    dbManager.clearActivePrivadita(event);
                     break;
 
                 // Remove the current privadita
                 case "$dropPrivadita":
-                    Privadita privaditaToDrop = privaditas.stream()
-                            .filter(privadita -> privadita.getServer().equals(event.getGuild().getName()))
-                            .findFirst()
-                            .orElse(null);
-                    if (privaditaToDrop != null) {
-                        privaditas.remove(privaditaToDrop);
-                        event.getChannel().sendMessage("Se ha cancelado la privadita").queue();
+                    // ✅ ACTUALIZAR: Eliminar privadita usando DBManager
+                    if (dbManager.hasActivePrivadita(event)) {
+                        dbManager.clearActivePrivadita(event);
+                        event.getChannel().sendMessage("✅ **Privadita cancelada.**").queue();
                     } else {
-                        event.getChannel().sendMessage("No hay ninguna privadita activa en este servidor").queue();
+                        event.getChannel().sendMessage("❌ **No hay ninguna privadita activa en este servidor.**").queue();
                     }
                     break;
 
@@ -124,10 +134,12 @@ public class Commands extends ListenerAdapter {
                     if (comando.length == 2) {
                         Player newPlayer = new Player();
                         newPlayer.setName(comando[1]);
-                    newPlayer.setElo(1000);
+                        newPlayer.setElo(1000);
+                        newPlayer.setWins(0);
+                        newPlayer.setLosses(0);
                         dbManager.AddPlayer(newPlayer);
                     } else {
-                        event.getChannel().sendMessage("El comando $addPlayer necesita un nombre de jugador").queue();
+                        event.getChannel().sendMessage("❌ **El comando $addPlayer necesita un nombre de jugador.**").queue();
                     }
                     break;
 
@@ -139,11 +151,14 @@ public class Commands extends ListenerAdapter {
                         for (String name : playersNames) {
                             Player newPlayer = new Player();
                             newPlayer.setName(name);
+                            newPlayer.setElo(1000);
+                            newPlayer.setWins(0);
+                            newPlayer.setLosses(0);
                             newPlayers.add(newPlayer);
                         }
                         dbManager.AddPlayers(newPlayers);
                     } else {
-                        event.getChannel().sendMessage("El comando $addPlayers necesita al menos un nombre de jugador").queue();
+                        event.getChannel().sendMessage("❌ **El comando $addPlayers necesita al menos un nombre de jugador.**").queue();
                     }
                     break;
 
@@ -151,7 +166,7 @@ public class Commands extends ListenerAdapter {
                     if (comando.length == 2) {
                         dbManager.DeletePlayer(comando[1]);
                     } else {
-                        event.getChannel().sendMessage("El comando $deletePlayer necesita un nombre de jugador").queue();
+                        event.getChannel().sendMessage("❌ **El comando $deletePlayer necesita un nombre de jugador.**").queue();
                     }
                     break;
 
@@ -184,7 +199,7 @@ public class Commands extends ListenerAdapter {
                     // Verificar que el usuario esté en un canal de voz
                     Member playMember = event.getMember();
                     if (playMember == null) {
-                        event.getChannel().sendMessage("❌ No se pudo verificar tu estado de voz").queue();
+                        event.getChannel().sendMessage("❌ **No se pudo verificar tu estado de voz.**").queue();
                         break;
                     }
 
@@ -200,7 +215,7 @@ public class Commands extends ListenerAdapter {
 
                     if (!playAudioManager.isConnected()) {
                         playAudioManager.openAudioConnection(playVoiceChannel);
-                        event.getChannel().sendMessage("✅ Conectado a `" + playVoiceChannel.getName() + "`").queue();
+                        event.getChannel().sendMessage("✅ **Conectado a** `" + playVoiceChannel.getName() + "`").queue();
                     }
 
                     // Construir URL o búsqueda (tomar desde comando[1] en adelante, NO desde comando[0])
@@ -341,14 +356,14 @@ public class Commands extends ListenerAdapter {
                     }
                     if (comando.length == 2) {
                         if (Integer.parseInt(comando[1]) > 20 || Integer.parseInt(comando[1]) < 2) {
-                            event.getChannel().sendMessage("The die must have between 2 and 20 sides").queue();
+                            event.getChannel().sendMessage("❌ **El dado debe tener entre 2 y 20 caras.**").queue();
                             break;
                         } else {
                             RollaDie rollaDie = new RollaDie(Integer.parseInt(comando[1]));
                             event.getChannel().sendMessage(rollaDie.toString()).queue();
                         }
                     } else {
-                        event.getChannel().sendMessage("The command $rolladie must have arguments").queue();
+                        event.getChannel().sendMessage("❌ **El comando $rolladie necesita argumentos.**").queue();
                     }
                     break;
 
@@ -358,24 +373,24 @@ public class Commands extends ListenerAdapter {
 
                 // Admin commands
                 case "$adminResetElo":
-                case "adminresetelo":
+                case "$adminresetelo":
                     if (comando.length < 2) {
-                        event.getChannel().sendMessage("❌ Uso: `$adminResetElo <nombre>`\n" +
-                                                      "Este comando resetea manualmente el Elo de un jugador a 1000.").queue();
+                        event.getChannel().sendMessage("❌ **Uso:** `$adminResetElo <nombre>`\n" +
+                                "Este comando resetea manualmente el Elo de un jugador a 1000.").queue();
                         return;
                     }
                     dbManager.AdminResetPlayerElo(comando[1]);
                     break;
 
                 default:
-                    event.getChannel().sendMessage("Comando no encontrado").queue();
+                    event.getChannel().sendMessage("❌ **Comando no encontrado.** Usa `$help` para ver los comandos disponibles.").queue();
             }
         }
     }
 
     public boolean checkCommandActive(MessageReceivedEvent event, String commandName) {
         if (!isActive()) {
-            event.getChannel().sendMessage("The " + commandName + " command is currently disabled").queue();
+            event.getChannel().sendMessage("❌ **El comando " + commandName + " está actualmente deshabilitado.**").queue();
             return false;
         }
         return true;
@@ -387,16 +402,16 @@ public class Commands extends ListenerAdapter {
         AudioManager audioManager = guild.getAudioManager();
 
         if (audioManager.isConnected()) {
-            event.getChannel().sendMessage("Ya estoy conectado a un canal de voz.").queue();
+            event.getChannel().sendMessage("✅ **Ya estoy conectado a un canal de voz.**").queue();
             return;
         }
 
         Member member = event.getMember();
-        if (member != null && member.getVoiceState().getChannel() != null) {
+        if (member != null && member.getVoiceState() != null && member.getVoiceState().getChannel() != null) {
             audioManager.openAudioConnection(member.getVoiceState().getChannel());
-            event.getChannel().sendMessage("Conectado al canal de voz.").queue();
+            event.getChannel().sendMessage("✅ **Conectado al canal de voz.**").queue();
         } else {
-            event.getChannel().sendMessage("No estás en un canal de voz.").queue();
+            event.getChannel().sendMessage("❌ **No estás en un canal de voz.**").queue();
         }
     }
 
@@ -407,9 +422,9 @@ public class Commands extends ListenerAdapter {
 
         if (audioManager.isConnected()) {
             audioManager.closeAudioConnection();
-            event.getChannel().sendMessage("Desconectado del canal de voz.").queue();
+            event.getChannel().sendMessage("✅ **Desconectado del canal de voz.**").queue();
         } else {
-            event.getChannel().sendMessage("No estoy conectado a ningún canal de voz.").queue();
+            event.getChannel().sendMessage("❌ **No estoy conectado a ningún canal de voz.**").queue();
         }
     }
 
@@ -418,22 +433,26 @@ public class Commands extends ListenerAdapter {
             // Leer el archivo Markdown que contiene los comandos
             InputStream inputStream = getClass().getResourceAsStream("/commands.md");
             if (inputStream == null) {
-                event.getChannel().sendMessage("No se pudo encontrar el archivo de comandos.").queue();
+                event.getChannel().sendMessage("❌ **No se pudo encontrar el archivo de comandos.**").queue();
                 return;
             }
             Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
             String helpMessage = scanner.hasNext() ? scanner.next() : "No hay comandos disponibles.";
             scanner.close();
 
-            // Enviar el mensaje de ayuda
+            // Enviar el mensaje de ayuda al DM
             event.getAuthor().openPrivateChannel().queue((channel) -> {
-                channel.sendMessage(helpMessage).queue();
+                channel.sendMessage(helpMessage).queue(
+                    success -> event.getChannel().sendMessage("✅ **Te he enviado la lista de comandos por mensaje privado.**").queue(),
+                    error -> event.getChannel().sendMessage("❌ **No pude enviarte un mensaje privado. Asegúrate de tener los DMs abiertos.**").queue()
+                );
             });
         } catch (Exception e) {
             e.printStackTrace();
-            event.getChannel().sendMessage("Ocurrió un error al leer el archivo de comandos.").queue();
+            event.getChannel().sendMessage("❌ **Ocurrió un error al leer el archivo de comandos.**").queue();
         }
     }
+
     // change the state of the command
     public void setIsActive(boolean isActive) {
         this.isActive.set(isActive);
