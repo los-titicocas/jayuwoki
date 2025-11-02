@@ -66,36 +66,87 @@ public class DBManager {
     }
     
     private static void loadPermissionLists() {
-        Utils.loadProperties();
-        
-        // Cargar desarrolladores
-        String developers = Utils.properties.getProperty("bot.developers", "");
-        if (!developers.isEmpty()) {
-            Arrays.stream(developers.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(Long::parseLong)
-                .forEach(BOT_DEVELOPERS::add);
+        try {
+            // Intentar cargar properties desde múltiples ubicaciones
+            java.util.Properties props = new java.util.Properties();
+            boolean loaded = false;
+            
+            // Intentar rutas posibles
+            String[] possiblePaths = {
+                "Jayuwoki/settings.properties",
+                "settings.properties",
+                "../settings.properties",
+                System.getProperty("user.dir") + "/Jayuwoki/settings.properties",
+                System.getProperty("user.dir") + "/settings.properties"
+            };
+            
+            System.out.println("🔍 DEBUG: Buscando settings.properties...");
+            System.out.println("🔍 DEBUG: Working directory: " + System.getProperty("user.dir"));
+            
+            for (String path : possiblePaths) {
+                java.io.File file = new java.io.File(path);
+                System.out.println("🔍 Probando: " + file.getAbsolutePath() + " → " + (file.exists() ? "✅" : "❌"));
+                
+                if (file.exists()) {
+                    try (java.io.FileInputStream input = new java.io.FileInputStream(file)) {
+                        props.load(input);
+                        loaded = true;
+                        System.out.println("✅ Archivo cargado desde: " + file.getAbsolutePath());
+                        break;
+                    }
+                }
+            }
+            
+            if (!loaded) {
+                System.err.println("❌ No se pudo encontrar settings.properties en ninguna ubicación");
+                return;
+            }
+            
+            System.out.println("🔍 DEBUG: Properties cargadas:");
+            System.out.println("  - Total properties: " + props.size());
+            props.forEach((key, value) -> 
+                System.out.println("    " + key + " = " + value));
+            
+            // Cargar desarrolladores
+            String developers = props.getProperty("bot.developers", "");
+            System.out.println("🔍 DEBUG: bot.developers = '" + developers + "'");
+            if (!developers.isEmpty()) {
+                Arrays.stream(developers.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Long::parseLong)
+                    .forEach(BOT_DEVELOPERS::add);
+            }
+            
+            // Cargar usuarios de confianza
+            String trusted = props.getProperty("trusted.users", "");
+            System.out.println("🔍 DEBUG: trusted.users = '" + trusted + "'");
+            if (!trusted.isEmpty()) {
+                Arrays.stream(trusted.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Long::parseLong)
+                    .forEach(TRUSTED_USERS::add);
+            }
+            
+            System.out.println("🔐 Permisos cargados:");
+            System.out.println("  Desarrolladores: " + BOT_DEVELOPERS.size() + " → " + BOT_DEVELOPERS);
+            System.out.println("  Usuarios de Confianza: " + TRUSTED_USERS.size() + " → " + TRUSTED_USERS);
+        } catch (Exception e) {
+            System.err.println("❌ ERROR al cargar permisos:");
+            e.printStackTrace();
         }
-        
-        // Cargar usuarios de confianza
-        String trusted = Utils.properties.getProperty("trusted.users", "");
-        if (!trusted.isEmpty()) {
-            Arrays.stream(trusted.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(Long::parseLong)
-                .forEach(TRUSTED_USERS::add);
-        }
-        
-        System.out.println("🔐 Permisos cargados:");
-        System.out.println("  Desarrolladores: " + BOT_DEVELOPERS.size());
-        System.out.println("  Usuarios de Confianza: " + TRUSTED_USERS.size());
     }
 
     // ==================== CONSTRUCTOR ====================
     
     public DBManager() {
+        // 🔐 Cargar permisos si aún no se han cargado
+        if (BOT_DEVELOPERS.isEmpty() && TRUSTED_USERS.isEmpty()) {
+            System.out.println("🔄 Cargando permisos desde constructor...");
+            loadPermissionLists();
+        }
+        
         try {
             // Cargar el archivo JSON desde la carpeta resources
             InputStream serviceAccount = DBManager.class.getClassLoader()
@@ -646,29 +697,37 @@ public class DBManager {
         if (member == null) return PermissionLevel.USER;
         
         long userId = member.getIdLong();
+        System.out.println("🔍 DEBUG: Checking permissions for user ID: " + userId);
+        System.out.println("🔍 DEBUG: BOT_DEVELOPERS list: " + BOT_DEVELOPERS);
+        System.out.println("🔍 DEBUG: TRUSTED_USERS list: " + TRUSTED_USERS);
         
         // 1. Comprobar si es desarrollador del bot (máximo nivel)
         if (BOT_DEVELOPERS.contains(userId)) {
+            System.out.println("✅ DEBUG: User is DEVELOPER");
             return PermissionLevel.DEVELOPER;
         }
         
         // 2. Comprobar si es usuario de confianza
         if (TRUSTED_USERS.contains(userId)) {
+            System.out.println("✅ DEBUG: User is TRUSTED");
             return PermissionLevel.TRUSTED;
         }
         
         // 3. Comprobar permisos de Discord en el servidor
         if (member.hasPermission(Permission.ADMINISTRATOR)) {
+            System.out.println("✅ DEBUG: User is ADMIN");
             return PermissionLevel.ADMIN;
         }
         
         if (member.hasPermission(Permission.MANAGE_SERVER) || 
             member.hasPermission(Permission.KICK_MEMBERS) ||
             member.hasPermission(Permission.BAN_MEMBERS)) {
+            System.out.println("✅ DEBUG: User is MODERATOR");
             return PermissionLevel.MODERATOR;
         }
         
         // 4. Usuario normal
+        System.out.println("❌ DEBUG: User is USER (normal)");
         return PermissionLevel.USER;
     }
 

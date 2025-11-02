@@ -77,8 +77,14 @@ public class Commands extends ListenerAdapter {
                         event.getChannel().sendMessage("❌ **Ya hay una privadita activa en este servidor.**\n" +
                                 "Usa `$dropPrivadita` para cancelarla primero.").queue();
                     } else if (comando.length == 11) {
+                        // ✅ Normalizar nombres de jugadores
+                        String[] normalizedNames = new String[10];
+                        for (int i = 0; i < 10; i++) {
+                            normalizedNames[i] = comando[i + 1].toLowerCase().trim();
+                        }
+                        
                         // Obtener jugadores desde la base de datos usando DBManager
-                        List<Player> players = dbManager.GetPlayers(Arrays.copyOfRange(comando, 1, comando.length), event);
+                        List<Player> players = dbManager.GetPlayers(normalizedNames, event);
 
                         if (players.size() == 10) {
                             // ✅ ACTUALIZAR: Crear y guardar privadita en DBManager
@@ -132,7 +138,7 @@ public class Commands extends ListenerAdapter {
                 case "$addPlayer":
                     if (comando.length == 2) {
                         Player newPlayer = new Player();
-                        newPlayer.setName(comando[1]);
+                        newPlayer.setName(comando[1].toLowerCase().trim()); // ✅ Normalizar nombre
                         newPlayer.setElo(1000);
                         newPlayer.setWins(0);
                         newPlayer.setLosses(0);
@@ -149,7 +155,7 @@ public class Commands extends ListenerAdapter {
                         List<Player> newPlayers = new ArrayList<>();
                         for (String name : playersNames) {
                             Player newPlayer = new Player();
-                            newPlayer.setName(name);
+                            newPlayer.setName(name.toLowerCase().trim()); // ✅ Normalizar nombre
                             newPlayer.setElo(1000);
                             newPlayer.setWins(0);
                             newPlayer.setLosses(0);
@@ -163,7 +169,7 @@ public class Commands extends ListenerAdapter {
 
                 case "$deletePlayer":
                     if (comando.length == 2) {
-                        dbManager.DeletePlayer(comando[1]);
+                        dbManager.DeletePlayer(comando[1].toLowerCase().trim()); // ✅ Normalizar nombre
                     } else {
                         event.getChannel().sendMessage("❌ **El comando $deletePlayer necesita un nombre de jugador.**").queue();
                     }
@@ -171,7 +177,7 @@ public class Commands extends ListenerAdapter {
 
                 case "$verElo":
                     if (comando.length == 2) {
-                        dbManager.ShowPlayerElo(comando[1]);
+                        dbManager.ShowPlayerElo(comando[1].toLowerCase().trim()); // ✅ Normalizar nombre
                     } else {
                         dbManager.ShowAllElo();
                     }
@@ -378,7 +384,7 @@ public class Commands extends ListenerAdapter {
                                 "Este comando resetea manualmente el Elo de un jugador a 1000.").queue();
                         return;
                     }
-                    dbManager.AdminResetPlayerElo(comando[1]);
+                    dbManager.AdminResetPlayerElo(comando[1].toLowerCase().trim()); // ✅ Normalizar nombre
                     break;
 
                 default:
