@@ -53,6 +53,9 @@ public class Utils {
                 properties.setProperty("imageCheck", "false");
                 properties.setProperty("soundCheck", "false");
                 properties.setProperty("rollaDie", "true");
+                // Sistema de permisos jerárquico
+                properties.setProperty("bot.developers", ""); // IDs separados por comas
+                properties.setProperty("trusted.users", ""); // IDs separados por comas
                 properties.store(output, null);
             } catch (IOException e) {
                 e.printStackTrace();

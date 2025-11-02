@@ -30,6 +30,68 @@ public class DBManager {
     
     // ❌ ELIMINADO: currentServer y openPermissions ya no son globales
     // Ahora cada servidor tiene su propio estado en ServerState
+    
+    // 🔐 SISTEMA DE PERMISOS JERÁRQUICO
+    private static final List<Long> BOT_DEVELOPERS = new ArrayList<>();
+    private static final List<Long> TRUSTED_USERS = new ArrayList<>();
+    
+    // Enum de niveles de permiso (de mayor a menor)
+    public enum PermissionLevel {
+        DEVELOPER(4, "Desarrollador del Bot"),
+        TRUSTED(3, "Usuario de Confianza"),
+        ADMIN(2, "Administrador del Servidor"),
+        MODERATOR(1, "Moderador"),
+        USER(0, "Usuario Normal");
+        
+        private final int level;
+        private final String displayName;
+        
+        PermissionLevel(int level, String displayName) {
+            this.level = level;
+            this.displayName = displayName;
+        }
+        
+        public int getLevel() { return level; }
+        public String getDisplayName() { return displayName; }
+        
+        // Comprueba si este nivel tiene suficientes permisos
+        public boolean hasPermission(PermissionLevel required) {
+            return this.level >= required.level;
+        }
+    }
+    
+    // Cargar IDs desde properties al iniciar
+    static {
+        loadPermissionLists();
+    }
+    
+    private static void loadPermissionLists() {
+        Utils.loadProperties();
+        
+        // Cargar desarrolladores
+        String developers = Utils.properties.getProperty("bot.developers", "");
+        if (!developers.isEmpty()) {
+            Arrays.stream(developers.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::parseLong)
+                .forEach(BOT_DEVELOPERS::add);
+        }
+        
+        // Cargar usuarios de confianza
+        String trusted = Utils.properties.getProperty("trusted.users", "");
+        if (!trusted.isEmpty()) {
+            Arrays.stream(trusted.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::parseLong)
+                .forEach(TRUSTED_USERS::add);
+        }
+        
+        System.out.println("🔐 Permisos cargados:");
+        System.out.println("  Desarrolladores: " + BOT_DEVELOPERS.size());
+        System.out.println("  Usuarios de Confianza: " + TRUSTED_USERS.size());
+    }
 
     // ==================== CONSTRUCTOR ====================
     
@@ -263,13 +325,18 @@ public class DBManager {
      * Añade un jugador a la base de datos del servidor.
      * @param newPlayer Jugador a añadir
      */
+    /**
+     * Añade un jugador a la base de datos (REQUIERE NIVEL MODERATOR).
+     * @param newPlayer Nuevo jugador a añadir
+     */
     public void AddPlayer(Player newPlayer) {
         try {
             String guildId = event.getGuild().getId(); // ✨ Usar Guild ID
             ServerState state = getServerState(event);
             state.getOpenPermissions().set(Boolean.parseBoolean(Utils.properties.getProperty("massPermissionCheck")));
             
-            if (CheckPermissions(state.getOpenPermissions().get())) {
+            // 🔐 REQUIERE NIVEL MODERATOR (moderadores pueden añadir jugadores)
+            if (CheckPermissions(state.getOpenPermissions().get(), PermissionLevel.MODERATOR)) {
                 if (!CheckPlayerFound(newPlayer)) {
                     event.getChannel().sendMessage("❌ **El jugador ya está en la base de datos de este servidor.**").queue();
                     return;
@@ -291,7 +358,7 @@ public class DBManager {
     }
 
     /**
-     * Añade múltiples jugadores a la base de datos del servidor.
+     * Añade múltiples jugadores a la base de datos del servidor (REQUIERE NIVEL MODERATOR).
      * @param newPlayers Lista de jugadores a añadir
      */
     public void AddPlayers(List<Player> newPlayers) {
@@ -299,7 +366,8 @@ public class DBManager {
         ServerState state = getServerState(event);
         state.getOpenPermissions().set(Boolean.parseBoolean(Utils.properties.getProperty("massPermissionCheck")));
         
-        if (CheckPermissions(state.getOpenPermissions().get())) {
+        // 🔐 REQUIERE NIVEL MODERATOR
+        if (CheckPermissions(state.getOpenPermissions().get(), PermissionLevel.MODERATOR)) {
             try {
                 List<Player> playersNotInDB = GetPlayersNotFound(newPlayers);
                 List<Player> playersAlreadyInDB = newPlayers.stream()
@@ -348,12 +416,17 @@ public class DBManager {
      * Elimina un jugador de la base de datos del servidor.
      * @param name Nombre del jugador a eliminar
      */
+    /**
+     * Elimina un jugador de la base de datos (REQUIERE NIVEL ADMIN).
+     * @param name Nombre del jugador a eliminar
+     */
     public void DeletePlayer(String name) {
         String guildId = event.getGuild().getId(); // ✨ Usar Guild ID
         ServerState state = getServerState(event);
         state.getOpenPermissions().set(Boolean.parseBoolean(Utils.properties.getProperty("massPermissionCheck")));
         
-        if (CheckPermissions(state.getOpenPermissions().get())) {
+        // 🔐 REQUIERE NIVEL ADMIN
+        if (CheckPermissions(state.getOpenPermissions().get(), PermissionLevel.ADMIN)) {
             CollectionReference playersCollection = db.collection(guildId)
                     .document("Privadita")
                     .collection("Players");
@@ -508,7 +581,8 @@ public class DBManager {
     }
 
     /**
-     * Resetea manualmente el Elo de un jugador (solo administradores).
+     * Resetea manualmente el Elo de un jugador (REQUIERE NIVEL TRUSTED O SUPERIOR).
+     * Este comando está protegido para evitar que admins del servidor lo usen sin control.
      * @param name Nombre del jugador a resetear
      */
     public void AdminResetPlayerElo(String name) {
@@ -516,7 +590,8 @@ public class DBManager {
         ServerState state = getServerState(event);
         state.getOpenPermissions().set(Boolean.parseBoolean(Utils.properties.getProperty("massPermissionCheck")));
         
-        if (CheckPermissions(state.getOpenPermissions().get())) {
+        // 🔐 REQUIERE NIVEL TRUSTED: Solo desarrolladores y usuarios de confianza
+        if (CheckPermissions(state.getOpenPermissions().get(), PermissionLevel.TRUSTED)) {
             CollectionReference playersCollection = db.collection(guildId)
                     .document("Privadita")
                     .collection("Players");
@@ -562,19 +637,87 @@ public class DBManager {
     // ==================== MÉTODOS DE PERMISOS ====================
 
     /**
-     * Verifica si el usuario tiene permisos para modificar la base de datos.
-     * @param openPermissions Si true, todos tienen permisos. Si false, solo admins.
-     * @return true si el usuario tiene permisos
+     * Obtiene el nivel de permiso del usuario actual.
+     * Jerarquía: DEVELOPER > TRUSTED > ADMIN > MODERATOR > USER
+     * @param member Usuario de Discord
+     * @return Nivel de permiso del usuario
      */
-    private boolean CheckPermissions(Boolean openPermissions) {
+    private PermissionLevel getUserPermissionLevel(Member member) {
+        if (member == null) return PermissionLevel.USER;
+        
+        long userId = member.getIdLong();
+        
+        // 1. Comprobar si es desarrollador del bot (máximo nivel)
+        if (BOT_DEVELOPERS.contains(userId)) {
+            return PermissionLevel.DEVELOPER;
+        }
+        
+        // 2. Comprobar si es usuario de confianza
+        if (TRUSTED_USERS.contains(userId)) {
+            return PermissionLevel.TRUSTED;
+        }
+        
+        // 3. Comprobar permisos de Discord en el servidor
+        if (member.hasPermission(Permission.ADMINISTRATOR)) {
+            return PermissionLevel.ADMIN;
+        }
+        
+        if (member.hasPermission(Permission.MANAGE_SERVER) || 
+            member.hasPermission(Permission.KICK_MEMBERS) ||
+            member.hasPermission(Permission.BAN_MEMBERS)) {
+            return PermissionLevel.MODERATOR;
+        }
+        
+        // 4. Usuario normal
+        return PermissionLevel.USER;
+    }
+
+    /**
+     * Verifica si el usuario tiene permisos suficientes para ejecutar una acción.
+     * Sistema jerárquico: Developers pueden todo, Trusted pueden comandos críticos,
+     * Admins comandos normales, etc.
+     * @param openPermissions Si true, todos tienen permisos (modo abierto)
+     * @param requiredLevel Nivel mínimo requerido para la acción
+     * @return true si el usuario tiene permisos suficientes
+     */
+    private boolean CheckPermissions(Boolean openPermissions, PermissionLevel requiredLevel) {
+        // Modo abierto: todos pueden
         if (openPermissions) {
             return true;
-        } else if (discordUser.hasPermission(Permission.ADMINISTRATOR)) {
+        }
+        
+        PermissionLevel userLevel = getUserPermissionLevel(discordUser);
+        
+        // Comprobar si tiene suficiente nivel
+        if (userLevel.hasPermission(requiredLevel)) {
             return true;
         } else {
-            event.getChannel().sendMessage("❌ **No tienes permisos para modificar la base de datos.**").queue();
+            event.getChannel().sendMessage(String.format(
+                "❌ **No tienes permisos para esta acción.**\n" +
+                "Tu nivel: **%s** | Se requiere: **%s** o superior",
+                userLevel.getDisplayName(),
+                requiredLevel.getDisplayName()
+            )).queue();
             return false;
         }
+    }
+    
+    /**
+     * Sobrecarga del método CheckPermissions para mantener compatibilidad.
+     * Por defecto requiere nivel ADMIN.
+     */
+    private boolean CheckPermissions(Boolean openPermissions) {
+        return CheckPermissions(openPermissions, PermissionLevel.ADMIN);
+    }
+    
+    /**
+     * Método público para recargar las listas de permisos desde properties.
+     * Útil para actualizar permisos sin reiniciar el bot.
+     */
+    public static void reloadPermissions() {
+        BOT_DEVELOPERS.clear();
+        TRUSTED_USERS.clear();
+        loadPermissionLists();
     }
 
     // ==================== GETTERS Y SETTERS ====================
