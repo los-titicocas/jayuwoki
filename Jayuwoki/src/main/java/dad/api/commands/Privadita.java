@@ -128,7 +128,7 @@ public class Privadita {
     messageBuilder.append("```\n**Cambios de Elo:**\n");
 
     for (int i = 0; i < 5; i++) {
-      if (ganador.equals("equipo1")) {
+      if (ganador.equals("blue")) {
         players.get(i).setWins(players.get(i).getWins() + 1);
         players.get(i + 5).setLosses(players.get(i + 5).getLosses() + 1);
         int oldEloWin = players.get(i).getElo();
