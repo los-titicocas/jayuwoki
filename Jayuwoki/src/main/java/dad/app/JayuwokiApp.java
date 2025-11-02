@@ -26,20 +26,31 @@ public class JayuwokiApp extends Application {
         // Load properties before accessing them
         Utils.loadProperties();
 
-        // Read theme with fallback
-        String theme = Utils.properties.getProperty("theme");
+        // Read theme with fallback (default to DARK)
+        String theme = Utils.properties.getProperty("theme", "dark");
         if (theme == null || theme.isBlank()) {
-            System.err.println("Theme property missing, using default 'light'");
-            theme = "light";
+            System.out.println("⚠️ Theme property missing, using default 'dark'");
+            theme = "dark";
         }
 
-        // Try to load theme resource; if missing, fall back to Modena
+        System.out.println("🎨 Loading theme for splash screen: " + theme);
+
+        // Try to load theme resource; if missing, fall back to dark theme
         URL themeUrl = getClass().getResource("/styles/" + theme + "-theme.css");
         if (themeUrl != null) {
             Application.setUserAgentStylesheet(themeUrl.toExternalForm());
+            System.out.println("✅ Theme loaded: " + theme);
         } else {
-            System.err.println("Theme resource not found: /styles/" + theme + "-theme.css. Using default stylesheet.");
-            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            System.err.println("❌ Theme resource not found: /styles/" + theme + "-theme.css");
+            // Intentar cargar dark theme como fallback
+            URL darkThemeUrl = getClass().getResource("/styles/dark-theme.css");
+            if (darkThemeUrl != null) {
+                Application.setUserAgentStylesheet(darkThemeUrl.toExternalForm());
+                System.out.println("✅ Fallback to dark theme");
+            } else {
+                System.err.println("❌ Dark theme not found, using Modena");
+                Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            }
         }
 
         // Load app icon with null check

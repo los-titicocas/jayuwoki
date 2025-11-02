@@ -153,6 +153,29 @@ public class MainController implements Initializable {
         });
 
         // bind setting checkbox
+        
+        // 🎨 Aplicar tema guardado al inicializar
+        applyStoredTheme();
+    }
+    
+    /**
+     * Aplica el tema guardado en properties al iniciar la aplicación.
+     */
+    private void applyStoredTheme() {
+        try {
+            Utils.loadProperties();
+            String theme = Utils.properties.getProperty("theme", "dark");
+            System.out.println("🎨 Loading theme: " + theme);
+            
+            String themeUrl = getClass().getResource("/styles/" + theme + "-theme.css").toExternalForm();
+            Application.setUserAgentStylesheet(themeUrl);
+            root.getScene().getRoot().applyCss();
+            
+            System.out.println("✅ Theme applied: " + theme);
+        } catch (Exception e) {
+            System.err.println("❌ Error al aplicar tema guardado:");
+            e.printStackTrace();
+        }
     }
 
     private void popOverMap() {
@@ -304,20 +327,32 @@ public class MainController implements Initializable {
 
     @FXML
     void onChangeTheme(ActionEvent event) {
-        String lightTheme = getClass().getResource("/styles/light-theme.css").toExternalForm();
-        String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
+        try {
+            String lightTheme = getClass().getResource("/styles/light-theme.css").toExternalForm();
+            String darkTheme = getClass().getResource("/styles/dark-theme.css").toExternalForm();
 
-        String currentTheme = Utils.properties.getProperty("theme");
-        System.out.println("Current theme: " + currentTheme); // Debugging line
+            // Recargar properties para asegurar que tenemos el valor actual
+            Utils.loadProperties();
+            String currentTheme = Utils.properties.getProperty("theme", "dark");
+            System.out.println("🎨 Current theme: " + currentTheme);
 
-        if (currentTheme.equals("dark")) {
-            Application.setUserAgentStylesheet(lightTheme);
-            Utils.setTheme("light");
-            System.out.println("Theme changed to light"); // Debugging line
-        } else {
-            Application.setUserAgentStylesheet(darkTheme);
-            Utils.setTheme("dark");
-            System.out.println("Theme changed to dark"); // Debugging line
+            if ("dark".equals(currentTheme)) {
+                // Cambiar a light
+                Application.setUserAgentStylesheet(lightTheme);
+                Utils.setTheme("light");
+                System.out.println("✅ Theme changed to light");
+            } else {
+                // Cambiar a dark
+                Application.setUserAgentStylesheet(darkTheme);
+                Utils.setTheme("dark");
+                System.out.println("✅ Theme changed to dark");
+            }
+            
+            // Forzar actualización visual
+            root.getScene().getRoot().applyCss();
+        } catch (Exception e) {
+            System.err.println("❌ Error al cambiar tema:");
+            e.printStackTrace();
         }
     }
 

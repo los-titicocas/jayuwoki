@@ -8,7 +8,8 @@ import java.util.Properties;
 
 public class Utils {
 
-    public static final String CONFIG_FILE = "Jayuwoki/settings.properties";
+    // Ruta absoluta basada en user.home para evitar problemas con Maven
+    public static final String CONFIG_FILE = System.getProperty("user.home") + File.separator + ".jayuwoki" + File.separator + "settings.properties";
     public static Properties properties = new Properties();
 
     public static void saveProperties() {
@@ -44,6 +45,14 @@ public class Utils {
 
     public static void createPropertiesFile(String filePath) {
         File file = new File(filePath);
+        
+        // Crear directorio padre si no existe
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            System.out.println("📁 Directory created: " + parentDir.getAbsolutePath() + " → " + created);
+        }
+        
         if (!file.exists()) {
             Properties properties = new Properties();
             try (FileOutputStream output = new FileOutputStream(filePath)) {
@@ -57,9 +66,13 @@ public class Utils {
                 properties.setProperty("bot.developers", ""); // IDs separados por comas
                 properties.setProperty("trusted.users", ""); // IDs separados por comas
                 properties.store(output, null);
+                System.out.println("✅ Settings file created: " + file.getAbsolutePath());
             } catch (IOException e) {
+                System.err.println("❌ Error creating settings file:");
                 e.printStackTrace();
             }
+        } else {
+            System.out.println("ℹ️ Settings file already exists: " + file.getAbsolutePath());
         }
     }
 }

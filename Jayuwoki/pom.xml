@@ -19,10 +19,6 @@
 
   <repositories>
     <repository>
-      <id>jitpack</id>
-      <url>https://jitpack.io</url>
-    </repository>
-    <repository>
       <id>central</id>
       <url>https://repo.maven.apache.org/maven2</url>
     </repository>
@@ -36,7 +32,6 @@
       <name>Lavalink Repository</name>
       <url>https://maven.lavalink.dev/snapshots</url>
     </repository>
-    <!-- Añadir repositorio para YouTube Plugin -->
     <repository>
       <id>lavalink</id>
       <name>Lavalink Repository</name>
@@ -45,6 +40,9 @@
   </repositories>
 
   <dependencies>
+    <!-- ========================================== -->
+    <!-- JAVAFX (UI - solo si usas interfaz gráfica) -->
+    <!-- ========================================== -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
@@ -58,17 +56,29 @@
     </dependency>
 
     <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-web</artifactId>
+      <version>22.0.1</version>
+    </dependency>
+
+    <!-- ========================================== -->
+    <!-- ICONOS (UI) -->
+    <!-- ========================================== -->
+    <dependency>
       <groupId>org.kordamp.ikonli</groupId>
       <artifactId>ikonli-javafx</artifactId>
       <version>12.3.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-materialdesign2-pack -->
+
     <dependency>
       <groupId>org.kordamp.ikonli</groupId>
       <artifactId>ikonli-materialdesign2-pack</artifactId>
       <version>12.3.1</version>
     </dependency>
 
+    <!-- ========================================== -->
+    <!-- CONTROLES EXTRA (UI) -->
+    <!-- ========================================== -->
     <dependency>
       <groupId>org.controlsfx</groupId>
       <artifactId>controlsfx</artifactId>
@@ -76,29 +86,27 @@
     </dependency>
 
     <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-web</artifactId>
-      <version>22.0.1</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.jfxtras/jfxtras-all -->
-    <dependency>
       <groupId>org.jfxtras</groupId>
       <artifactId>jfxtras-all</artifactId>
       <version>10.0-r1</version>
     </dependency>
 
-    <!-- Dependency for WebView (.md files render) -->
+    <!-- ========================================== -->
+    <!-- MARKDOWN RENDERER (WebView) -->
+    <!-- ========================================== -->
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
       <artifactId>flexmark-all</artifactId>
       <version>0.62.2</version>
     </dependency>
 
+    <!-- ========================================== -->
+    <!-- DISCORD BOT (JDA) -->
+    <!-- ========================================== -->
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>5.2.2</version> <!-- replace $version with the latest version -->
+      <version>5.2.2</version>
       <exclusions>
         <exclusion>
           <groupId>club.minnced</groupId>
@@ -107,6 +115,9 @@
       </exclusions>
     </dependency>
 
+    <!-- ========================================== -->
+    <!-- FIREBASE (Base de Datos) -->
+    <!-- ========================================== -->
     <dependency>
       <groupId>com.google.firebase</groupId>
       <artifactId>firebase-admin</artifactId>
@@ -116,27 +127,23 @@
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-firestore</artifactId>
-      <version>3.30.3</version> <!-- Usa la última versión disponible -->
+      <version>3.30.3</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.vladsch.flexmark</groupId>
-      <artifactId>flexmark-all</artifactId>
-      <version>0.62.2</version>
-    </dependency>
-
-    <!-- REEMPLAZAR LavaPlayer por la versión con YouTube fix -->
-    <dependency>
-        <groupId>dev.lavalink.youtube</groupId>
-        <artifactId>v2</artifactId>
-        <version>1.8.3</version>
-    </dependency>
-    
-    <!-- LavaPlayer Base -->
+    <!-- ========================================== -->
+    <!-- AUDIO PLAYER (LavaPlayer) -->
+    <!-- ========================================== -->
     <dependency>
         <groupId>dev.arbjerg</groupId>
         <artifactId>lavaplayer</artifactId>
         <version>2.2.2</version>
+    </dependency>
+
+    <!-- YouTube Source (bloqueado pero necesario para SoundCloud) -->
+    <dependency>
+        <groupId>dev.lavalink.youtube</groupId>
+        <artifactId>v2</artifactId>
+        <version>1.8.3</version>
     </dependency>
 
   </dependencies>
@@ -154,22 +161,16 @@
               <goal>package</goal>
             </goals>
             <configuration>
-              <!-- mandatory -->
               <mainClass>dad.app.Main</mainClass>
-
               <bundleJre>false</bundleJre>
               <generateInstaller>true</generateInstaller>
               <administratorRequired>true</administratorRequired>
               <platform>windows</platform>
               <winConfig>
-
-                <!-- general properties -->
                 <icoFile>assets/installer-icon.ico</icoFile>
                 <generateSetup>true</generateSetup>
                 <generateMsi>false</generateMsi>
                 <generateMsm>false</generateMsm>
-
-                <!-- exe creation properties -->
                 <headerType>gui</headerType>
                 <wrapJar>true</wrapJar>
                 <fileVersion>1.0.0.0</fileVersion>
@@ -180,11 +181,7 @@
                 <productName>${name}</productName>
                 <internalName>${name}</internalName>
                 <originalFilename>${name}.exe</originalFilename>
-
-                <!-- choose EXE creation tool -->
                 <exeCreationTool>launch4j</exeCreationTool>
-
-                <!-- setup generation properties -->
                 <setupMode>installForCurrentUser</setupMode>
                 <setupLanguages>
                   <english>compiler:Default.isl</english>
@@ -198,15 +195,11 @@
                 <disableWelcomePage>false</disableWelcomePage>
                 <createDesktopIconTask>true</createDesktopIconTask>
                 <removeOldLibs>true</removeOldLibs>
-
-                <!-- signing properties -->
                 <signing>
                   <keystore>path/to/keystore</keystore>
                   <storepass>password</storepass>
                   <alias>cert_alias</alias>
                 </signing>
-
-                <!-- windows registry entries added during installation -->
                 <registry>
                   <entries>
                     <entry>
@@ -216,7 +209,6 @@
                     </entry>
                   </entries>
                 </registry>
-
               </winConfig>
             </configuration>
           </execution>
@@ -228,7 +220,6 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.6.2</version>
         <executions>
-          <!-- Ejecución normal del bot -->
           <execution>
             <id>run-bot</id>
             <configuration>
@@ -236,7 +227,6 @@
             </configuration>
           </execution>
           
-          <!-- Ejecución del script de migración -->
           <execution>
             <id>migrate-data</id>
             <configuration>
