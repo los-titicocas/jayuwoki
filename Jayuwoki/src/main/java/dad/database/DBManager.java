@@ -547,19 +547,20 @@ public class DBManager {
             }
 
             StringBuilder message = new StringBuilder("📊 **RANKING ELO - " + event.getGuild().getName() + "**\n\n```\n");
-            message.append(String.format("%-3s %-20s %6s %4s %4s\n", "#", "Jugador", "Elo", "W", "L"));
-            message.append("─".repeat(42)).append("\n");
+            message.append(String.format("%-3s %-20s %6s %4s %4s %7s\n", "#", "Jugador", "Elo", "W", "L", "WR"));
+            message.append("─".repeat(50)).append("\n");
 
             int position = 1;
             for (DocumentSnapshot playerDoc : querySnapshot.getDocuments()) {
                 Player player = playerDoc.toObject(Player.class);
                 if (player != null) {
-                    message.append(String.format("%-3d %-20s %6d %4d %4d\n",
+                    message.append(String.format("%-3d %-20s %6d %4d %4d %6.0f%%\n",
                             position++,
                             player.getName(),
                             player.getElo(),
                             player.getWins(),
-                            player.getLosses()));
+                            player.getLosses(),
+                            player.getWinRate()));
                 }
             }
 

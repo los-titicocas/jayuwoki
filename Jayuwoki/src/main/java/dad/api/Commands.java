@@ -103,7 +103,7 @@ public class Commands extends ListenerAdapter {
                 // Set the winner of the privadita
                 case "$resultadoPrivadita":
                     if (comando.length < 2) {
-                        event.getChannel().sendMessage("❌ **Uso:** `$resultadoPrivadita <equipo1|equipo2>`").queue();
+                        event.getChannel().sendMessage("❌ **Uso:** `$resultadoPrivadita <blue|red>`").queue();
                         break;
                     }
                     
