@@ -36,6 +36,26 @@ public class Player {
         this.elo.set(elo);
     }
 
+    /**
+     * Calcula el Win Rate (porcentaje de victorias) del jugador.
+     * @return Win Rate como porcentaje (0.0 - 100.0)
+     */
+    public double getWinRate() {
+        int totalGames = wins.get() + losses.get();
+        if (totalGames == 0) {
+            return 0.0;
+        }
+        return (wins.get() * 100.0) / totalGames;
+    }
+    
+    /**
+     * Obtiene el Win Rate formateado como String sin decimales.
+     * @return Win Rate formateado
+     */
+    public String getWinRateFormatted() {
+        return String.format("%.0f%%", getWinRate());
+    }
+
     public String PrintStats() {
         StringBuilder stats = new StringBuilder();
 
@@ -43,6 +63,7 @@ public class Player {
         stats.append("Wins: ").append(wins.get()).append("\n");
         stats.append("Losses: ").append(losses.get()).append("\n");
         stats.append("Elo: ").append(elo.get()).append("\n");
+        stats.append("Win Rate: ").append(getWinRateFormatted()).append("\n");
 
         return stats.toString(); // Retorna el mensaje como un String
     }
