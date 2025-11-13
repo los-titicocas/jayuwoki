@@ -107,12 +107,6 @@
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
       <version>5.2.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>club.minnced</groupId>
-          <artifactId>opus-java</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- ========================================== -->

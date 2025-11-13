@@ -516,7 +516,8 @@ public class DBManager {
 
             if (playerDoc.exists()) {
                 Player player = playerDoc.toObject(Player.class);
-                event.getChannel().sendMessage(player.PrintStats()).queue();
+                String seasonHeader = "📅 " + Utils.getSeasonHeader() + "\n\n";
+                event.getChannel().sendMessage(seasonHeader + player.PrintStats()).queue();
             } else {
                 event.getChannel().sendMessage("❌ **El jugador `" + name + "` no está en la base de datos de este servidor.**").queue();
             }
@@ -546,7 +547,8 @@ public class DBManager {
                 return;
             }
 
-            StringBuilder message = new StringBuilder("📊 **RANKING ELO - " + event.getGuild().getName() + "**\n\n```\n");
+            String seasonHeader = "📅 " + Utils.getSeasonHeader() + "\n\n";
+            StringBuilder message = new StringBuilder(seasonHeader + "📊 **RANKING ELO - " + event.getGuild().getName() + "**\n\n```\n");
             message.append(String.format("%-3s %-20s %6s %4s %4s %7s\n", "#", "Jugador", "Elo", "W", "L", "WR"));
             message.append("─".repeat(50)).append("\n");
 
@@ -554,7 +556,7 @@ public class DBManager {
             for (DocumentSnapshot playerDoc : querySnapshot.getDocuments()) {
                 Player player = playerDoc.toObject(Player.class);
                 if (player != null) {
-                    message.append(String.format("%-3d %-20s %6d %4d %4d %6.0f%%\n",
+            message.append(String.format("%-3d %-20s %6d %4d %4d %6.2f%%\n",
                             position++,
                             player.getName(),
                             player.getElo(),
