@@ -49,11 +49,11 @@ public class Player {
     }
     
     /**
-     * Obtiene el Win Rate formateado como String sin decimales.
-     * @return Win Rate formateado
+     * Obtiene el Win Rate formateado como String con dos decimales.
+     * @return Win Rate formateado (ej: "65.50%")
      */
     public String getWinRateFormatted() {
-        return String.format("%.0f%%", getWinRate());
+        return String.format("%.2f%%", getWinRate());
     }
 
     public String PrintStats() {

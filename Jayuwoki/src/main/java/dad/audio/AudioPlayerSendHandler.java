@@ -29,8 +29,20 @@ public class AudioPlayerSendHandler implements AudioSendHandler {
 
     @Override
     public ByteBuffer provide20MsAudio() {
+        // Flip the buffer to prepare for reading.
         buffer.flip();
-        return buffer;
+
+        // Copy the valid bytes into a new array-backed ByteBuffer because
+        // JDA requires a ByteBuffer with a backing array (hasArray()==true).
+        int length = buffer.remaining();
+        byte[] data = new byte[length];
+        buffer.get(data);
+
+        // Clear the original buffer so MutableAudioFrame can reuse it.
+        buffer.clear();
+
+        // Return an array-backed ByteBuffer containing only the valid bytes.
+        return ByteBuffer.wrap(data);
     }
 
     @Override
