@@ -9,7 +9,8 @@
 - `$dropPrivadita` - Cancela la privadita actual
 - `$verElo` - Muestra ranking completo ordenado por Elo
 - `$verElo <nombre>` - Muestra estadísticas de un jugador
-- `$csvTemporada [número]` - CSV de una temporada terminada (sin número: la última)
+- `$historico` - Temporadas pasadas y campeones
+- `$verTemporada [n]` / `$csvTemporada [n]` - Tabla o CSV de una temporada
 
 ## 🎵 Sistema de Música (YouTube, SoundCloud, etc.)
 - `$play <URL o búsqueda>` - Reproduce música o añade a la cola
@@ -35,7 +36,7 @@
 
 ---
 
-📅 Temporadas de 3 meses desde el 23/11/2026: al acabar se guarda un CSV y se reinicia el Elo.
+📅 Temporadas de 3 meses desde el 23/11/2026; al acabar se reinicia el Elo.
 
 💡 **Tip:** El sistema detecta y corrige automáticamente bugs de Elo (jugadores con Elo anómalo por bugs se resetean a 1000 automáticamente)
 

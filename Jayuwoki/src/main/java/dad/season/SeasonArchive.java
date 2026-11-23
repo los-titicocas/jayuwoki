@@ -105,4 +105,19 @@ public class SeasonArchive {
         String text = new String(Files.readAllBytes(file), java.nio.charset.StandardCharsets.UTF_8);
         return text.startsWith("\uFEFF") ? text.substring(1) : text;
     }
+
+    /** Temporadas con CSV en la caché local. */
+    public java.util.List<Long> listSeasons(String guildId) {
+        java.util.List<Long> seasons = new java.util.ArrayList<>();
+        File[] files = guildDir(guildId).toFile().listFiles();
+        if (files != null) {
+            for (File f : files) {
+                Matcher m = FILE.matcher(f.getName());
+                if (m.matches()) {
+                    seasons.add(Long.parseLong(m.group(1)));
+                }
+            }
+        }
+        return seasons;
+    }
 }

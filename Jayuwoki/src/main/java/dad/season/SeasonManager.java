@@ -219,4 +219,18 @@ public class SeasonManager {
         }
         return OptionalLong.of(Math.max(remote.getAsLong(), local.getAsLong()));
     }
+
+    /** Contenido del CSV de una temporada cerrada (caché local o Firestore). */
+    public Optional<String> readCsv(String guildId, long season) throws Exception {
+        Optional<Path> file = findCsv(guildId, season);
+        return file.isPresent() ? Optional.of(archive.readCsv(file.get())) : Optional.empty();
+    }
+
+    /** Temporadas cerradas con clasificación guardada, de la más reciente a la más antigua. */
+    public List<Long> archivedSeasons(String guildId) throws Exception {
+        java.util.TreeSet<Long> all = new java.util.TreeSet<>(java.util.Comparator.reverseOrder());
+        all.addAll(store.listArchivedSeasons(guildId));
+        all.addAll(archive.listSeasons(guildId));
+        return new java.util.ArrayList<>(all);
+    }
 }

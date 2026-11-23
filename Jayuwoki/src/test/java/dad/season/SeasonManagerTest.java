@@ -266,4 +266,27 @@ class SeasonManagerTest {
         assertTrue(store.readArchivedCsv(G, 0).orElseThrow().contains("ana,1120"));
         assertEquals(1, store.states.get(G).currentSeason());
     }
+
+    @Test
+    void elHistoricoListaLasTemporadasYSeLeeSuClasificacion() throws Exception {
+        today.set(LocalDate.of(2026, 11, 23));
+        SeasonManager bot = arrancarBot();
+        bot.ensureCurrent(G);
+        store.putPlayer(G, "luis", 1040, 3, 0);
+        today.set(LocalDate.of(2027, 2, 23));
+        bot.ensureCurrent(G);
+
+        assertEquals(List.of(1L, 0L), bot.archivedSeasons(G));
+        List<SeasonCsv.Row> t0 = SeasonCsv.parse(bot.readCsv(G, 0).orElseThrow());
+        assertEquals(new SeasonCsv.Row("ana", 1120, 7, 3), t0.get(0));
+        List<SeasonCsv.Row> t1 = SeasonCsv.parse(bot.readCsv(G, 1).orElseThrow());
+        assertEquals(new SeasonCsv.Row("luis", 1040, 3, 0), t1.get(0));
+        assertTrue(bot.readCsv(G, 7).isEmpty());
+
+        // Sin caché local (otro equipo): se lee igual desde la base de datos
+        Files.delete(archive.find(G, 1).orElseThrow());
+        SeasonManager otro = new SeasonManager(store, new SeasonArchive(Files.createTempDirectory("vacio")), today::get);
+        assertEquals(List.of(1L, 0L), otro.archivedSeasons(G));
+        assertEquals(t1, SeasonCsv.parse(otro.readCsv(G, 1).orElseThrow()));
+    }
 }

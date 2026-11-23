@@ -55,4 +55,7 @@ public interface SeasonStore {
 
     /** Última temporada con CSV guardado. */
     OptionalLong latestArchivedSeason(String guildId) throws Exception;
+
+    /** Todas las temporadas con CSV guardado. */
+    List<Long> listArchivedSeasons(String guildId) throws Exception;
 }

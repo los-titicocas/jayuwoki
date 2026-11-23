@@ -225,4 +225,16 @@ public class FirestoreSeasonStore implements SeasonStore {
         }
         return OptionalLong.of(docs.get(0).getLong("season"));
     }
+
+    @Override
+    public List<Long> listArchivedSeasons(String guildId) throws Exception {
+        List<Long> seasons = new ArrayList<>();
+        for (QueryDocumentSnapshot doc : archive(guildId).select("season").get().get().getDocuments()) {
+            Long n = doc.getLong("season");
+            if (n != null) {
+                seasons.add(n);
+            }
+        }
+        return seasons;
+    }
 }

@@ -34,9 +34,15 @@ public final class SeasonCsv {
     private SeasonCsv() {
     }
 
-    public static String build(List<Row> rows) {
+    /** Filas ordenadas según la clasificación. */
+    public static List<Row> rank(List<Row> rows) {
         List<Row> sorted = new ArrayList<>(rows);
         sorted.sort(RANKING);
+        return sorted;
+    }
+
+    public static String build(List<Row> rows) {
+        List<Row> sorted = rank(rows);
         StringBuilder sb = new StringBuilder(HEADER).append("\r\n");
         int position = 1;
         for (Row r : sorted) {
@@ -72,5 +78,66 @@ public final class SeasonCsv {
             v = "\"" + v.replace("\"", "\"\"") + "\"";
         }
         return v;
+    }
+
+    /**
+     * Lee un CSV generado por {@link #build} y devuelve las filas en el orden del archivo (ya viene ordenado
+     * por la clasificación). Tolera BOM, saltos CRLF/LF, campos entre comillas y el apóstrofo anti-fórmulas.
+     */
+    public static List<Row> parse(String csv) {
+        List<Row> rows = new ArrayList<>();
+        if (csv == null) {
+            return rows;
+        }
+        String text = csv.startsWith("\uFEFF") ? csv.substring(1) : csv;
+        String[] lines = text.split("\r?\n");
+        for (int i = 1; i < lines.length; i++) { // la 0 es la cabecera
+            if (lines[i].isBlank()) {
+                continue;
+            }
+            List<String> f = splitLine(lines[i]);
+            if (f.size() < 5) {
+                continue;
+            }
+            String name = f.get(1);
+            if (name.length() > 1 && name.charAt(0) == '\'' && "=+-@\t\r".indexOf(name.charAt(1)) >= 0) {
+                name = name.substring(1);
+            }
+            try {
+                rows.add(new Row(name, Integer.parseInt(f.get(2).trim()),
+                        Integer.parseInt(f.get(3).trim()), Integer.parseInt(f.get(4).trim())));
+            } catch (NumberFormatException e) {
+                // fila corrupta: se ignora
+            }
+        }
+        return rows;
+    }
+
+    private static List<String> splitLine(String line) {
+        List<String> out = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        boolean quoted = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (quoted) {
+                if (c == '"' && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    cur.append('"');
+                    i++;
+                } else if (c == '"') {
+                    quoted = false;
+                } else {
+                    cur.append(c);
+                }
+            } else if (c == '"') {
+                quoted = true;
+            } else if (c == ',') {
+                out.add(cur.toString());
+                cur.setLength(0);
+            } else {
+                cur.append(c);
+            }
+        }
+        out.add(cur.toString());
+        return out;
     }
 }

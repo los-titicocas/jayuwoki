@@ -92,4 +92,9 @@ class InMemorySeasonStore implements SeasonStore {
         TreeMap<Long, String> m = archives.get(guildId);
         return m == null || m.isEmpty() ? OptionalLong.empty() : OptionalLong.of(m.lastKey());
     }
+
+    @Override
+    public synchronized List<Long> listArchivedSeasons(String guildId) {
+        return new ArrayList<>(archives.getOrDefault(guildId, new TreeMap<>()).keySet());
+    }
 }
