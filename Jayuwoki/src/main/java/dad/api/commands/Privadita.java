@@ -18,6 +18,35 @@ public class Privadita {
   private ListProperty<Player> players = new SimpleListProperty<>(FXCollections.observableArrayList());
   private StringProperty server = new SimpleStringProperty();
   private final ArrayList<String> roles = new ArrayList<>(List.of("Top", "Jungla", "Mid", "ADC", "Support"));
+  // true solo si se validaron los jugadores y se hicieron los equipos (10 jugadores: 0-4 Blue, 5-9 Red)
+  private boolean valid = false;
+
+  /** Equipo ganador de una privadita. */
+  public enum Team {
+    BLUE, RED;
+
+    /**
+     * Normaliza la entrada del usuario: ignora espacios y mayúsculas/minúsculas
+     * ("red", "RED", " Blue ", "bLuE"...). Devuelve vacío si no es un equipo válido (o es null).
+     */
+    public static Optional<Team> parse(String input) {
+      if (input == null) {
+        return Optional.empty();
+      }
+      switch (input.trim().toLowerCase(Locale.ROOT)) {
+        case "blue":
+          return Optional.of(BLUE);
+        case "red":
+          return Optional.of(RED);
+        default:
+          return Optional.empty();
+      }
+    }
+  }
+
+  /** Copia de elo/wins/losses de un jugador, para poder deshacer un resultado si falla el guardado. */
+  public record StatsSnapshot(Player player, int elo, int wins, int losses) {
+  }
 
   // Helper class to store team split
   private static class TeamSplit {
@@ -42,6 +71,12 @@ public class Privadita {
 
     // Start the match setup
     StartPrivadita(event);
+  }
+
+  /** Solo para tests: privadita ya formada (0-4 Blue, 5-9 Red), sin evento de Discord. */
+  Privadita(List<Player> orderedPlayers) {
+    this.players.addAll(orderedPlayers);
+    this.valid = orderedPlayers.size() == 10;
   }
 
   // java
@@ -149,6 +184,7 @@ public class Privadita {
 
     messageBuilder.append("```");
     event.getChannel().sendMessage(messageBuilder.toString()).queue();
+    valid = true;
   }
 
 
@@ -228,75 +264,120 @@ public class Privadita {
     return true;
   }
 
+  /**
+   * Versión original del comando (valida, aplica y envía el mensaje). Se mantiene por compatibilidad;
+   * Commands usa ahora {@link Team#parse(String)} + {@link #aplicarResultado(Team)} para poder guardar en
+   * la base de datos antes de anunciar y deshacer si algo falla.
+   */
   public void ResultadoPrivadita(String ganador, MessageReceivedEvent event) {
+    Optional<Team> team = Team.parse(ganador);
+    if (team.isEmpty()) {
+      event.getChannel().sendMessage("Pon el equipo bien tolete").queue();
+      return;
+    }
+    event.getChannel().sendMessage(aplicarResultado(team.get())).queue();
+  }
+
+  /**
+   * Aplica el resultado: suma victorias/derrotas y actualiza el Elo de los 10 jugadores.
+   * Primero valida y calcula todos los Elo nuevos y SOLO después modifica a los jugadores, para que un error
+   * nunca deje la privadita a medias (con unos jugadores actualizados y otros no).
+   *
+   * @return el mensaje con los cambios de Elo para enviar al chat
+   * @throws IllegalStateException si la privadita no tiene 10 jugadores válidos
+   */
+  public String aplicarResultado(Team ganador) {
+    Objects.requireNonNull(ganador, "ganador");
+    List<Player> lista = players.get() == null ? List.of() : new ArrayList<>(players.get());
+    if (lista.size() != 10 || lista.contains(null)) {
+      throw new IllegalStateException("La privadita no tiene 10 jugadores válidos (tiene " + lista.size() + ")");
+    }
+
     System.out.println("Elo de todos los jugadores:");
-    for (Player p : players) {
+    for (Player p : lista) {
       System.out.println(p.getName() + " - Elo: " + p.getElo());
     }
 
-    double averageEloEquipo1 = players.subList(0, 5).stream()
-            .mapToInt(Player::getElo)
-            .average()
-            .orElse(0);
+    double averageEloEquipo1 = lista.subList(0, 5).stream().mapToInt(Player::getElo).average().orElse(0); // Blue
+    double averageEloEquipo2 = lista.subList(5, 10).stream().mapToInt(Player::getElo).average().orElse(0); // Red
 
-    double averageEloEquipo2 = players.subList(5, 10).stream()
-            .mapToInt(Player::getElo)
-            .average()
-            .orElse(0);
+    boolean blueGana = ganador == Team.BLUE;
+    List<Player> ganadores = blueGana ? lista.subList(0, 5) : lista.subList(5, 10);
+    List<Player> perdedores = blueGana ? lista.subList(5, 10) : lista.subList(0, 5);
+    double eloRivalDeGanadores = blueGana ? averageEloEquipo2 : averageEloEquipo1;
+    double eloRivalDePerdedores = blueGana ? averageEloEquipo1 : averageEloEquipo2;
 
-    StringBuilder messageBuilder = new StringBuilder();
-    messageBuilder.append("Resultado de la partida:\n");
-
-    switch (ganador) {
-      case "blue":
-        messageBuilder.append("\n🏆 **Equipo Azul ha ganado!** 🏆\n");
-        break;
-      case "red":
-        messageBuilder.append("\n🔥 **Equipo Rojo ha ganado!** 🔥\n");
-        break;
-      default:
-        event.getChannel().sendMessage("Pon el equipo bien tolete").queue();
-        return;
+    // 1) Calcular sin tocar a los jugadores (misma fórmula que Player.ActualizarElo)
+    int[] nuevoEloGanador = new int[5];
+    int[] nuevoEloPerdedor = new int[5];
+    for (int i = 0; i < 5; i++) {
+      nuevoEloGanador[i] = eloTrasPartida(ganadores.get(i).getElo(), eloRivalDeGanadores, true);
+      nuevoEloPerdedor[i] = eloTrasPartida(perdedores.get(i).getElo(), eloRivalDePerdedores, false);
     }
 
+    // 2) Aplicar y construir el mensaje (mismo formato que antes)
+    StringBuilder messageBuilder = new StringBuilder();
+    messageBuilder.append("Resultado de la partida:\n");
+    messageBuilder.append(blueGana
+            ? "\n🏆 **Equipo Azul ha ganado!** 🏆\n"
+            : "\n🔥 **Equipo Rojo ha ganado!** 🔥\n");
     messageBuilder.append("```\n**Cambios de Elo:**\n");
 
     for (int i = 0; i < 5; i++) {
-      if (ganador.equals("blue")) {
-        players.get(i).setWins(players.get(i).getWins() + 1);
-        players.get(i + 5).setLosses(players.get(i + 5).getLosses() + 1);
-        int oldEloWin = players.get(i).getElo();
-        int oldEloLose = players.get(i + 5).getElo();
-        players.get(i).ActualizarElo(averageEloEquipo2, true);
-        players.get(i + 5).ActualizarElo(averageEloEquipo1, false);
+      Player ganadorI = ganadores.get(i);
+      Player perdedorI = perdedores.get(i);
+      int oldEloWin = ganadorI.getElo();
+      int oldEloLose = perdedorI.getElo();
 
-        messageBuilder.append(players.get(i).getName()).append(": ")
-                .append(oldEloWin).append(" ➝ ").append(players.get(i).getElo())
-                .append(" (+").append(players.get(i).getElo() - oldEloWin).append(")\n");
+      ganadorI.setWins(ganadorI.getWins() + 1);
+      ganadorI.setElo(nuevoEloGanador[i]);
+      perdedorI.setLosses(perdedorI.getLosses() + 1);
+      perdedorI.setElo(nuevoEloPerdedor[i]);
 
-        messageBuilder.append(players.get(i + 5).getName()).append(": ")
-                .append(oldEloLose).append(" ➝ ").append(players.get(i + 5).getElo())
-                .append(" (").append(players.get(i + 5).getElo() - oldEloLose).append(")\n");
-      } else {
-        players.get(i + 5).setWins(players.get(i + 5).getWins() + 1);
-        players.get(i).setLosses(players.get(i).getLosses() + 1);
-        int oldEloWin = players.get(i + 5).getElo();
-        int oldEloLose = players.get(i).getElo();
-        players.get(i + 5).ActualizarElo(averageEloEquipo1, true);
-        players.get(i).ActualizarElo(averageEloEquipo2, false);
+      messageBuilder.append(ganadorI.getName()).append(": ")
+              .append(oldEloWin).append(" ➝ ").append(ganadorI.getElo())
+              .append(" (+").append(ganadorI.getElo() - oldEloWin).append(")\n");
 
-        messageBuilder.append(players.get(i + 5).getName()).append(": ")
-                .append(oldEloWin).append(" ➝ ").append(players.get(i + 5).getElo())
-                .append(" (+").append(players.get(i + 5).getElo() - oldEloWin).append(")\n");
-
-        messageBuilder.append(players.get(i).getName()).append(": ")
-                .append(oldEloLose).append(" ➝ ").append(players.get(i).getElo())
-                .append(" (").append(players.get(i).getElo() - oldEloLose).append(")\n");
-      }
+      messageBuilder.append(perdedorI.getName()).append(": ")
+              .append(oldEloLose).append(" ➝ ").append(perdedorI.getElo())
+              .append(" (").append(perdedorI.getElo() - oldEloLose).append(")\n");
     }
 
     messageBuilder.append("```");
-    event.getChannel().sendMessage(messageBuilder.toString()).queue();
+    return messageBuilder.toString();
+  }
+
+  private static int eloTrasPartida(int elo, double eloMedioRival, boolean gana) {
+    Player copia = new Player();
+    copia.setElo(elo);
+    copia.ActualizarElo(eloMedioRival, gana);
+    return copia.getElo();
+  }
+
+  /** Guarda elo/wins/losses actuales de los jugadores (para deshacer con {@link #restoreStats}). */
+  public List<StatsSnapshot> snapshotStats() {
+    List<StatsSnapshot> snapshot = new ArrayList<>();
+    if (players.get() != null) {
+      for (Player p : players.get()) {
+        if (p != null) {
+          snapshot.add(new StatsSnapshot(p, p.getElo(), p.getWins(), p.getLosses()));
+        }
+      }
+    }
+    return snapshot;
+  }
+
+  public static void restoreStats(List<StatsSnapshot> snapshot) {
+    for (StatsSnapshot s : snapshot) {
+      s.player().setElo(s.elo());
+      s.player().setWins(s.wins());
+      s.player().setLosses(s.losses());
+    }
+  }
+
+  /** false si el comando $privadita no pasó la validación (nombres repetidos, etc.). */
+  public boolean isValid() {
+    return valid;
   }
 
   public MessageReceivedEvent getEvent() {

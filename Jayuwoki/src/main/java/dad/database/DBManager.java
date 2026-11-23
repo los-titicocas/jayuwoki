@@ -376,8 +376,9 @@ public class DBManager {
      * 
      * @param event Evento de Discord para obtener el servidor
      * @param players Lista de jugadores con datos actualizados
+     * @return true si se guardaron; false si falló la escritura (no se ha guardado nada: es un batch)
      */
-    public void updatePlayers(MessageReceivedEvent event, javafx.collections.ObservableList<Player> players) {
+    public boolean updatePlayers(MessageReceivedEvent event, javafx.collections.ObservableList<Player> players) {
         String guildId = event.getGuild().getId(); // ✨ Usar Guild ID
         System.out.println("Actualizando jugadores en servidor: " + event.getGuild().getName() + " (" + guildId + ")");
 
@@ -400,9 +401,11 @@ public class DBManager {
         try {
             batch.commit().get();
             System.out.println("✅ Jugadores actualizados en servidor: " + event.getGuild().getName());
+            return true;
         } catch (Exception e) {
             System.out.println("❌ Error al actualizar jugadores en servidor: " + event.getGuild().getName());
             e.printStackTrace();
+            return false;
         }
     }
 

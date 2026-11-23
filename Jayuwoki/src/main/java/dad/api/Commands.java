@@ -68,6 +68,16 @@ public class Commands extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        try {
+            processMessage(event);
+        } catch (Exception e) {
+            // Red de seguridad: ningún comando debe quedarse a medias sin responder
+            e.printStackTrace();
+            event.getChannel().sendMessage("❌ **Ha ocurrido un error inesperado al ejecutar el comando.** Inténtalo de nuevo.").queue();
+        }
+    }
+
+    private void processMessage(MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
         if (message.startsWith("$")) {
             dbManager.setEvent(event);
@@ -102,7 +112,11 @@ public class Commands extends ListenerAdapter {
                         if (players.size() == 10) {
                             // ✅ ACTUALIZAR: Crear y guardar privadita en DBManager
                             Privadita nuevaPrivadita = new Privadita(players, event);
-                            dbManager.setActivePrivadita(event, nuevaPrivadita);
+                            // Solo se guarda si pasó la validación (nombres repetidos, etc.); si no, quedaría
+                            // una privadita rota que haría fallar $resultadoPrivadita
+                            if (nuevaPrivadita.isValid()) {
+                                dbManager.setActivePrivadita(event, nuevaPrivadita);
+                            }
                             
                             // event.getChannel().sendMessage(nuevaPrivadita.toString()).queue();
                         } else {
@@ -115,25 +129,8 @@ public class Commands extends ListenerAdapter {
 
                 // Set the winner of the privadita
                 case "$resultadoPrivadita":
-                    if (comando.length < 2) {
-                        event.getChannel().sendMessage("❌ **Uso:** `$resultadoPrivadita <blue|red>`").queue();
-                        break;
-                    }
-                    
-                    // ✅ ACTUALIZAR: Obtener privadita desde DBManager
-                    if (!dbManager.hasActivePrivadita(event)) {
-                        event.getChannel().sendMessage("❌ **No hay ninguna privadita activa en este servidor.**").queue();
-                        break;
-                    }
-                    
-                    Privadita privaditaResultado = dbManager.getActivePrivadita(event);
-                    privaditaResultado.ResultadoPrivadita(comando[1], event);
-                    
-                    // Actualizar jugadores en Firebase
-                    dbManager.updatePlayers(event, privaditaResultado.getPlayers());
-                    
-                    // Limpiar privadita
-                    dbManager.clearActivePrivadita(event);
+                case "$resultadoprivadita":
+                    handleResultadoPrivadita(event, comando);
                     break;
 
                 // Remove the current privadita
@@ -408,6 +405,71 @@ public class Commands extends ListenerAdapter {
                     event.getChannel().sendMessage("❌ **Comando no encontrado.** Usa `$help` para ver los comandos disponibles.").queue();
             }
         }
+    }
+
+    /**
+     * $resultadoPrivadita <blue|red>
+     * - El equipo se normaliza (espacios y mayúsculas/minúsculas) ANTES de tocar nada.
+     * - Una entrada inválida no cancela la privadita: se puede volver a mandar el resultado correcto.
+     * - El resultado se calcula, se guarda en Firebase y solo entonces se anuncia y se limpia la privadita.
+     *   Si algo falla, se deshacen los cambios en memoria y la privadita sigue activa para reintentar.
+     */
+    private void handleResultadoPrivadita(MessageReceivedEvent event, String[] comando) {
+        String arg = firstArgument(comando);
+        if (arg == null) {
+            event.getChannel().sendMessage("❌ **Uso:** `$resultadoPrivadita <blue|red>`").queue();
+            return;
+        }
+        Optional<Privadita.Team> ganador = Privadita.Team.parse(arg);
+        if (ganador.isEmpty()) {
+            event.getChannel().sendMessage("❌ **Equipo no válido:** `" + sanitize(arg) + "`. Usa `$resultadoPrivadita blue` o "
+                    + "`$resultadoPrivadita red` (da igual mayúsculas o minúsculas). La privadita sigue activa.").queue();
+            return;
+        }
+
+        if (!dbManager.hasActivePrivadita(event)) {
+            event.getChannel().sendMessage("❌ **No hay ninguna privadita activa en este servidor.**").queue();
+            return;
+        }
+        Privadita privadita = dbManager.getActivePrivadita(event);
+        List<Privadita.StatsSnapshot> antes = privadita.snapshotStats();
+        try {
+            String resultado = privadita.aplicarResultado(ganador.get());
+
+            if (!dbManager.updatePlayers(event, privadita.getPlayers())) {
+                Privadita.restoreStats(antes);
+                event.getChannel().sendMessage("❌ **No se pudo guardar el resultado en la base de datos.** "
+                        + "No se ha registrado nada y la privadita sigue activa: vuelve a usar `$resultadoPrivadita <blue|red>`.").queue();
+                return;
+            }
+
+            dbManager.clearActivePrivadita(event);
+            event.getChannel().sendMessage(resultado).queue();
+        } catch (Exception e) {
+            Privadita.restoreStats(antes);
+            e.printStackTrace();
+            event.getChannel().sendMessage("❌ **Error al registrar el resultado:** " + sanitize(describe(e)) + "\n"
+                    + "No se ha registrado nada y la privadita sigue activa. Vuelve a intentarlo o usa `$dropPrivadita`.").queue();
+        }
+    }
+
+    /** Primer argumento no vacío (tolera dobles espacios: "$resultadoPrivadita   red"). */
+    private static String firstArgument(String[] comando) {
+        for (int i = 1; i < comando.length; i++) {
+            String t = comando[i].trim();
+            if (!t.isEmpty()) {
+                return t.split("\\s+")[0];
+            }
+        }
+        return null;
+    }
+    private static String describe(Throwable e) {
+        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+    }
+    /** Evita que un texto del usuario rompa el formato o mencione a @everyone. */
+    private static String sanitize(String text) {
+        String t = text.replace("`", "").replace("@", "");
+        return t.length() > 60 ? t.substring(0, 60) + "…" : t;
     }
 
     public boolean checkCommandActive(MessageReceivedEvent event, String commandName) {
