@@ -234,6 +234,20 @@ public class DBManager {
                           " (" + event.getGuild().getId() + ")");
     }
 
+    /**
+     * Elimina la privadita activa de un servidor a partir de su ID (sin evento de Discord).
+     * Lo usa el cambio de temporada: una privadita empezada con los Elo de la temporada anterior
+     * no debe registrarse en la nueva.
+     * @param guildId ID del servidor
+     * @return true si había una privadita activa
+     */
+    public boolean clearActivePrivadita(String guildId) {
+        ServerState state = getServerState(guildId);
+        boolean had = state.hasActivePrivadita();
+        state.clearPrivadita();
+        return had;
+    }
+
     // ==================== MÉTODOS DE JUGADORES ====================
 
     /**

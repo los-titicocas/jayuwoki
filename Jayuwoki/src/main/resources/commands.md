@@ -34,6 +34,8 @@
 
 ---
 
+📅 Temporadas de 3 meses desde el 23/11/2026: al acabar se guarda un CSV y se reinicia el Elo.
+
 💡 **Tip:** El sistema detecta y corrige automáticamente bugs de Elo (jugadores con Elo anómalo por bugs se resetean a 1000 automáticamente)
 
 🎵 **Fuentes soportadas:** YouTube (no funcha), SoundCloud, Bandcamp, Vimeo, Twitch, archivos HTTP

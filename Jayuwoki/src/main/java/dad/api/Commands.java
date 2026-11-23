@@ -7,6 +7,11 @@ import dad.audio.PlayerManager;
 import dad.audio.GuildMusicManager;
 import dad.database.DBManager;
 import dad.database.Player;
+import dad.season.FirestoreSeasonStore;
+import dad.season.SeasonArchive;
+import dad.season.SeasonCalendar;
+import dad.season.SeasonManager;
+import dad.season.SeasonScheduler;
 import dad.utils.Utils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import javafx.beans.property.BooleanProperty;
@@ -17,9 +22,11 @@ import javafx.collections.FXCollections;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +45,7 @@ import java.io.IOException;
 
 
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
@@ -54,9 +62,38 @@ public class Commands extends ListenerAdapter {
     // define the state of the command
     private final BooleanProperty isActive = new SimpleBooleanProperty(true);
 
+    /** Comandos que leen o escriben Elo: antes de ejecutarlos se comprueba si toca cambiar de temporada. */
+    private static final Set<String> SEASON_COMMANDS = Set.of(
+            "$privadita", "$resultadoPrivadita", "$resultadoprivadita", "$verElo", "$verEscalera",
+            "$addPlayer", "$addPlayers", "$deletePlayer", "$adminResetElo", "$adminresetelo");
+
+    /** Canal de Discord donde se anuncia el fin de temporada (sobrescribible con season.announceChannelId). */
+    private static final String DEFAULT_SEASON_ANNOUNCE_CHANNEL = "1309584794744524910";
+
+    // Sistema de temporadas (null si Firebase no se pudo inicializar)
+    private SeasonManager seasonManager;
+    private SeasonScheduler seasonScheduler;
+
     public Commands() {
         Utils.loadProperties();
         loadCommandStatus();
+        initSeasons();
+    }
+
+    /**
+     * Arranca el sistema de temporadas: la comprobación de fechas corre en segundo plano (no depende de que
+     * nadie use un comando) y usa siempre la conexión JDA actual, así que sobrevive a reconexiones.
+     */
+    private void initSeasons() {
+        if (dbManager.getDb() == null) {
+            System.err.println("⚠️ [Temporadas] Firebase no está disponible: el sistema de temporadas queda desactivado.");
+            return;
+        }
+        SeasonArchive archive = new SeasonArchive(SeasonArchive.defaultDir(Utils.properties.getProperty("season.archiveDir")));
+        seasonManager = new SeasonManager(new FirestoreSeasonStore(dbManager.getDb()), archive, SeasonCalendar::today);
+        seasonManager.setListener(this::onSeasonClosed);
+        seasonScheduler = new SeasonScheduler(seasonManager, this::getJda);
+        seasonScheduler.start();
     }
 
     // checks if the commands are active
@@ -64,6 +101,14 @@ public class Commands extends ListenerAdapter {
         // fill with the commands
         boolean rollaDieActive = Boolean.parseBoolean(Utils.properties.getProperty("rollaDie", "true"));
         setIsActive(rollaDieActive);
+    }
+
+    /** En cuanto Discord está listo se comprueba la temporada, sin esperar al primer ciclo del planificador. */
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
+        if (seasonScheduler != null) {
+            seasonScheduler.checkNow();
+        }
     }
 
     @Override
@@ -91,40 +136,17 @@ public class Commands extends ListenerAdapter {
             logs.add(logEntry);
 
             // Switch with all the possible commands
+            // Si ha terminado la temporada, se cierra ANTES de responder: nunca se muestran ni se
+            // modifican datos de la temporada anterior
+            if (SEASON_COMMANDS.contains(comando[0])) {
+                ensureSeasonUpToDate(event);
+            }
+
             switch (comando[0]) {
 
                 // Start a privadita
                 case "$privadita":
-                    // ✅ ACTUALIZAR: Verificar privadita activa usando DBManager
-                    if (dbManager.hasActivePrivadita(event)) {
-                        event.getChannel().sendMessage("❌ **Ya hay una privadita activa en este servidor.**\n" +
-                                "Usa `$dropPrivadita` para cancelarla primero.").queue();
-                    } else if (comando.length == 11) {
-                        // ✅ Normalizar nombres de jugadores
-                        String[] normalizedNames = new String[10];
-                        for (int i = 0; i < 10; i++) {
-                            normalizedNames[i] = comando[i + 1].toLowerCase().trim();
-                        }
-                        
-                        // Obtener jugadores desde la base de datos usando DBManager
-                        List<Player> players = dbManager.GetPlayers(normalizedNames, event);
-
-                        if (players.size() == 10) {
-                            // ✅ ACTUALIZAR: Crear y guardar privadita en DBManager
-                            Privadita nuevaPrivadita = new Privadita(players, event);
-                            // Solo se guarda si pasó la validación (nombres repetidos, etc.); si no, quedaría
-                            // una privadita rota que haría fallar $resultadoPrivadita
-                            if (nuevaPrivadita.isValid()) {
-                                dbManager.setActivePrivadita(event, nuevaPrivadita);
-                            }
-                            
-                            // event.getChannel().sendMessage(nuevaPrivadita.toString()).queue();
-                        } else {
-                            event.getChannel().sendMessage("❌ **Uno o más jugadores no fueron encontrados en la base de datos de este servidor.**").queue();
-                        }
-                    } else {
-                        event.getChannel().sendMessage("❌ **El comando $privadita necesita 10 jugadores.**").queue();
-                    }
+                    runSeasonLocked(event, () -> handlePrivadita(event, comando));
                     break;
 
                 // Set the winner of the privadita
@@ -407,6 +429,40 @@ public class Commands extends ListenerAdapter {
         }
     }
 
+    // Start a privadita
+    private void handlePrivadita(MessageReceivedEvent event, String[] comando) {
+        // ✅ ACTUALIZAR: Verificar privadita activa usando DBManager
+        if (dbManager.hasActivePrivadita(event)) {
+            event.getChannel().sendMessage("❌ **Ya hay una privadita activa en este servidor.**\n" +
+                    "Usa `$dropPrivadita` para cancelarla primero.").queue();
+        } else if (comando.length == 11) {
+            // ✅ Normalizar nombres de jugadores
+            String[] normalizedNames = new String[10];
+            for (int i = 0; i < 10; i++) {
+                normalizedNames[i] = comando[i + 1].toLowerCase().trim();
+            }
+            
+            // Obtener jugadores desde la base de datos usando DBManager
+            List<Player> players = dbManager.GetPlayers(normalizedNames, event);
+
+            if (players.size() == 10) {
+                // ✅ ACTUALIZAR: Crear y guardar privadita en DBManager
+                Privadita nuevaPrivadita = new Privadita(players, event);
+                // Solo se guarda si pasó la validación (nombres repetidos, etc.); si no, quedaría
+                // una privadita rota que haría fallar $resultadoPrivadita
+                if (nuevaPrivadita.isValid()) {
+                    dbManager.setActivePrivadita(event, nuevaPrivadita);
+                }
+                
+                // event.getChannel().sendMessage(nuevaPrivadita.toString()).queue();
+            } else {
+                event.getChannel().sendMessage("❌ **Uno o más jugadores no fueron encontrados en la base de datos de este servidor.**").queue();
+            }
+        } else {
+            event.getChannel().sendMessage("❌ **El comando $privadita necesita 10 jugadores.**").queue();
+        }
+    }
+
     /**
      * $resultadoPrivadita <blue|red>
      * - El equipo se normaliza (espacios y mayúsculas/minúsculas) ANTES de tocar nada.
@@ -427,30 +483,131 @@ public class Commands extends ListenerAdapter {
             return;
         }
 
-        if (!dbManager.hasActivePrivadita(event)) {
-            event.getChannel().sendMessage("❌ **No hay ninguna privadita activa en este servidor.**").queue();
-            return;
-        }
-        Privadita privadita = dbManager.getActivePrivadita(event);
-        List<Privadita.StatsSnapshot> antes = privadita.snapshotStats();
-        try {
-            String resultado = privadita.aplicarResultado(ganador.get());
-
-            if (!dbManager.updatePlayers(event, privadita.getPlayers())) {
-                Privadita.restoreStats(antes);
-                event.getChannel().sendMessage("❌ **No se pudo guardar el resultado en la base de datos.** "
-                        + "No se ha registrado nada y la privadita sigue activa: vuelve a usar `$resultadoPrivadita <blue|red>`.").queue();
+        runSeasonLocked(event, () -> {
+            if (!dbManager.hasActivePrivadita(event)) {
+                event.getChannel().sendMessage("❌ **No hay ninguna privadita activa en este servidor.**").queue();
                 return;
             }
+            Privadita privadita = dbManager.getActivePrivadita(event);
+            List<Privadita.StatsSnapshot> antes = privadita.snapshotStats();
+            try {
+                String resultado = privadita.aplicarResultado(ganador.get());
 
-            dbManager.clearActivePrivadita(event);
-            event.getChannel().sendMessage(resultado).queue();
-        } catch (Exception e) {
-            Privadita.restoreStats(antes);
-            e.printStackTrace();
-            event.getChannel().sendMessage("❌ **Error al registrar el resultado:** " + sanitize(describe(e)) + "\n"
-                    + "No se ha registrado nada y la privadita sigue activa. Vuelve a intentarlo o usa `$dropPrivadita`.").queue();
+                if (!dbManager.updatePlayers(event, privadita.getPlayers())) {
+                    Privadita.restoreStats(antes);
+                    event.getChannel().sendMessage("❌ **No se pudo guardar el resultado en la base de datos.** "
+                            + "No se ha registrado nada y la privadita sigue activa: vuelve a usar `$resultadoPrivadita <blue|red>`.").queue();
+                    return;
+                }
+
+                dbManager.clearActivePrivadita(event);
+                event.getChannel().sendMessage(resultado).queue();
+            } catch (Exception e) {
+                Privadita.restoreStats(antes);
+                e.printStackTrace();
+                event.getChannel().sendMessage("❌ **Error al registrar el resultado:** " + sanitize(describe(e)) + "\n"
+                        + "No se ha registrado nada y la privadita sigue activa. Vuelve a intentarlo o usa `$dropPrivadita`.").queue();
+            }
+        });
+    }
+
+    // ==================== TEMPORADAS ====================
+
+
+    /** Se llama al cerrar una temporada (desde el hilo del planificador o desde un comando). */
+    private void onSeasonClosed(String guildId, long closedSeason, long newSeason, Optional<Path> csv) {
+        // Una privadita creada con los Elo de la temporada anterior no debe registrarse en la nueva
+        boolean privaditaCancelada = dbManager.clearActivePrivadita(guildId);
+
+        JDA current = jda;
+        Guild guild = current != null ? current.getGuildById(guildId) : null;
+        if (guild == null) {
+            return;
         }
+        TextChannel channel = seasonAnnounceChannel(guild);
+        if (channel == null) {
+            System.out.println("ℹ️ [Temporadas] " + guild.getName() + ": sin canal donde anunciar el cambio de temporada");
+            return;
+        }
+        StringBuilder msg = new StringBuilder()
+                .append("🏁 **").append(capitalize(seasonName(closedSeason))).append(" terminada.** ")
+                .append("Empieza la **Temporada ").append(newSeason).append("** (")
+                .append(SeasonCalendar.human(SeasonCalendar.startOf(newSeason))).append(" – ")
+                .append(SeasonCalendar.human(SeasonCalendar.lastDay(newSeason))).append(").\n")
+                .append("Elo, victorias y derrotas reiniciados (Elo ").append(FirestoreSeasonStore.DEFAULT_ELO).append(").");
+        if (privaditaCancelada) {
+            msg.append("\n⚠️ La privadita que estaba en curso se ha cancelado por el cambio de temporada.");
+        }
+        if (csv.isPresent()) {
+            msg.append("\n📄 Clasificación final adjunta.");
+            File file = csv.get().toFile();
+            channel.sendMessage(msg.toString()).addFiles(FileUpload.fromData(file, file.getName())).queue();
+        } else {
+            channel.sendMessage(msg.toString()).queue();
+        }
+    }
+
+    /**
+     * Canal donde se anuncia el fin de temporada (con el CSV adjunto).
+     * Por defecto el canal {@link #DEFAULT_SEASON_ANNOUNCE_CHANNEL}; se puede cambiar con la propiedad
+     * {@code season.announceChannelId} de settings.properties (varios IDs separados por comas, uno por servidor).
+     * Si el servidor no tiene ninguno de esos canales, o el bot no puede escribir en él, se usa su canal de sistema.
+     */
+    private TextChannel seasonAnnounceChannel(Guild guild) {
+        String ids = Utils.properties.getProperty("season.announceChannelId", DEFAULT_SEASON_ANNOUNCE_CHANNEL);
+        for (String id : ids.split(",")) {
+            String trimmed = id.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            try {
+                TextChannel configured = guild.getTextChannelById(trimmed);
+                if (configured != null) {
+                    if (configured.canTalk()) {
+                        return configured;
+                    }
+                    System.out.println("⚠️ [Temporadas] " + guild.getName() + ": sin permiso para escribir en #" + configured.getName());
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("⚠️ [Temporadas] season.announceChannelId no válido: '" + trimmed + "'");
+            }
+        }
+        TextChannel system = guild.getSystemChannel();
+        return system != null && system.canTalk() ? system : null;
+    }
+
+    /**
+     * Comprobación al usar comandos de Elo (además del planificador en segundo plano). Si el cambio de
+     * temporada falla, se avisa en el chat en vez de mostrar datos de la temporada anterior sin decir nada.
+     */
+    private void ensureSeasonUpToDate(MessageReceivedEvent event) {
+        if (seasonManager == null) {
+            return;
+        }
+        try {
+            seasonManager.ensureCurrent(event.getGuild().getId());
+        } catch (Exception e) {
+            // No bloquea el comando: el planificador lo reintentará
+            e.printStackTrace();
+            event.getChannel().sendMessage("⚠️ **El cambio de temporada está pendiente** (error: " + sanitize(describe(e))
+                    + "). Se reintentará automáticamente; mientras tanto los datos pueden ser de la temporada anterior.").queue();
+        }
+    }
+
+    private void runSeasonLocked(MessageReceivedEvent event, Runnable action) {
+        if (seasonManager == null) {
+            action.run();
+        } else {
+            seasonManager.runLocked(event.getGuild().getId(), action);
+        }
+    }
+
+    private static String seasonName(long season) {
+        return season == SeasonCalendar.PRESEASON ? "pretemporada" : "Temporada " + season;
+    }
+
+    private static String capitalize(String s) {
+        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 
     /** Primer argumento no vacío (tolera dobles espacios: "$resultadoPrivadita   red"). */
@@ -463,9 +620,11 @@ public class Commands extends ListenerAdapter {
         }
         return null;
     }
+
     private static String describe(Throwable e) {
         return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
     }
+
     /** Evita que un texto del usuario rompa el formato o mencione a @everyone. */
     private static String sanitize(String text) {
         String t = text.replace("`", "").replace("@", "");

@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import java.util.Properties;
 
 public class Utils {
@@ -81,37 +77,11 @@ public class Utils {
     }
 
     /**
-     * Calcula la temporada actual basándose en un inicio fijo (temporada 1 empieza el 2 de noviembre de 2025)
-     * y periodos de 4 meses. Devuelve un encabezado legible con rango y días restantes.
+     * Cabecera de temporada que muestran $verElo y $verElo <nombre>.
+     * Antes calculaba temporadas de 4 meses desde el 2/11/2025; ahora delega en el sistema de temporadas
+     * (Temporada 1 desde el 23/11/2026, 3 meses cada una) para que coincida con los reinicios reales.
      */
     public static String getSeasonHeader() {
-        // Base: la primera temporada (Season 1) empieza el 2 de noviembre de 2025
-        LocalDate baseStart = LocalDate.of(2025, 11, 2);
-        LocalDate today = LocalDate.now();
-
-        // Calcular cuántos meses completos han pasado desde la base (en términos de inicio de mes)
-        long monthsBetween = ChronoUnit.MONTHS.between(baseStart.withDayOfMonth(1), today.withDayOfMonth(1));
-        long periods = monthsBetween >= 0 ? monthsBetween / 4 : (long) Math.floor(monthsBetween / 4.0);
-
-        LocalDate seasonStart = baseStart.plusMonths(periods * 4);
-        LocalDate seasonEnd = seasonStart.plusMonths(4).minusDays(1);
-
-        // Si hoy ya pasó el seasonEnd (caso borde por redondeo), avanzar un periodo
-        if (today.isAfter(seasonEnd)) {
-            periods++;
-            seasonStart = baseStart.plusMonths(periods * 4);
-            seasonEnd = seasonStart.plusMonths(4).minusDays(1);
-        }
-
-        int seasonNumber = (int) (1 + periods);
-
-        long daysLeft = ChronoUnit.DAYS.between(today, seasonEnd) + 1; // incluir día final
-        if (daysLeft < 0) daysLeft = 0;
-
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d MMM yyyy", new Locale("es"));
-        String startStr = seasonStart.format(fmt);
-        String endStr = seasonEnd.format(fmt);
-
-        return String.format("Temporada %d (%s - %s) — %d días restantes", seasonNumber, startStr, endStr, daysLeft);
+        return dad.season.SeasonCalendar.header(dad.season.SeasonCalendar.today());
     }
 }
