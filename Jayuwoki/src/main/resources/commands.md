@@ -9,6 +9,7 @@
 - `$dropPrivadita` - Cancela la privadita actual
 - `$verElo` - Muestra ranking completo ordenado por Elo
 - `$verElo <nombre>` - Muestra estadísticas de un jugador
+- `$csvTemporada [número]` - CSV de una temporada terminada (sin número: la última)
 
 ## 🎵 Sistema de Música (YouTube, SoundCloud, etc.)
 - `$play <URL o búsqueda>` - Reproduce música o añade a la cola

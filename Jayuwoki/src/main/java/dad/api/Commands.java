@@ -65,7 +65,8 @@ public class Commands extends ListenerAdapter {
     /** Comandos que leen o escriben Elo: antes de ejecutarlos se comprueba si toca cambiar de temporada. */
     private static final Set<String> SEASON_COMMANDS = Set.of(
             "$privadita", "$resultadoPrivadita", "$resultadoprivadita", "$verElo", "$verEscalera",
-            "$addPlayer", "$addPlayers", "$deletePlayer", "$adminResetElo", "$adminresetelo");
+            "$csvTemporada", "$csvtemporada", "$addPlayer", "$addPlayers", "$deletePlayer",
+            "$adminResetElo", "$adminresetelo");
 
     /** Canal de Discord donde se anuncia el fin de temporada (sobrescribible con season.announceChannelId). */
     private static final String DEFAULT_SEASON_ANNOUNCE_CHANNEL = "1309584794744524910";
@@ -153,6 +154,12 @@ public class Commands extends ListenerAdapter {
                 case "$resultadoPrivadita":
                 case "$resultadoprivadita":
                     handleResultadoPrivadita(event, comando);
+                    break;
+
+                // Send the CSV of a finished season
+                case "$csvTemporada":
+                case "$csvtemporada":
+                    handleCsvTemporada(event, comando);
                     break;
 
                 // Remove the current privadita
@@ -513,6 +520,77 @@ public class Commands extends ListenerAdapter {
 
     // ==================== TEMPORADAS ====================
 
+    /** $csvTemporada [n] → envía el CSV de la temporada n, o de la última terminada si no se indica. */
+    private void handleCsvTemporada(MessageReceivedEvent event, String[] comando) {
+        if (seasonManager == null) {
+            event.getChannel().sendMessage("❌ **El sistema de temporadas no está disponible** (no hay conexión con la base de datos).").queue();
+            return;
+        }
+        String guildId = event.getGuild().getId();
+        long actual = seasonManager.currentSeasonByDate();
+        String usage = "❌ **Uso:** `$csvTemporada` (última terminada) o `$csvTemporada <número>` — p. ej. `$csvTemporada 1`. "
+                + "La pretemporada es la `0`.";
+
+        long temporada;
+        String arg = firstArgument(comando);
+        if (arg == null) {
+            OptionalLong last;
+            try {
+                last = seasonManager.latestArchivedSeason(guildId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage("❌ **No se pudo consultar el histórico de temporadas:** " + sanitize(describe(e))).queue();
+                return;
+            }
+            if (last.isEmpty()) {
+                event.getChannel().sendMessage("ℹ️ **Todavía no ha terminado ninguna temporada en este servidor.**"
+                        + (actual == SeasonCalendar.PRESEASON
+                            ? " La Temporada 1 empieza el " + SeasonCalendar.human(SeasonCalendar.FIRST_SEASON_START) + "."
+                            : "")).queue();
+                return;
+            }
+            temporada = last.getAsLong();
+        } else {
+            String num = arg.toLowerCase(Locale.ROOT).replaceFirst("^(temporada|t)", "");
+            try {
+                temporada = Long.parseLong(num);
+            } catch (NumberFormatException e) {
+                event.getChannel().sendMessage(usage).queue();
+                return;
+            }
+            if (temporada < 0) {
+                event.getChannel().sendMessage(usage).queue();
+                return;
+            }
+        }
+
+        Optional<Path> csv;
+        try {
+            csv = seasonManager.findCsv(guildId, temporada); // caché local o, si no está, Firestore
+        } catch (Exception e) {
+            e.printStackTrace();
+            event.getChannel().sendMessage("❌ **No se pudo recuperar el CSV:** " + sanitize(describe(e))).queue();
+            return;
+        }
+        if (csv.isEmpty()) {
+            if (temporada > actual) {
+                event.getChannel().sendMessage("⏳ **La " + seasonName(temporada) + " todavía no ha empezado.**").queue();
+            } else if (temporada == actual) {
+                event.getChannel().sendMessage("⏳ **La " + seasonName(temporada) + " todavía no ha terminado** (termina el "
+                        + SeasonCalendar.human(SeasonCalendar.lastDay(temporada)) + ").").queue();
+            } else {
+                event.getChannel().sendMessage("❌ **No hay CSV guardado de la " + seasonName(temporada) + " en este servidor.** "
+                        + "Puede que la temporada terminara sin jugadores registrados.").queue();
+            }
+            return;
+        }
+
+        File file = csv.get().toFile();
+        event.getChannel().sendMessage("📄 **Clasificación final de la " + seasonName(temporada) + "**")
+                .addFiles(FileUpload.fromData(file, file.getName()))
+                .queue(null, error -> event.getChannel()
+                        .sendMessage("❌ **No se pudo enviar el archivo:** " + sanitize(describe(error))).queue());
+    }
 
     /** Se llama al cerrar una temporada (desde el hilo del planificador o desde un comando). */
     private void onSeasonClosed(String guildId, long closedSeason, long newSeason, Optional<Path> csv) {
@@ -539,7 +617,7 @@ public class Commands extends ListenerAdapter {
             msg.append("\n⚠️ La privadita que estaba en curso se ha cancelado por el cambio de temporada.");
         }
         if (csv.isPresent()) {
-            msg.append("\n📄 Clasificación final adjunta.");
+            msg.append("\n📄 Clasificación final adjunta (también con `$csvTemporada ").append(closedSeason).append("`).");
             File file = csv.get().toFile();
             channel.sendMessage(msg.toString()).addFiles(FileUpload.fromData(file, file.getName())).queue();
         } else {
